@@ -1,0 +1,130 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[T1]{fontenc}   
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+
+% font
+\usepackage{times}
+
+% enable hyperref for example from index
+\usepackage[colorlinks=false, pdfborder={0 0 0}]{hyperref}
+
+% images
+\usepackage{graphicx}
+\graphicspath{{img/}}
+
+% interline
+\renewcommand{\baselinestretch}{1.5} 
+
+% page geom
+\usepackage[margin=1in]{geometry}
+
+\usepackage{lastpage} % per tenere traccia del numero totale di pagine
+\usepackage{fancyhdr} % per definire uno stile di numerazione personalizzato
+
+\usepackage{lipsum} % TODO: temporaneo, solo per riempire con contenuto casuale
+
+\begin{document}
+
+\begin{titlepage}
+
+\begin{center}
+
+% marchio di ateneo
+\includegraphics[width=6.5cm,height=4.7cm]{marchio-di-ateneo}
+
+\vspace{10mm}
+
+{Dipartimento di Informatica - Scienza e Ingegneria - DISI} 
+
+\vspace{5mm}
+
+{\large{Corso di Laurea in Ingegneria e Scienze Informatiche}}
+
+\vspace{15mm}
+
+{\huge{\bf{IMPLEMENTAZIONE CUDA DI}}}\\
+\vspace{3mm}
+{\huge{\bf{UN ALGORITMO DI PROIEZIONE}}}\\
+\vspace{3mm}
+{\huge{\bf{TOMOGRAFICA}}}\\
+\vspace{3mm}
+
+\vspace{5mm}
+{Tesi di Laurea in Ingegneria e Scienze Informatiche}
+
+\end{center}
+
+\vspace{10mm}
+
+\noindent\begin{minipage}[t]{0.40\textwidth}
+{\large{Relatore: \\ Prof. Moreno Marzolla}}
+
+\vspace{3mm}
+
+{\large{Correlatore: \\ Prof. Elena Loli Piccolomini}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.40\textwidth}\raggedleft
+{\large{Presentata da: \\ Enrico Marchionni}}
+\end{minipage}
+
+\vfill
+
+\hrule height 0.6mm
+
+\begin{center}
+{Sessione marzo 2025\\}
+{Anno Accademico 2024/2025\\}
+\end{center}
+
+\end{titlepage}
+
+\begin{abstract}
+\lipsum[1-3]
+\end{abstract}
+
+\fancypagestyle{fancy}{\fancyfoot[C]{\thepage}}
+\fancypagestyle{plain}{\fancyfoot[C]{\thepage}}
+\pagestyle{fancy}
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+
+\fancypagestyle{fancy}{\fancyfoot[C]{\thepage\ di \pageref{LastPage}}}
+\fancypagestyle{plain}{\fancyfoot[C]{\thepage\ di \pageref{LastPage}}}
+\pagestyle{fancy}
+\newpage
+\pagenumbering{arabic}
+
+% Chapter 1
+\chapter{L'inizio}
+
+\section{Predisponendo la scena}
+\lipsum[1-2] % Placeholder text
+\section{Un primo incontro}
+\lipsum[3-4]
+
+% Chapter 2
+\chapter{Una nuova scoperta}
+
+\section{Eventi inaspettati}
+\lipsum[5-6]
+\section{Un cambiamento degli eventi}
+\lipsum[7-8]
+
+% Chapter 3
+\chapter{La risoluzione}
+
+\section{Conflitto finale}
+\lipsum[9-10]
+\section{Riflessioni di chiusura}
+\lipsum[11-12]
+
+\appendix
+
+\chapter{Conclusioni}
+\lipsum[13]
+
+\end{document}
