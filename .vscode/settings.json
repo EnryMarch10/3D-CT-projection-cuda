@@ -1,5 +1,10 @@
 {
     "cSpell.words": [
+        "inputgen",
         "Siddon"
-    ]
+    ],
+    "files.associations": {
+        "stdio.h": "c",
+        "stdlib.h": "c"
+    }
 }
