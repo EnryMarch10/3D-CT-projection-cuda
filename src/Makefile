@@ -114,10 +114,10 @@ purge:
 DIR_INPUT := input
 
 CUBE_WITH_SPHERICAL_HOLE := cube_with_spherical_hole
-SPHERE := sphere
+HALF_SPHERE := half_sphere
 CUBE := cube
 
-SHAPES := $(CUBE_WITH_SPHERICAL_HOLE) $(SPHERE) $(CUBE)
+SHAPES := $(CUBE_WITH_SPHERICAL_HOLE) $(HALF_SPHERE) $(CUBE)
 
 inputs: $(addprefix $(DIR_INPUT)/, $(addsuffix .dat, $(SHAPES)))
 
@@ -125,9 +125,9 @@ $(DIR_INPUT)/$(CUBE_WITH_SPHERICAL_HOLE).dat: $(DIR_BIN)/$(EXE_INPUT)
 	@mkdir -p $(DIR_INPUT)
 	$< $@ $(CUBE_WITH_SPHERICAL_HOLE) $(WORK_SIZE)
 
-$(DIR_INPUT)/$(SPHERE).dat: $(DIR_BIN)/$(EXE_INPUT)
+$(DIR_INPUT)/$(HALF_SPHERE).dat: $(DIR_BIN)/$(EXE_INPUT)
 	@mkdir -p $(DIR_INPUT)
-	$< $@ $(SPHERE) $(WORK_SIZE)
+	$< $@ $(HALF_SPHERE) $(WORK_SIZE)
 
 $(DIR_INPUT)/$(CUBE).dat: $(DIR_BIN)/$(EXE_INPUT)
 	@mkdir -p $(DIR_INPUT)
