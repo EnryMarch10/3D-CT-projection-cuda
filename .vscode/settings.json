@@ -1,4 +1,7 @@
 {
+    "editor.rulers": [
+        130
+    ],
     "cSpell.words": [
         "inputgen",
         "Siddon"

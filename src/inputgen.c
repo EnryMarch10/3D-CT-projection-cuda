@@ -85,7 +85,7 @@ followed by the other slices in ascending order of the y coordinate.
 #define DEFAULT_FILE_NAME "input.dat"
 
 #define CUBE "cube"
-#define SPHERE "sphere"
+#define SPHERE "half_sphere"
 #define CUBE_WITH_SPHERICAL_HOLE "cube_with_spherical_hole"
 
 /**
@@ -152,13 +152,14 @@ void generateCubeSlice(double *f, int nOfSlices, int offset, int sideLength)
     const int innerToOuterDiff = gl_nVoxel[X] / 2 - sideLength / 2;
     const int rightSide = innerToOuterDiff + sideLength;
 
+    // Iterates over each voxel of the grid
 #pragma omp parallel for collapse(3) default(none) shared(f, nOfSlices, gl_nVoxel, offset, sideLength, innerToOuterDiff, rightSide)
     for (int n = 0 ; n < nOfSlices; n++) {
         for (int i = 0; i < gl_nVoxel[Z]; i++) {
             for (int j = 0; j < gl_nVoxel[X]; j++) {
-                f[(gl_nVoxel[Z]) * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0;
                 if ((i >= innerToOuterDiff) && (i <= rightSide) && (j >= innerToOuterDiff) && (j <= rightSide)
                     && (n + offset >= innerToOuterDiff) && (n + offset <=  gl_nVoxel[Y] - innerToOuterDiff)) {
+                    // Voxel position is inside the cubic object
                     f[gl_nVoxel[Z] * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 1.0;
                 } else {
                     f[gl_nVoxel[Z] * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
@@ -173,6 +174,7 @@ void generateCubeSlice(double *f, int nOfSlices, int offset, int sideLength)
 */
 void generateSphereSlice(double *f, int nOfSlices, int offset, int diameter)
 {
+    // Iterates over each voxel of the grid
 #pragma omp parallel for collapse(3) default(none) shared(f, nOfSlices, gl_nVoxel, offset, diameter, gl_objectSideLength, gl_voxelYDim, gl_voxelXDim, gl_voxelZDim)
     for (int n = 0; n < nOfSlices; n++) {
         for (int r = 0; r < gl_nVoxel[Z]; r++) {
@@ -183,9 +185,10 @@ void generateSphereSlice(double *f, int nOfSlices, int offset, int diameter)
                 temp.z = -(gl_objectSideLength / 2) + (gl_voxelZDim / 2) + (r) * gl_voxelZDim;
                 const double distance = sqrt(pow(temp.x, 2) + pow(temp.y, 2) + pow(temp.z, 2));
                 if (distance <= diameter && c < gl_nVoxel[Z] / 2) {
-                    f[(gl_nVoxel[Z]) * r + c + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 1;
+                    // Voxel position is inside the sphere object
+                    f[gl_nVoxel[Z] * r + c + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 1.0;
                 } else {
-                    f[(gl_nVoxel[Z]) * r + c + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
+                    f[gl_nVoxel[Z] * r + c + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
                 }
             }
         }
@@ -206,7 +209,7 @@ void generateCubeWithSphereSlice(double *f, int nOfSlices, int offset, const int
     for (int n = 0 ; n < nOfSlices; n++) {
         for (int i = 0; i < gl_nVoxel[Z]; i++) {
             for (int j = 0; j < gl_nVoxel[X]; j++) {
-                f[(gl_nVoxel[Z]) * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0;
+                f[(gl_nVoxel[Z]) * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
                 if ((i >= innerToOuterDiff) && (i <= rightSide) && (j >= innerToOuterDiff) && (j <= rightSide)
                     && (n + offset >= innerToOuterDiff) && (n + offset <=  gl_nVoxel[Y] - innerToOuterDiff)) {
                     // Voxel position is inside the cubic object
@@ -217,12 +220,9 @@ void generateCubeWithSphereSlice(double *f, int nOfSlices, int offset, const int
                     const double distance = sqrt(pow(temp.x - sphereCenter.x, 2) + pow(temp.y - sphereCenter.y, 2) + pow(temp.z - sphereCenter.z, 2));
 
                     if (distance > sideLength * gl_voxelXDim / 6) {
-                        // Voxel position is inside the cubic object and inside the spherical cavity
+                        // Voxel position is outside the spherical cavity
                         f[(gl_nVoxel[Z]) * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 1.0;
                     }
-                } else {
-                    // Voxel position is outside the cubic object
-                    f[(gl_nVoxel[Z]) * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
                 }
             }
         }
