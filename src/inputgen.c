@@ -237,8 +237,8 @@ int main(int argc, char *argv[])
 
     if (argc > 4) {
         fprintf(stderr,
-            "Usage:\n%s DEST [OBJECT] [PIXELS]\nWhere:\n"
-            " - DEST: is the output file name, default is '%s'.\n"
+            "Usage:\n%s [DEST] [OBJECT] [PIXELS]\nWhere:\n"
+            " - [DEST]: is the output file name, default is '%s'.\n"
             " - [OBJECT]: can be: '%s' (default), '%s' or '%s'.\n"
             " - [PIXELS]: is the number of pixels per side of the detector, every other parameter is set based to its"
             " value, if no value is given, default values are used.\n",
@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
                 objectType = 2;
             } else if (strcmp(argv[2], CUBE) != 0) {
                 fprintf(stderr,
-                    "Usage:\n%s DEST [OBJECT] [PIXELS]\nWhere:\n"
+                    "Usage:\n%s [DEST] [OBJECT] [PIXELS]\nWhere:\n"
                     " - [OBJECT]: can be: '%s' (default), '%s' or '%s', nothing else is accepted.\n",
                     CUBE,
                     SPHERE,
