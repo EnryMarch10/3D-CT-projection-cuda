@@ -1,26 +1,59 @@
-@thesis{Colletta2025,
-  author      = {Lorenzo Colletta},
+@Thesis{Colletta2024,
+  author      = {Colletta, Lorenzo},
   title       = {Implementazione parallela di un algoritmo di proiezione tomografica},
   type        = {Tesi di laurea triennale},
   institution = {Ingegneria e Scienze Informatiche, Università di Bologna, Cesena},
   year        = {2024/2025},
 }
 
-@inbook{Siddon1984,
-  author       = {Robert L. Siddon},
-  title        = {Fast calculation of the exact radiological path for a three dimensional CT array},
-  organization = {Department of Radiation Therapy and Joint Center for Radiation Therapy, Harvard Medical School, Boston},
-  volume       = {12},
-  number       = {2},
-  pages        = {252-255},
-  publisher    = {Medical Physics},
-  year         = {1984},
+@Article{Siddon1984,
+  author = {Siddon, Robert L.},
+  title = {Fast calculation of the exact radiological path for a three-dimensional CT array},
+  journal = {Medical Physics},
+  volume = {12},
+  number = {2},
+  pages = {252-255},
+  keywords = {Medical imaging, Non-ionizing radiation equipment and techniques, Biomedical imaging, RADIOTHERAPY, INHOMOGENEITY,
+  BIOMEDICAL RADIOGRAPHY, COMPUTERIZED TOMOGRAPHY, DIAGNOSTIC TECHNIQUES, Computed tomography, Radiation therapy,
+  Radiation treatment, Dosimetry, Medical imaging, Radiography},
+  doi = {https://doi.org/10.1118/1.595715},
+  url = {https://aapm.onlinelibrary.wiley.com/doi/abs/10.1118/1.595715},
+  eprint = {https://aapm.onlinelibrary.wiley.com/doi/pdf/10.1118/1.595715},
+  abstract = {Ready availability has prompted the use of computed tomography (CT) data in various applications in radiation
+  therapy. For example, some radiation treatment planning systems now utilize CT data in heterogeneous dose calculation
+  algorithms. In radiotherapy imaging applications, CT data are projected onto specified planes, thus producing “radiographs,”
+  which are compared with simulator radiographs to assist in proper patient positioning and delineation of target volumes.
+  All these applications share the common geometric problem of evaluating the radiological path through the CT array.
+  Due to the complexity of the three-dimensional geometry and the enormous amount of CT data, the exact evaluation of the
+  radiological path has proven to be a time consuming and difficult problem.
+  This paper identifies the inefficient aspect of the traditional exact evaluation of the radiological path as that of treating
+  the CT data as individual voxels. Rather than individual voxels, a new exact algorithm is presented that considers the CT data
+  as consisting of the intersection volumes of three orthogonal sets of equally spaced, parallel planes. For a three-dimensional
+  CT array of N3 voxels, the new exact algorithm scales with 3N, the number of planes, rather than N3, the number of voxels.
+  Coded in fortran-77 on a VAX 11/780 with a floating point option, the algorithm requires approximately 5 ms to calculate an
+  average radiological path in a 1003 voxel array.},
+  year = {1985}
 }
 
-@manual{MoroLoli2022,
-  author       = {Elena Morotti, Elena Loli Piccolomini},
-  title        = {Sparse Regularized CT Reconstruction: An Optimization Perspective},
-  organization = {Department of Political and Social Sciences with Department of Computer Science and Engineering, University of Bologna, Bologna},
-  year         = {2022},
-  note         = {34 pages},
+@Inbook{MoroLoli2021,
+  author = "Morotti, Elena and Piccolomini, Elena Loli",
+  editor = "Chen, Ke and Sch{\"o}nlieb, Carola-Bibiane and Tai, Xue-Cheng and Younces, Laurent",
+  title = "Sparse Regularized CT Reconstruction: An Optimization Perspective",
+  bookTitle = "Handbook of Mathematical Models and Algorithms in Computer Vision and Imaging: Mathematical Imaging and Vision",
+  year = "2021",
+  publisher = "Springer International Publishing",
+  address = "Cham",
+  pages = "1--34",
+  abstract = "In Computed Tomography (CT), decreasing the X-rays dose is essential to reduce the negative effects of radiation
+  exposure on the human health. One possible way to accomplish it is to reduce the number of projections acquired, hence the name
+  of sparse CT. Traditional methods for image reconstruction cannot recover reliable images in this case: the lack of information
+  due to the missed projections produces strong artifacts. Alternatively, optimization frameworks are flexible models where
+  incorporated regularization functions impose regularity constraints on the solution, thus avoiding unwanted artifacts and
+  contrasting noise propagation. Since the iterative methods solving the optimization problem calculate more accurate solutions as
+  iterations (and computational time) increase, it is possible to choose a better reconstructed image at the expense of execution
+  time, or viceversa. Parallel implementations of the iterative solvers significantly reduce the computational time, allowing for
+  a large number of iterations in a prefixed short time.",
+  isbn = "978-3-030-03009-4",
+  doi = "10.1007/978-3-030-03009-4_123-1",
+  url = "https://doi.org/10.1007/978-3-030-03009-4_123-1"
 }

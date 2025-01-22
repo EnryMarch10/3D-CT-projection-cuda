@@ -6,19 +6,26 @@
 \usepackage{times} % Selected font
 \usepackage{xcolor} % Colors
 \usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
+\usepackage{float} % For anchor options
 \usepackage{graphicx} % Images
 \graphicspath{{img/}}
+\newcounter{figcounter} % Initialize new counter to 0
 \usepackage{setspace} % For flexible line spacing management
 \usepackage[margin=1in]{geometry} % Page geom
 \usepackage{lastpage} % To track the total number of pages
 \usepackage{fancyhdr} % To define a custom page numbering style
 \usepackage[backend=biber, style=alphabetic, sorting=ydnt]{biblatex} % To include bibliography
 \addbibresource{riferimenti.bib}
-
-\setlength{\parskip}{1em}
-\setlength{\parindent}{0pt}
+\usepackage{amsmath} % Necessary for \text{} command inside maths notations
+\setlength{\parskip}{1em} % Set global paragraph spacing
+\setlength{\parindent}{0pt} % No paragraph indentation
+% Remove \parskip after figures
+\BeforeBeginEnvironment{figure}{\setlength{\parskip}{0pt}}
+\AfterEndEnvironment{figure}{\addtolength{\parskip}{1pt}}
 \usepackage{enumitem} % To avoid interline between bullets and text before them
 \setlist[itemize]{topsep=0pt, partopsep=0pt, parsep=0pt}
+\usepackage{tikz} % To draw graphs
+\usetikzlibrary{3d} % For 3D graphs
 
 \begin{document}
 
@@ -103,7 +110,7 @@ proiezioni che una TC potrebbe generare.
 Gli obiettivi di questo lavoro sono:
 \begin{itemize}
   \item Implementare una versione CUDA di un certo algoritmo di proiezione proposto da Siddon \cite{Siddon1984} partendo da
-        una sua implementazione parallela in C che sfrutta OpenMP \cite{Colletta2025}.
+        una sua implementazione parallela in C che sfrutta OpenMP \cite{Colletta2024}.
   \item Analizzare le prestazioni della versione CUDA per GPU e confrontarle con la versione parallela per CPU già nota.
 \end{itemize}
 \end{abstract}
@@ -121,10 +128,407 @@ Gli obiettivi di questo lavoro sono:
 \newpage
 \pagenumbering{arabic}
 
-% Chapter 1
 \chapter{Introduzione}
 
-\dots
+Una proiezione è una matrice i cui valori rappresentano l'attenuazione dei raggi X che attraversano il corpo oggetto di studio.
+Considerando un'immagine generata a partire della matrice proiezione, i colori rappresentano graficamente i vari livelli di
+attenuazione: un raggio che attraversa una regione più densa del corpo subisce una maggiore attenuazione rispetto ad un
+raggio che attraversa una regione meno densa.
+
+Durante una scansione tomografica sono acquisite numerose immagini attorno all'oggetto di studio.
+Nel caso più semplice, che noi considereremo, si possono considerare le diverse angolazioni di una traiettoria circolare.
+Intuitivamente più sono le proiezioni acquisite, più la ricostruzione dell'oggetto sarà efficace.
+D'altra parte, specialmente in ambito medico, ridurre l'esposizione alle radiazioni è di beneficio per l'individuo scansionato.
+Questo implica che il numero di proiezioni generate è esso stesso molto variabile in base all'applicazione.
+
+Nelle sezioni seguenti, verrà descritto il modello matematico alla base della computazione, questo sarà direttamente collegato con
+le sue applicazioni nell'algoritmo risolutivo, infine una descrizione del problema dal punto di vista geometrico sarà
+esaminata (seguendo \cite{Colletta2024}).
+
+\section{Il modello matematico}
+
+Di seguito discusse le nozioni matematiche fondamentali per comprendere, dal punto di vista algebrico, il calcolo
+alla base della creazione delle proiezioni, vedi \cite{MoroLoli2021}.
+
+\subsection{La legge di Lambert-Beer}
+
+Dal punto di vista fisico, i dati di proiezione riflettono l'assorbimento dei fotoni che costituiscono i raggi X, e l'immagine
+dell'oggetto scansionato è una rappresentazione della mappa dei coefficienti di attenuazione in pseudo-colori.
+Il modello fisico che descrive l'assorbimento dei fotoni in termini di coefficienti di attenuazione è descritto dalla legge di
+Lambert-Beer.
+
+Il meccanismo fisico che porta all'attenuazione dell'intensità dei raggi è solitamente descritto da un singolo coefficiente di
+attenuazione \(\mu = \mu(w) \ge 0\) che dipende dalla posizione lungo percorso del raggio, indicata da \(w\).
+Questi coefficienti determinano i vari \(m(w)\), cioè le intensità del raggio nella posizione indicata da \(w\).
+
+La \textbf{legge di Lambert-Beer} per il calcolo della proiezione del coefficiente di attenuazione lungo un segmento di lunghezza
+\(W\):
+\begin{equation} \label{eq:law_lambert-beer}
+  P_W\mu = - \ln{(\frac{m}{m_0})} = \int_0^W \mu(w) \, dw
+\end{equation}
+
+Dove:
+\begin{itemize}
+  \item \(m\) è l'intensità finale del raggio, dopo aver attraversato il materiale.
+  \item \(m_0\) è l'intensità iniziale del raggio.
+  \item \(\mu(w)\) è una funzione continua che descrive il coefficiente di attenuazione alla posizione \(w\) lungo il raggio.
+  \item \(W\) è la lunghezza totale del percorso attraverso il materiale.
+\end{itemize}
+
+\subsection{La trasformata di Radon}
+
+La \textbf{trasformata di Radon}, in un modello continuo, è data dall'insieme delle proiezioni acquisite lungo l'intera
+traiettoria circolare.
+La rappresentazione grafica di tutti i dati misurati nel caso bidimensionale è chiamata \textit{sinogramma}.
+
+\subsection{Il caso discreto}
+
+Nel caso discreto il corpo è diviso in volumi più piccoli, detti \textbf{voxel}, che sono elementi di dimensione molto piccola in
+cui il corpo è approssimato.
+Per ciascun voxel il coefficiente di attenuazione è un valore approssimato costante.
+
+L'\autoref{eq:law_lambert-beer} nel caso discreto, per calcolare una singola proiezione, diventa:
+\begin{equation} \label{eq:law_lambert-beer_discrete}
+  g_i = \sum_{j=0}^N M_{i, j} f_j \quad \forall i \in 1, \dots, n_p
+\end{equation}
+
+Dove:
+\begin{itemize}
+  \item \(j\) è il \(j\)-esimo voxel (degli \(N\) totali).
+  \item \(i\) è l'\(i\)-esimo raggio considerato.
+  \item \(n_p\) è il numero di raggi usati per il calcolo della proiezione.
+  \item \(N\) è il numero di voxel che costituiscono il corpo, dato da \(N_x \cdot N_y \cdot N_z\).
+  \item \(g_i\) è l'attenuazione subita dall'\(i\)-esimo raggio.
+  \item \(M\) è una matrice di \(n_p \times N\) elementi che per ogni raggio definisce la lunghezza della porzione sottesa al
+        volume di ciascun voxel.
+  \item \(f_j\) è il valore del coefficiente di attenuazione assunto nel volume interno al \(j\)-esimo voxel.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \resizebox{0.8\textwidth}{!}{
+    \begin{tikzpicture}[x={(0.9cm,-0.3cm)}, y={(0cm,1cm)}, z={(-0.9cm,-0.3cm)}]
+
+    % Draw the grid on the top face
+    \foreach \i in {0,...,6} {
+      \draw[gray] (\i,6,0) -- (\i,6,6);
+      \draw[gray] (0,6,\i) -- (6,6,\i);
+    }
+    
+    % Draw the grid on the left face
+    \foreach \i in {0,...,6} {
+      \draw[gray] (\i,0,6) -- (\i,6,6);
+      \draw[gray] (0,\i,6) -- (6,\i,6);
+    }
+    
+    % Draw the grid on the right face
+    \foreach \i in {0,...,6} {
+      \draw[gray] (6,0,\i) -- (6,6,\i);
+      \draw[gray] (6,\i,0) -- (6,\i,6);
+    }
+    
+    % Outline the cube
+    \draw[thick] (0,6,0) -- (6,6,0) -- (6,6,6) -- (0,6,6) -- (0,6,0); % Top face
+    \draw[thick] (0,0,6) -- (6,0,6) -- (6,0,0); % Bottom face
+    \draw[thick] (0,6,6) -- (0,0,6); % Left vertical
+    \draw[thick] (6,6,6) -- (6,0,6); % Center vertical
+    \draw[thick] (6,6,0) -- (6,0,0); % Right vertical
+    
+    % Add axis arrows
+    \draw[->,thick] (6,0,0) -- (8,0,0) node[below right] {$x$}; % x-axis
+    \draw[->,thick] (0,6,0) -- (0,8,0) node[left] {$y$};        % y-axis
+    \draw[->,thick] (0,0,6) -- (0,0,8) node[below left] {$z$};  % z-axis
+    
+    % Add a point above the cube
+    \draw[dashed] (3,6,3) -- (3,6.9,3);
+    % \fill[green] (3,7,3) circle (4pt);
+    % \node[above, draw=none] at (3,7.1,3) {Source};
+    \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=0pt, label=above:Source] at (3,6.9,3) {};
+
+    % Label the cube sides
+    \node[below left] at (3,0,6) {$N_x$};
+    \node[below right] at (6,0,3) {$N_z$};
+    \node[left] at (0,3,6) {$N_y$};
+      
+    \end{tikzpicture}
+  }
+  \caption{\label{fig:CT_ex_cube_voxels} Esempio di oggetto cubico suddiviso in \(N = N_x \cdot N_y \cdot N_z\) voxel cubici.
+           Solitamente i voxel sono dei parallelepipedi, nel caso più semplice possono essere dei cubi con una dimensione
+           \(d = d_x = d_y = d_z\) fissata in base alle necessità.}
+\end{figure}
+
+Nel caso discreto della trasformata di Radon il numero di proiezioni dipende dal numero di posizioni considerate in cui si
+posiziona la sorgente, tale numero verrà di seguito indicato con \(N_\theta\).
+In \autoref{fig:CT_ex_cube_voxels} solo una di queste proiezioni verrà catturata, visto che la sorgente è posta in una posizione
+fissata, ad un certo angolo.
+
+\section{Algoritmo risolutivo}
+
+Considerando quanto già visto nel modello matematico, nel nostro caso l'algoritmo di Siddon si occupa di determinare la matrice
+\(M\), mentre il vettore \(f\) deve essere già noto in partenza.
+Questa matrice e vettore rispettivamente devono essere noti per poter procedere con la computazione.
+
+L'algoritmo svolge una computazione equivalente a quella descritta nell'\autoref{eq:law_lambert-beer_discrete}:
+\begin{equation*}
+  d = \sum_i \sum_j \sum_k l(i, j, k) \rho(i, j, k)
+\end{equation*}
+dove i parametri \(i\), \(j\) e \(k\) individuano un singolo voxel nello spazio tridimensionale.
+In particolare, considerando una specifica configurazione di \((i, j, k)\), \(l\) rappresenta la lunghezza sottesa in quel
+voxel (equivalente di \(M\)) mentre \(\rho\) rappresenta la densità del voxel (equivalente di \(f\)).
+
+\subsection{La matrice \(M\)}
+
+\begin{figure}[H]
+  \centering
+  \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}
+    % Left panel
+    \begin{scope}
+      \refstepcounter{figcounter} % Increment the counter
+      % Grid
+      \draw[step=1cm, gray, thin] (0,0) grid (6,6);
+
+      % Source and detector
+      \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=1.5pt, label=above:Source] (source1) at (-2, 6.5) {};
+      \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=1.5pt, label=below:Detector] (detector1) at (6.5, -2) {};
+
+      % Ray line
+      \draw[gray, thick] (source1) -- (detector1);
+
+      % Intersections
+      \foreach \i in {0,...,9}{
+        \fill[black] (0 + \i * 0.5,4.5 - \i * 0.5) circle (3pt);
+      }
+      \node at (-0.5,-0.5) {(\alph{figcounter})}; % Use the counter for the label
+    \end{scope}
+    % Arrow
+    \node at (7.5, 3) {\Huge\textbf{$\rightarrow$}};
+    % Right panel
+    \begin{scope}[shift={(11,0)}]
+      \refstepcounter{figcounter} % Increment the counter
+      % Planes
+      \foreach \y in {0,...,6} {
+        \draw[gray, thin] (-2,\y) -- (8,\y); % Horizontal lines
+      }
+      \foreach \x in {0,...,6} {
+          \draw[gray, thin] (\x,-2) -- (\x,8); % Vertical lines
+      }
+
+      % Source and detector
+      \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=0pt, label=above:Source] (source2) at (-2, 6.5) {};
+      \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=0pt, label=below:Detector] (detector2) at (6.5, -2) {};
+
+      % Ray line
+      \draw[gray, thick] (source2) -- (detector2);
+
+      % Intersections
+      \fill[red] (-1.5,6.0) circle (3pt);
+      \fill[red] (-0.5,5.0) circle (3pt);
+      \foreach \i in {0,...,9}{
+        \fill[black] (0 + \i * 0.5,4.5 - \i * 0.5) circle (3pt);
+      }
+      \fill[red] (5.0,-0.5) circle (3pt);
+      \fill[red] (6.0,-1.5) circle (3pt);
+      \node at (-0.5,-0.5) {(\alph{figcounter})}; % Use the counter for the label
+    \end{scope}
+    \end{tikzpicture}
+  }
+  \caption{\label{fig:CT_Siddon_grid_to_planes} Pixel (voxel nel caso 2D) considerati come piani paralleli che ne rappresentano
+           la struttura.
+           Come si può notare alcune intersezioni tra il raggio e i piani non sono valide perché fuori dalla griglia, guarda i
+           puntini rossi della figura \textit{b}.
+           La matrice \(M\) per questo raggio specificherà per ciascun pixel della griglia la lunghezza del segmento del raggio
+           all'interno di quel pixel.}
+\end{figure}
+
+I punti chiave dell'algoritmo, nella determinazione della matrice \(M\), possono essere così riassunti:
+\begin{itemize}
+  \item L'algoritmo considera, invece dei singoli voxel indipendenti, tre insiemi (spazio 3D) di rette ortogonali ed equidistanti
+        tra loro che vanno a costruire la griglia di discretizzazione del corpo nello spazio
+        \autoref{fig:CT_Siddon_grid_to_planes}.
+  \item Si calcolano i punti di intersezione tra le rette (i raggi) e i piani che definiscono i voxel.
+  \item Si calcola la lunghezza dei segmenti sottesi ai voxel, come la differenza tra punti di intersezione consecutivi.
+\end{itemize}
+
+\subsection{Il vettore \(f\)}
+
+Il vettore \(f\) rappresenta il coefficiente di attenuazione assunto nella regione interna al volume sotteso da ciascun voxel.
+Presenta dunque un numero di elementi pari al numero di voxel in cui è suddiviso l'oggetto.
+
+Le tre diverse configurazioni, fornite da \cite{Colletta2024}, sono state qui riutilizzate:
+\begin{itemize}
+  \item Un \textbf{cubo}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi all'interno della
+        regione cubica sono posti ad 1, altrimenti a 0.
+  \item Una \textbf{semi-sfera}: stabilita la lunghezza del raggio della semisfera che si intende rappresentare, gli elementi
+        all'interno della regione semisferica sono posti ad 1, altrimenti a 0.
+  \item Un \textbf{cubo con cavità sferica}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi
+        all'interno della regione cubica, ad eccezione da quelli la cui distanza da un punto stabilito all'interno dell'oggetto
+        sia inferiore ad un raggio stabilito, sono posti ad 1, altrimenti a 0.
+\end{itemize}
+
+\section{Considerazioni geometriche}
+
+Questa sezione approfondisce le considerazioni geometriche necessarie per poter procedere con l'implementazione dell'algoritmo di
+Siddon.
+
+\subsection{I piani}
+
+L'equazione cartesiana di un piano nello spazio tridimensionale è un'equazione di primo grado in tre incognite:
+\begin{equation*}
+  ax + by + cz + d = 0 \quad \text{con } a, b, c, d \in \Re
+\end{equation*}
+
+Nell'algoritmo di Siddon, i piani considerati sono quelli che delimitano i volumi sottesi ai voxel.
+I voxel, come già detto, hanno dimensioni uniformi e forma di parallelepipedi.
+Di conseguenza i piani coinvolti sono paralleli agli assi cartesiani, dunque le loro equazioni sono nella forma:
+\begin{align*}
+  ax + d &= 0 \quad \text{se parallelo al piano } yz \\
+  by + d &= 0 \quad \text{se parallelo al piano } xz \\
+  cz + d &= 0 \quad \text{se parallelo al piano } xy
+\end{align*}
+
+Dato che le distanze tra i piani paralleli sono regolari, data l'equazione di un piano è possibile determinare l'equazione degli
+altri traslando più volte.
+L'equazione degli altri piani a partire dal primo si determina nel seguente modo:
+\begin{align*}
+  X_{plane}(i) &= X_{plane}(1) + (i - 1) d_x \quad \forall i \in 1, \dots, N_x \\
+  Y_{plane}(j) &= Y_{plane}(1) + (j - 1) d_y \quad \forall j \in 1, \dots, N_y \\
+  Z_{plane}(k) &= Z_{plane}(1) + (k - 1) d_z \quad \forall k \in 1, \dots, N_z
+\end{align*}
+
+dove \(N_x\), \(N_y\) e \(N_z\) sono il numero di voxel lungo gli assi \(x\), \(y\) e \(z\), mentre \(d_x\), \(d_y\) e \(d_z\)
+sono a loro volta le dimensioni dei voxel lungo i tre assi cartesiani.
+
+\subsection{Retta rappresentante un raggio}
+
+Un raggio può essere rappresentato mediante l'equazione parametrica di una retta passante per due punti
+\(Source = (X_1, Y_1, Z_1)\) e \(Detector = (X_2, Y_2, Z_2)\):\
+\begin{align*}
+  X(a) &= X_1 + a (X_2 - X_1) \\
+  Y(a) &= Y_1 + a (Y_2 - Y_1) \\
+  Z(a) &= Z_1 + a (Z_2 - Z_1)
+\end{align*}
+
+\setcounter{figcounter}{0}
+\begin{figure}[H]
+  \centering
+  \resizebox{\textwidth}{!}{
+    \begin{tikzpicture}
+    % Left-up panel
+    \begin{scope}[shift={(0,9)}]
+        \refstepcounter{figcounter} % Increment the counter
+        % Grid
+        \draw[step=1cm, gray, thin] (0,0) grid (6,6);
+
+        % Source and detector
+        \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=1.5pt, label=above:Source] (source1) at (-2, 6.5) {};
+        \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=1.5pt, label=below:Detector] (detector1) at (6.5, -2) {};
+
+        % Ray line
+        \draw[gray, thick] (source1) -- (detector1);
+
+        % Parameters
+        \fill[black] (0,4.5) circle (3pt);
+        \node[right, draw=none] at (0,4.5) {\(a_{min}\)};
+        \fill[black] (4.5,0) circle (3pt);
+        \node[above, draw=none] at (4.6,0.2) {\(a_{max}\)};
+        \node at (-0.5,-0.5) {(\alph{figcounter})}; % Use the counter for the label
+    \end{scope}
+    % Right-up panel
+    \begin{scope}[shift={(9,9)}]
+      \refstepcounter{figcounter} % Increment the counter
+      % Grid
+      \draw[step=1cm, gray, thin] (0,0) grid (6,6);
+
+      % Source and detector
+      \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=1.5pt, label=above:Source] (source2) at (1, 3.5) {};
+      \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=1.5pt, label=below:Detector] (detector2) at (6.5, -2) {};
+
+      % Ray line
+      \draw[gray, thick] (source2) -- (detector2);
+
+      % Intersections
+      \node[right, draw=none] at (1.2, 3.5) {\(a_{min} = 0\)};
+      \fill[black] (4.5,0) circle (3pt);
+      \node[above, draw=none] at (4.6,0.2) {\(a_{max}\)};
+      \node at (-0.5,-0.5) {(\alph{figcounter})}; % Use the counter for the label
+    \end{scope}
+    % Left-down panel
+    \begin{scope}[shift={(0,0)}]
+        \refstepcounter{figcounter} % Increment the counter
+        % Grid
+        \draw[step=1cm, gray, thin] (0,0) grid (6,6);
+
+        % Source and detector
+        \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=1.5pt, label=above:Source] (source3) at (-2, 6.5) {};
+        \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=1.5pt, label=below:Detector] (detector3) at (3.5, 1) {};
+
+        % Ray line
+        \draw[gray, thick] (source3) -- (detector3);
+
+        % Intersections
+        \fill[black] (0,4.5) circle (3pt);
+        \node[right, draw=none] at (0,4.5) {\(a_{min}\)};
+        \node[above, draw=none] at (4,1.2) {\(a_{max} = 1\)};
+        \node at (-0.5,-0.5) {(\alph{figcounter})}; % Use the counter for the label
+    \end{scope}
+    % Right-down panel
+    \begin{scope}[shift={(9,0)}]
+      \refstepcounter{figcounter} % Increment the counter
+      % Grid
+      \draw[step=1cm, gray, thin] (0,0) grid (6,6);
+
+      % Source and detector
+      \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=1.5pt, label=above:Source] (source4) at (1, 3.5) {};
+      \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=1.5pt, label=below:Detector] (detector4) at (3.5, 1) {};
+
+      % Ray line
+      \draw[gray, thick] (source4) -- (detector4);
+
+      % Intersections
+      \node[right, draw=none] at (1.2, 3.5) {\(a_{min} = 0\)};
+      \node[above, draw=none] at (4,1.2) {\(a_{max} = 1\)};
+      \node at (-0.5,-0.5) {(\alph{figcounter})}; % Use the counter for the label
+    \end{scope}
+    \end{tikzpicture}
+  }
+  \caption{\label{fig:CT_Siddon_ranges} Le quantità \(a_{min}\) e \(a_{max}\) sono quelle che definiscono i range da considerare
+           per ottenere solo le intersezioni con piani effettivamente all'interno della griglia di pixel (voxel nel caso 3D).
+           Si può notare che \(a_{min}\) nelle figure \textit{a} e \textit{c} sarà maggiore di 0, così come \(a_{max}\) nelle
+           figure \textit{a} e \textit{b} sarà minore di 1.
+           Questo permette di non considerate le intersezioni in eccesso, esterne alla griglia di partenza.}
+\end{figure}
+
+In questo modo:
+\begin{itemize}
+  \item Per definire un raggio basta conoscere il punto "sorgente" ed il punto sul "rilevatore" dove avverrebbe la misurazione.
+  \item È possibile rappresentare un punto appartenente alla retta del raggio attraverso un unico parametro \(a\), in particolare
+        \(a = 0\) coincide con il punto \(1\), \(a = 1\) coincide con il punto \(2\), per i valori di \(a\) compresi tra
+        \([0, 1]\) si hanno i punti appartenenti al segmento di cui i due punti, \(Source\) e \(Detector\), sono gli estremi, vedi
+        \autoref{fig:CT_Siddon_ranges}.
+\end{itemize}
+
+Il punto di intersezione di un raggio ed un piano lo si ottiene risolvendo in \(a\) il sistema lineare dato dall'equazione del
+piano e una componente della retta come di seguito:
+\begin{equation}
+  \begin{aligned}
+    &\begin{cases}
+      X = X_1 + a (X_2 - X_1) \\
+      X = X_{planes}(1) + (i - 1) d_x
+    \end{cases} \quad \text{se } i \in 1, \dots, N_x \\
+    &\begin{cases}
+      Y = Y_1 + a (Y_2 - Y_1) \\
+      Y = Y_{planes}(1) + (i - 1) d_y
+    \end{cases} \quad \text{se } i \in 1, \dots, N_y \\
+    &\begin{cases}
+      Z = Z_1 + a (Z_2 - Z_1) \\
+      Z = Z_{planes}(1) + (i - 1) d_z
+    \end{cases} \quad \text{se } i \in 1, \dots, N_z
+  \end{aligned} \nonumber
+\end{equation}
+
+dove sono stati indicati i sistemi utilizzati nel caso in cui il piano sia parallelo al piano \(yz\) (primo sistema), al piano
+\(xz\) (secondo sistema) o al piano \(xy\) (terzo sistema).
 
 \appendix
 
