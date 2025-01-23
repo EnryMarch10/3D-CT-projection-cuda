@@ -19,59 +19,6 @@
  *
  ****************************************************************************/
 
-/***
-This program generates a three-dimensional voxel grid and stores it into the specified binary file.
-
-COMPILE:
-
-    gcc -Wall -Wpedantic -std=c99 -fopenmp inputgen.c ./source/voxel.c -I./source/ -lm -o inputgen
-
-This program can also be compiled so that the output file has no header (the 16 integer values described below). 
-This output file structure should not be used as input to the projection.c program. Use the -DRAW argument when compiling:
-
-    gcc -Wall -Wpedantic -std=c99 -fopenmp -DRAW inputgen.c ./source/voxel.c -I./source/ -lm -o inputgen
-
-RUN:
-
-    inputgen output.dat [object Type] [integer]
-
-- First parameter is the name of the file to store the output in;
-- Second parameter is optional and can be: 1 (solid cube with spherical cavity), 2 (solid sphere) or 3 (solid cube),
-  if not passed 3 (solid cube) is default;
-- Third parameter is the number of pixel per side of the detector, every other parameter is set based to its value,
-  if no value is given, default values are used;
-
-OUTPUT FILE STRUCTURE:
-
-The voxel (three-dimensional) grid is represented as a stack of two-dimensional grids.
-Considering a three-dimensional Cartesian system where the x-axis is directed from left to right, the y-axis is
-directed upwards, and the z-axis is orthogonal to them,
-a two-dimensional grid can be viewed as a horizontal slice, orthogonal to the y-axis, of the object.
-
-First a sequence of 16 integer values is given, representing on order:
- - gl_pixelDim
- - gl_angularTrajectory
- - gl_positionsAngularDistance
- - gl_objectSideLength
- - gl_detectorSideLength
- - gl_distanceObjectDetector
- - gl_distanceObjectSource
- - gl_voxelXDim
- - gl_voxelYDim
- - gl_voxelZDim
- - gl_nVoxel[0]
- - gl_nVoxel[1]
- - gl_nVoxel[2]
- - gl_nPlanes[0]
- - gl_nPlanes[1]
- - gl_nPlanes[2]
-
-Then, the values composing the voxel grid are given for a total of (gl_nVoxel[0] * gl_nVoxel[1] * gl_nVoxel[2]) (double)
-values. Each sequence of length v 1 ∗ v 3 represents a horizontal slice of the object stored as a one-dimensional array
-of elements ordered first by the x coordinate and then by the z coordinate. The first slice memorized is the bottom one,
-followed by the other slices in ascending order of the y coordinate.
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
