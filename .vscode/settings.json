@@ -9,6 +9,9 @@
     ],
     "files.associations": {
         "stdio.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "common.h": "c",
+        "hpc.h": "c",
+        "time.h": "c"
     }
 }
