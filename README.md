@@ -13,12 +13,11 @@ for NVIDIA GPUs.
 
 ## Summary
 
-### Structure
-
 The main folders of this project and their purposes are:
-- `doc`: Contains the project documentation, including my personal [thesis](doc/relazione.pdf) in
+- `doc`: Contains the project documentation, including my personal bachelor's thesis in
   [Computer Science and Engineering](https://corsi.unibo.it/1cycle/ComputerScienceEngineering).
 - `src`: Contains the source code of the project.
+- `docs`: Contains the doxygen documentation for the source code of the project.
 
 ## License
 

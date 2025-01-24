@@ -82,9 +82,9 @@ $(DIR_BIN)/%: $(DIR_OBJ)/%.o
 	@mkdir -p $(DIR_BIN)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
 
-$(DIR_OBJ)/%.o: %.c
+$(DIR_OBJ)/%.o: %.c hpc.h
 	@mkdir -p $(DIR_OBJ)
-	$(CC) $(CFLAGS) -c $^ -o $@ $(LDLIBS)
+	$(CC) $(CFLAGS) -c $< -o $@ $(LDLIBS)
 
 # CUDA
 
