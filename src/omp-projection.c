@@ -389,8 +389,8 @@ Point getPixel(int r, int c, int index)
     const double cosAngle = cosineTable[index];
     const double elementOffset =  gl_detectorSideLength / 2 - gl_pixelDim / 2;
 
-    pixel.x = (-gl_distanceObjectDetector * sinAngle) + cosAngle * (-elementOffset + gl_pixelDim * c);
-    pixel.y = (-gl_distanceObjectDetector) * cosAngle - sinAngle * (-elementOffset + gl_pixelDim * c);
+    pixel.x = -gl_distanceObjectDetector * sinAngle + cosAngle * (-elementOffset + gl_pixelDim * c);
+    pixel.y = -gl_distanceObjectDetector * cosAngle - sinAngle * (-elementOffset + gl_pixelDim * c);
     pixel.z = -elementOffset + gl_pixelDim * r;
 
     return pixel;
