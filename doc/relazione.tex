@@ -128,23 +128,23 @@ Gli obiettivi di questo lavoro sono:
 \chapter{Introduzione}
 
 Una proiezione è una matrice i cui valori rappresentano l'attenuazione dei raggi X che attraversano il corpo oggetto di studio.
-Considerando un'immagine generata a partire della matrice proiezione, i colori rappresentano graficamente i vari livelli di
+Considerando un'immagine generata a partire dalla matrice proiezione, i colori rappresentano graficamente i vari livelli di
 attenuazione: un raggio che attraversa una regione più densa del corpo subisce una maggiore attenuazione rispetto ad un
 raggio che attraversa una regione meno densa.
 
 Durante una scansione tomografica sono acquisite numerose immagini attorno all'oggetto di studio.
-Nel caso più semplice, che noi considereremo, si possono considerare le diverse angolazioni di una traiettoria circolare.
+Nel caso più semplice, che noi analizzeremo, si possono considerare le diverse angolazioni di una traiettoria circolare.
 Intuitivamente più sono le proiezioni acquisite, più la ricostruzione dell'oggetto sarà efficace.
 D'altra parte, specialmente in ambito medico, ridurre l'esposizione alle radiazioni è di beneficio per l'individuo scansionato.
 Questo implica che il numero di proiezioni generate è esso stesso molto variabile in base all'applicazione.
 
-Nelle sezioni seguenti, verrà descritto il modello matematico alla base della computazione, questo sarà direttamente collegato con
-le sue applicazioni nell'algoritmo risolutivo, infine una descrizione del problema dal punto di vista geometrico sarà
-esaminata.
+Nelle sezioni successive verrà illustrato il modello matematico che costituisce la base della computazione, mettendolo in
+relazione diretta con le sue applicazioni nell'algoritmo risolutivo.
+Infine, sarà esaminato il problema dal punto di vista geometrico.
 
 \section{Il modello matematico}
 
-Di seguito discusse le nozioni matematiche fondamentali per comprendere, dal punto di vista algebrico, il calcolo
+Di seguito verranno discusse le nozioni matematiche fondamentali per comprendere, dal punto di vista algebrico, il calcolo
 alla base della creazione delle proiezioni, vedi \cite{MoroLoli2021}.
 
 \subsection{La legge di Lambert-Beer}
@@ -154,11 +154,11 @@ Il modello fisico che descrive l'assorbimento dei fotoni in termini di coefficie
 Lambert-Beer.
 
 Il meccanismo fisico che porta all'attenuazione dell'intensità dei raggi è solitamente descritto da un singolo coefficiente di
-attenuazione \(\mu = \mu(w) \ge 0\) che dipende dalla posizione lungo percorso del raggio, indicata da \(w\).
+attenuazione \(\mu = \mu(w) \ge 0\) che dipende dalla posizione lungo il percorso del raggio, indicata da \(w\).
 Questi coefficienti determinano i vari \(m(w)\), cioè le intensità del raggio nella posizione indicata da \(w\).
 
 La \textbf{legge di Lambert-Beer} per il calcolo della proiezione del coefficiente di attenuazione lungo un segmento di lunghezza
-\(W\):
+\(W\) è:
 \begin{equation} \label{eq:law_lambert-beer}
   P_W\mu = - \ln{(\frac{m}{m_0})} = \int_0^W \mu(w) \, dw
 \end{equation}
@@ -250,14 +250,14 @@ Matematicamente quindi, per il calcolo delle proiezioni, viene considerata un'ap
 
 Nel caso discreto della trasformata di Radon il numero di proiezioni dipende dal numero di posizioni considerate in cui si
 effettuano le scansioni, tale numero verrà di seguito indicato con \(N_\theta\).
-Ad ogni posizione la sorgente ed il rilevatore sono posi in modo opportuno con il fine di analizzare lo stesso oggetto da più
-angolazioni diverse.
+Ad ogni posizione la sorgente ed il rilevatore sono posti in modo da poter analizzare lo stesso oggetto da più angolazioni
+diverse.
 
 \section{Algoritmo risolutivo}
 
-Considerando quanto già visto nel modello matematico, nel nostro caso l'algoritmo di Siddon si occupa di determinare la matrice
+Considerando quanto già visto nel modello matematico, nel nostro caso l'algoritmo di Siddon si occupa di calcolare la matrice
 \(M\), mentre il vettore \(f\) deve essere già noto in partenza.
-Questa dati devono quindi essere determinati per poter procedere con la computazione.
+Questa dati devono essere determinati per poter procedere con la computazione.
 
 L'algoritmo svolge una computazione equivalente a quella descritta nell'\autoref{eq:law_lambert-beer_discrete}:
 \begin{equation*}
@@ -416,11 +416,11 @@ Siddon.
            nel sistema di riferimento cartesiano considerato nelle discussioni seguenti.}
 \end{figure}
 
-In \autoref{fig:CT_reference_plane} sono rappresentati un oggetto di forma cubica, la sorgente ed il rilevatore, tutto posto
+In \autoref{fig:CT_reference_plane} sono rappresentati un oggetto di forma cubica, la sorgente ed il rilevatore, tutti posti
 in uno specifico sistema cartesiano, in cui il centro dell'oggetto corrisponde con l'origine degli assi.
 
-Nel nostro caso la posizione del punto sorgente, da cui partono i raggi, e dei pixel rilevatore, al centro di cui questi vengono
-a dirigersi, ruotano in un'orbita circolare in modo da scansionare il corpo da più posizioni.
+Nel nostro caso la posizione del punto sorgente, da cui partono i raggi, e dei pixel del rilevatore, al centro di cui questi
+vengono a dirigersi, ruotano in un'orbita circolare in modo da scansionare il corpo da più posizioni.
 
 Quando la sorgente ruota in un senso nelle specifiche posizioni dell'orbita, il rilevatore ruota coerentemente nel senso opposto.
 
@@ -429,7 +429,7 @@ Quando la sorgente ruota in un senso nelle specifiche posizioni dell'orbita, il 
 La sorgente è approssimata ad un punto, che indica la posizione a partire dalla quale sono diretti i raggi.
 Le posizioni considerate sono più di una e sono distribuite, nell'implementazione trattata, lungo una traiettoria circolare
 (o una sezione di essa) intorno all'oggetto.
-Rimane da determinarne ciascuna posizione.
+Rimane da stabilirne ciascuna coordinata nello spazio.
 
 Conoscendo l'estensione angolare \(\theta\) della sezione della traiettoria considerata e la distanza angolare \(\alpha\) tra
 ciascuna posizione, si è scelto l'uso delle coordinate polari, dove una posizione è individuata dalla distanza dall'origine e
@@ -458,9 +458,9 @@ Le coordinate cartesiane si ottengono a partire dalle coordinate polari nel segu
     Z_i = 0
   \end{cases} \quad \text{per } i = 0, \dots, N_\theta - 1
 \end{equation}
-dove sono state usate le formule degli archi associati per seno e coseno per ricondursi dal sistema sistema precedentemente
-descritto, senso orario a partire dal semi asse positivo delle \(y\), al sistema tradizionale per la misurazione di un angolo,
-senso antiorario a partire dal semi asse positivo delle \(x\).
+dove sono state applicate le formule degli archi associati per seno e coseno per passare dal sistema con misurazione in senso
+orario a partire dal semiasse positivo delle \(y\) al sistema tradizionale con misurazione in senso antiorario a partire dal
+semiasse positivo delle \(x\).
 Inoltre, \(Z_i\) è posta a \(0\) in quanto, per costruzione, la traiettoria giace sul piano \(xy\).
 
 \subsection{L'oggetto}
@@ -473,7 +473,7 @@ L'equazione cartesiana di un piano nello spazio è un'equazione di primo grado i
   ax + by + cz + d = 0 \quad \text{con } a, b, c, d \in \Re
 \end{equation*}
 
-Avendo in mente \autoref{fig:CT_reference_plane}, i piani coinvolti, oltre che ad essere paralleli tra di loro, sono paralleli
+Avendo in mente la \autoref{fig:CT_reference_plane}, i piani coinvolti, oltre che ad essere paralleli tra di loro, sono paralleli
 anche agli assi cartesiani.
 Dunque, le loro equazioni sono nella forma:
 \begin{align*}
@@ -482,7 +482,7 @@ Dunque, le loro equazioni sono nella forma:
   cz + d &= 0 \quad \text{se parallelo al piano } xy
 \end{align*}
 
-Dato che le distanze tra i piani paralleli sono regolari, data l'equazione di un piano è possibile determinare l'equazione degli
+Dato che le distanze tra i piani paralleli sono regolari, avendo l'equazione di un piano è possibile determinare l'equazione degli
 altri traslando più volte.
 L'equazione degli altri piani a partire dal primo si determina nel seguente modo:
 \begin{align*}
@@ -496,8 +496,8 @@ sono a loro volta le dimensioni di un singolo voxel lungo i tre assi cartesiani.
 
 \subsection{I rilevatori}
 
-Nel caso tridimensionale, il rilevatore può essere considerato una matrice di unità di misurazione, i pixel, posta ad una distanza
-\(d_r\) dal centro del corpo di studio.
+Nel caso tridimensionale, il rilevatore può essere visto come una matrice di unità di misura, ossia i pixel, posizionata a una
+distanza \(d_r\) dal centro del corpo in esame.
 
 L'approccio usato per relazionare i raggi con il rilevatore è detto \textit{ray-driven}.
 Per ciascun unità del rilevatore si considera l'esistenza di un unico raggio passante, diretto dalla sorgente al centro del
@@ -530,9 +530,9 @@ Le coordinate di tale posizione traslata sono date da:
     Y' = \sin(\frac{3\pi}{2} - (\delta - \lambda)) d_r = -\cos(\delta - \lambda) d_r
   \end{cases}
 \end{equation}
-dove, in modo analogo all'\autoref{eq:gonometric_source_coordinates}, sono state usate le formule degli archi associati per seno e
-coseno per ricondursi dal sistema sistema precedentemente descritto, senso orario a partire dal semi asse negativo delle \(y\), al
-sistema tradizionale per la misurazione di un angolo, senso antiorario a partire dal semi asse positivo delle \(x\).
+dove, in modo analogo all'\autoref{eq:gonometric_source_coordinates}, sono state applicate le formule degli archi associati per
+seno e coseno per passare dal sistema con misurazione in senso orario a partire dal semi asse negativo delle \(y\) al sistema
+tradizionale con misurazione in senso antiorario a partire dal semi asse positivo delle \(x\).
 In questo caso \(Z\) è costante, \(Z' = Z\), in quanto, per costruzione, la traiettoria trasla sul piano \(xy\), senza influire
 sulla coordinata nell'asse \(z\), quindi verrà omessa nella discussione seguente.
 
@@ -622,7 +622,7 @@ Le posizioni di un'unità del rilevatore possono dunque essere ottenute, a parti
 
 \subsection{I raggi}
 
-Un raggio, approssimazione di radiazioni elettromagnetiche, è considerato come un segmento che, nell'implementazione trattata,
+Un raggio, approssimazione di radiazioni elettromagnetiche, è considerato come un segmento che, nell'implementazione usata,
 collega la sorgente con il centro di un pixel del rilevatore (approccio ray-driven).
 
 Può essere rappresentato mediante l'equazione parametrica di una retta passante per due punti \(Source = (X_1, Y_1, Z_1)\) e
@@ -720,13 +720,13 @@ Può essere rappresentato mediante l'equazione parametrica di una retta passante
            per ottenere solo le intersezioni con piani effettivamente all'interno della griglia di pixel (voxel nel caso 3D).
            Si può notare che \(a_{min}\) nelle figure \textit{a} e \textit{c} sarà maggiore di 0, così come \(a_{max}\) nelle
            figure \textit{a} e \textit{b} sarà minore di 1.
-           Questo permette di non considerate le intersezioni in eccesso, esterne alla griglia di partenza, risolvendo il
+           Questo permette di non considerare le intersezioni in eccesso, esterne alla griglia di partenza, risolvendo il
            problema esposto nella \autoref{fig:CT_Siddon_grid_to_planes}.}
 \end{figure}
 
 In questo modo:
 \begin{itemize}
-  \item Per definire un raggio basta conoscere il punto "sorgente" ed il punto sul "rilevatore" dove avverrebbe la misurazione.
+  \item Per definire un raggio basta conoscere il punto ``sorgente'' ed il punto sul ``rilevatore'' dove avviene la misurazione.
   \item È possibile rappresentare un punto appartenente alla retta del raggio attraverso un unico parametro \(a\), in particolare
         \(a = 0\) coincide con il punto \(Source\), \(a = 1\) coincide con il punto \(Detector\), per i valori di \(a\) compresi
         tra \([0, 1]\) si hanno punti interni al segmento, vedi \autoref{fig:CT_Siddon_ranges}.
