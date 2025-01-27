@@ -29,6 +29,7 @@ EXE := $(EXE_INPUT) $(EXE_OMP) $(EXE_CUDA) # $(EXE_SERIAL)
 
 # C
 CC = gcc
+LFLAGS += -O2
 CFLAGS += -std=c99 -Wall -Wpedantic -Werror -O2 -D_XOPEN_SOURCE=600
 LDLIBS += -lm
 
@@ -41,6 +42,7 @@ all: $(TARGETS) $(EXE_INPUT)
 
 $(EXE_INPUT): $(TARGET_INPUT)
 $(TARGET_INPUT): CFLAGS += -fopenmp
+$(TARGET_INPUT): LFLAGS += -fopenmp
 
 # $(SERIAL): $(EXE_SERIAL)
 # $(EXE_SERIAL): $(TARGET_SERIAL)
@@ -48,6 +50,7 @@ $(TARGET_INPUT): CFLAGS += -fopenmp
 $(OPENMP): $(EXE_OMP)
 $(EXE_OMP): $(TARGET_OMP)
 $(TARGET_OMP): CFLAGS += -fopenmp
+$(TARGET_OMP): LFLAGS += -fopenmp
 
 $(CUDA): $(EXE_CUDA)
 $(EXE_CUDA): $(TARGET_CUDA)
@@ -58,11 +61,11 @@ $(EXE_CUDA): $(TARGET_CUDA)
 
 $(DIR_BIN)/%: $(DIR_OBJ)/%.o
 	@mkdir -p $(DIR_BIN)
-	$(CC) $(CFLAGS) $^ -o $@ $(LDLIBS)
+	$(CC) $(LFLAGS) $^ -o $@ $(LDLIBS)
 
 $(DIR_OBJ)/%.o: %.c hpc.h
 	@mkdir -p $(DIR_OBJ)
-	$(CC) $(CFLAGS) -c $< -o $@ $(LDLIBS)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # CUDA
 
@@ -74,7 +77,7 @@ $(DIR_BIN)/%: %.cu
 
 $(DIR_BIN)/$(EXE_INPUT): $(DIR_OBJ)/$(EXE_INPUT).o
 	@mkdir -p $(DIR_BIN)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(LFLAGS) $^ -o $@
 
 $(DIR_OBJ)/$(EXE_INPUT).o: $(EXE_INPUT).c
 	@mkdir -p $(DIR_OBJ)
