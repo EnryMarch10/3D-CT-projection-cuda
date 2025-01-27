@@ -103,7 +103,20 @@ Makefile</h2>
 <div class="fragment"><div class="line">make help</div>
 </div><!-- fragment --><p>Then using one of the specified targets you can run:</p>
 <div class="fragment"><div class="line">make [TARGET] [VARIABLE=VALUE]</div>
-</div><!-- fragment --><p>The <b>C</b> files are compiled inside <code>build/obj/</code> and their executables (linked version) can be found in <code>build/bin/</code>.</p>
+</div><!-- fragment --><p>Execute this command to generate some simple projection images: </p><div class="fragment"><div class="line">make images WORK_SIZE=400</div>
+</div><!-- fragment --><blockquote class="doxtable">
+<p>&zwj;[!NOTE] This command is designed for quick and simple use, providing an overview of the output file system tree. </p>
+</blockquote>
+<p>The generated file system tree will be:</p><ul>
+<li><code>build</code> contains miscellaneous files obtained from the source code.<ul>
+<li><code>obj</code> contains the compiled source code.</li>
+<li><code>bin</code> contains the executables, <code>obj/*</code> linked version.</li>
+</ul>
+</li>
+<li><code>input</code> contains generated input <code>.dat</code> files.</li>
+<li><code>output</code> contains output <code>.pgm</code> files and possibly their <code>.png</code> format.</li>
+</ul>
+<p>Execute <code>make purge</code> to clean everything.</p>
 <h2><a class="anchor" id="input-generation"></a>
 Input Generation</h2>
 <p>The source file <code><a class="el" href="inputgen_8c.html" title="Implementation of an input generator of 3D objects configurations of: a cube, a half sphere and a cub...">inputgen.c</a></code> contains the code necessary to generate the input files used as 3D inputs for the projection algorithm that will create the 2D image projections.</p>
