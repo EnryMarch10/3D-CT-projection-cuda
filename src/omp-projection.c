@@ -44,7 +44,6 @@
 #include "common.h"
 
 #define OBJ_BUFFER 100
-#define TABLES_DIM 1024
 
 int gl_pixelDim;
 int gl_angularTrajectory;
@@ -69,7 +68,7 @@ double *cosineTable;
  * @param cosTable An array containing a certain number of precalculated cos values.
  * @param length The length of the arrays.
  */
-void initTables(double *sinTable, double *cosTable, int length)
+void initTables(double *sinTable, double *cosTable)
 {
     const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance;  // Number of angular positions
 
@@ -631,10 +630,10 @@ int main(int argc, char *argv[])
     // Each thread will have its own variable to store its minimum and maximum attenuation computed
     double absMaxValue, absMinValue;
 
-    sineTable = (double *) malloc(sizeof(double) * TABLES_DIM);
-    cosineTable = (double *) malloc(sizeof(double) * TABLES_DIM);
+    sineTable = (double *) malloc(sizeof(double) * (nTheta + 1));
+    cosineTable = (double *) malloc(sizeof(double) * (nTheta + 1));
 
-    initTables(sineTable, cosineTable, TABLES_DIM);
+    initTables(sineTable, cosineTable);
 
     double totalTime = 0.0;
 
@@ -692,4 +691,6 @@ int main(int argc, char *argv[])
     }
     fclose(outputFilePointer);
     free(attenuation);
+
+    return EXIT_SUCCESS;
 }
