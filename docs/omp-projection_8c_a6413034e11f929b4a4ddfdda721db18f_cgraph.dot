@@ -32,7 +32,7 @@ digraph "computeProjections"
   Node11 [id="Node000011",label="getAMin",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#a73679a64b017a5578d232a5627587c50",tooltip="Computes the minimum parametric value a, representing the fist intersection between ray and object."];
   Node1 -> Node9 [id="edge15_Node000001_Node000009",color="steelblue1",style="solid",tooltip=" "];
   Node1 -> Node12 [id="edge16_Node000001_Node000012",color="steelblue1",style="solid",tooltip=" "];
-  Node12 [id="Node000012",label="getPixel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#af2d8cd57a92a738cf2312e04d0dd93e5",tooltip="Retrieves the cartesian coordinates of a unit of the detector."];
+  Node12 [id="Node000012",label="getPixel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#a2ae47d18f1fb51f2aa28602ddc0c8390",tooltip="Retrieves the cartesian coordinates of a unit of the detector."];
   Node1 -> Node13 [id="edge17_Node000001_Node000013",color="steelblue1",style="solid",tooltip=" "];
   Node13 [id="Node000013",label="getRangeOfIndex",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#aa5c9680241b94ef3b5d5dd53bcefe022",tooltip="Retrieves the range of parametric values of the planes."];
   Node13 -> Node3 [id="edge18_Node000013_Node000003",color="steelblue1",style="solid",tooltip=" "];
@@ -49,9 +49,11 @@ digraph "computeProjections"
   Node16 [id="Node000016",label="getSidesZPlanes",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#ab468469d53baf0666599c7d93e031449",tooltip="Computes a coordinate of the two planes of the object's sides orthogonal to the z axis."];
   Node16 -> Node5 [id="edge27_Node000016_Node000005",color="steelblue1",style="solid",tooltip=" "];
   Node1 -> Node17 [id="edge28_Node000001_Node000017",color="steelblue1",style="solid",tooltip=" "];
-  Node17 [id="Node000017",label="getSource",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#abd5efe513d5c6927d35b8f9474a64c22",tooltip="Retrieves the cartesian coordinates of the source."];
+  Node17 [id="Node000017",label="getSource",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#a9aaeb5802feab4cd9d5d8fe4ee1d7e06",tooltip="Retrieves the cartesian coordinates of the source."];
   Node1 -> Node18 [id="edge29_Node000001_Node000018",color="steelblue1",style="solid",tooltip=" "];
-  Node18 [id="Node000018",label="merge3",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#ad79f89bbd9169631ffe9fdd39f762492",tooltip="Merges three sorted arrays into one single sorted array."];
-  Node18 -> Node19 [id="edge30_Node000018_Node000019",color="steelblue1",style="solid",tooltip=" "];
-  Node19 [id="Node000019",label="merge",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#ae093475516e0af47d7370aab234e102f",tooltip="Merges two sorted arrays into one single sorted array."];
+  Node18 [id="Node000018",label="initTables",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#af0d19fe4c3150a7feb2c29081941a6fc",tooltip="Initializes sin and cos tables, with default values for a certain length."];
+  Node1 -> Node19 [id="edge30_Node000001_Node000019",color="steelblue1",style="solid",tooltip=" "];
+  Node19 [id="Node000019",label="merge3",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#ad79f89bbd9169631ffe9fdd39f762492",tooltip="Merges three sorted arrays into one single sorted array."];
+  Node19 -> Node20 [id="edge31_Node000019_Node000020",color="steelblue1",style="solid",tooltip=" "];
+  Node20 [id="Node000020",label="merge",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#ae093475516e0af47d7370aab234e102f",tooltip="Merges two sorted arrays into one single sorted array."];
 }

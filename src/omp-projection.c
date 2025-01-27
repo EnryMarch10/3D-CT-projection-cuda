@@ -58,9 +58,6 @@ int gl_voxelZDim;
 int gl_nVoxel[3];
 int gl_nPlanes[3];
 
-double *sineTable;
-double *cosineTable;
-
 /**
  * @brief Initializes `sin` and `cos` tables, with default values for a certain length.
  *
@@ -68,11 +65,9 @@ double *cosineTable;
  * @param cosTable An array containing a certain number of precalculated cos values.
  * @param length The length of the arrays.
  */
-void initTables(double *sinTable, double *cosTable)
+void initTables(double *sinTable, double *cosTable, const int length)
 {
-    const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance;  // Number of angular positions
-
-    for (int positionIndex = 0; positionIndex <= nTheta; positionIndex++) {
+    for (int positionIndex = 0; positionIndex < length; positionIndex++) {
         sinTable[positionIndex] = sin((-gl_angularTrajectory / 2 + positionIndex * gl_positionsAngularDistance) * M_PI / 180);
         cosTable[positionIndex] = cos((-gl_angularTrajectory / 2 + positionIndex * gl_positionsAngularDistance) * M_PI / 180);
     }
@@ -359,16 +354,18 @@ int merge3(double *a, double *b, double *c, int lenA, int lenB, int lenC, double
 /**
  * @brief Retrieves the cartesian coordinates of the source.
  *
+ * @param sinTable An array containing a certain number of precalculated sin values.
+ * @param cosTable An array containing a certain number of precalculated cos values.
  * @param index A value that defines the angle being considered.
  * @return The coordinates of the source.
  */
-Point getSource(int index)
+Point getSource(double *sinTable, double *cosTable, int index)
 {
     Point source;
 
     source.z = 0;
-    source.x = sineTable[index] * gl_distanceObjectSource;
-    source.y = cosineTable[index] * gl_distanceObjectSource;
+    source.x = sinTable[index] * gl_distanceObjectSource;
+    source.y = cosTable[index] * gl_distanceObjectSource;
 
     return source;
 }
@@ -376,16 +373,18 @@ Point getSource(int index)
 /**
  * @brief Retrieves the cartesian coordinates of a unit of the detector.
  *
+ * @param sinTable An array containing a certain number of precalculated sin values.
+ * @param cosTable An array containing a certain number of precalculated cos values.
  * @param r The row of the detector matrix.
  * @param c The column of the detector matrix.
  * @param index A value that defines the angle being considered, and consequently, the source.
  * @return The coordinates of a unit of the detector, relative to the specified source.
  */
-Point getPixel(int r, int c, int index)
+Point getPixel(double *sinTable, double *cosTable, int r, int c, int index)
 {
     Point pixel;
-    const double sinAngle = sineTable[index];
-    const double cosAngle = cosineTable[index];
+    const double sinAngle = sinTable[index];
+    const double cosAngle = cosTable[index];
     const double elementOffset =  gl_detectorSideLength / 2 - gl_pixelDim / 2;
 
     pixel.x = -gl_distanceObjectDetector * sinAngle + cosAngle * (-elementOffset + gl_pixelDim * c);
@@ -473,7 +472,7 @@ double computeAbsorption(Point source, Point pixel, double *a, int lenA, int sli
  */
 void computeProjections(int slice, double *f, double *attenuation, double *absMax, double *absMin)
 {
-    const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance; // Number of angular positions
+    const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1; // Number of angular positions
     const int nSidePixels = gl_detectorSideLength / gl_pixelDim;
 
     double amax = -INFINITY;
@@ -484,18 +483,24 @@ void computeProjections(int slice, double *f, double *attenuation, double *absMa
     double aY[gl_nPlanes[Y]];
     double aZ[gl_nPlanes[Z]];
 
+    double *sinTable;
+    double *cosTable;
+    sinTable = (double *) malloc(sizeof(double) * nTheta);
+    cosTable = (double *) malloc(sizeof(double) * nTheta);
+    initTables(sinTable, cosTable, nTheta);
+
     // Iterates over each source
-    for (int positionIndex = 0; positionIndex <= nTheta; positionIndex++) {
-        const Point source = getSource(positionIndex);
+    for (int positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+        const Point source = getSource(sinTable, cosTable, positionIndex);
 
         // Iterates over each pixel of the detector
-#pragma omp parallel for collapse(2) schedule(dynamic) default(none) shared(nSidePixels, positionIndex, source, slice, f, attenuation, nTheta, gl_nVoxel) private(temp, aX, aY, aZ, aMerged) reduction(min:amin) reduction(max:amax)
+#pragma omp parallel for collapse(2) schedule(dynamic) default(none) shared(sinTable, cosTable, nSidePixels, positionIndex, source, slice, f, attenuation, nTheta, gl_nVoxel) private(temp, aX, aY, aZ, aMerged) reduction(min:amin) reduction(max:amax)
         for (int r = 0; r < nSidePixels; r++) {
             for (int c = 0; c < nSidePixels; c++) {
                 Point pixel;
 
                 // Gets the pixel's center cartesian coordinates
-                pixel = getPixel(r, c, positionIndex);
+                pixel = getPixel(sinTable, cosTable, r, c, positionIndex);
 
                 // Computes Min-Max parametric values
                 double aMin, aMax;
@@ -556,6 +561,8 @@ void computeProjections(int slice, double *f, double *attenuation, double *absMa
             }
         }
     }
+    free(sinTable);
+    free(cosTable);
     *absMax = amax;
     *absMin = amin;
 }
@@ -622,21 +629,15 @@ int main(int argc, char *argv[])
     int nSidePixels = gl_detectorSideLength / gl_pixelDim;
 
     // Number of angular positions
-    const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance;
+    const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1;
     // Array containing the coefficients of each voxel
     double *grid = (double *) malloc(sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * OBJ_BUFFER);
     // Array containing the computed attenuation detected in each pixel of the detector
-    double *attenuation = (double *) calloc(nSidePixels * nSidePixels * (nTheta + 1), sizeof(double));
+    double *attenuation = (double *) calloc(nSidePixels * nSidePixels * nTheta, sizeof(double));
     // Each thread will have its own variable to store its minimum and maximum attenuation computed
     double absMaxValue, absMinValue;
 
-    sineTable = (double *) malloc(sizeof(double) * (nTheta + 1));
-    cosineTable = (double *) malloc(sizeof(double) * (nTheta + 1));
-
-    initTables(sineTable, cosineTable);
-
     double totalTime = 0.0;
-
     // Iterates over object subsection
     for (int slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
         int nOfSlices;
@@ -651,8 +652,6 @@ int main(int argc, char *argv[])
         if (!fread(grid, sizeof(double), gl_nVoxel[X] * gl_nVoxel[Z] * nOfSlices, inputFilePointer)) {
             fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
             free(grid);
-            free(sineTable);
-            free(cosineTable);
             free(attenuation);
             return EXIT_FAILURE;
         }
@@ -664,8 +663,6 @@ int main(int argc, char *argv[])
     }
     fclose(inputFilePointer);
     free(grid);
-    free(sineTable);
-    free(cosineTable);
     printf("Execution time (s) %.2f\n", totalTime);
     fflush(stdout);
 
@@ -676,8 +673,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     // Iterates over each attenuation value computed, prints a value between [0-255]
-    fprintf(outputFilePointer, "P2\n%d %d\n255", nSidePixels, nSidePixels * (nTheta + 1));
-    for (double positionIndex = 0; positionIndex <= nTheta; positionIndex++) {
+    fprintf(outputFilePointer, "P2\n%d %d\n255", nSidePixels, nSidePixels * nTheta);
+    for (double positionIndex = 0; positionIndex < nTheta; positionIndex++) {
         double angle = -gl_angularTrajectory / 2 + positionIndex * gl_positionsAngularDistance;
         fprintf(outputFilePointer, "\n#%lf", angle);
         for (int i = 0; i < nSidePixels; i++) {

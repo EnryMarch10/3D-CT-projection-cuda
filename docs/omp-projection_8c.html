@@ -118,14 +118,12 @@ Include dependency graph for omp-projection.c:</div>
 Macros</h2></td></tr>
 <tr class="memitem:a28e9af725dfe6fdf44b8d2fc2661d8e6" id="r_a28e9af725dfe6fdf44b8d2fc2661d8e6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a28e9af725dfe6fdf44b8d2fc2661d8e6">OBJ_BUFFER</a>&#160;&#160;&#160;100</td></tr>
 <tr class="separator:a28e9af725dfe6fdf44b8d2fc2661d8e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c5e47dfabf1cd414758dcd3c494d6f1" id="r_a5c5e47dfabf1cd414758dcd3c494d6f1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a5c5e47dfabf1cd414758dcd3c494d6f1">TABLES_DIM</a>&#160;&#160;&#160;1024</td></tr>
-<tr class="separator:a5c5e47dfabf1cd414758dcd3c494d6f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a5000146a352c8329bb90f666a9cc7e77" id="r_a5000146a352c8329bb90f666a9cc7e77"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a5000146a352c8329bb90f666a9cc7e77">initTables</a> (double *sinTable, double *cosTable, int length)</td></tr>
-<tr class="memdesc:a5000146a352c8329bb90f666a9cc7e77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes <code>sin</code> and <code>cos</code> tables, with default values for a certain length.  <br /></td></tr>
-<tr class="separator:a5000146a352c8329bb90f666a9cc7e77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0d19fe4c3150a7feb2c29081941a6fc" id="r_af0d19fe4c3150a7feb2c29081941a6fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#af0d19fe4c3150a7feb2c29081941a6fc">initTables</a> (double *sinTable, double *cosTable, const int length)</td></tr>
+<tr class="memdesc:af0d19fe4c3150a7feb2c29081941a6fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes <code>sin</code> and <code>cos</code> tables, with default values for a certain length.  <br /></td></tr>
+<tr class="separator:af0d19fe4c3150a7feb2c29081941a6fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd8bbcfabb3ddef2ccaafb9928a37b95" id="r_abd8bbcfabb3ddef2ccaafb9928a37b95"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#abd8bbcfabb3ddef2ccaafb9928a37b95">min</a> (int a, int b)</td></tr>
 <tr class="memdesc:abd8bbcfabb3ddef2ccaafb9928a37b95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the minimum value between <code>a</code> and <code>b</code>.  <br /></td></tr>
 <tr class="separator:abd8bbcfabb3ddef2ccaafb9928a37b95"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -162,12 +160,12 @@ Functions</h2></td></tr>
 <tr class="memitem:ad79f89bbd9169631ffe9fdd39f762492" id="r_ad79f89bbd9169631ffe9fdd39f762492"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ad79f89bbd9169631ffe9fdd39f762492">merge3</a> (double *a, double *b, double *c, int lenA, int lenB, int lenC, double *merged)</td></tr>
 <tr class="memdesc:ad79f89bbd9169631ffe9fdd39f762492"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merges three sorted arrays into one single sorted array.  <br /></td></tr>
 <tr class="separator:ad79f89bbd9169631ffe9fdd39f762492"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd5efe513d5c6927d35b8f9474a64c22" id="r_abd5efe513d5c6927d35b8f9474a64c22"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPoint.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#abd5efe513d5c6927d35b8f9474a64c22">getSource</a> (int index)</td></tr>
-<tr class="memdesc:abd5efe513d5c6927d35b8f9474a64c22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the cartesian coordinates of the source.  <br /></td></tr>
-<tr class="separator:abd5efe513d5c6927d35b8f9474a64c22"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2d8cd57a92a738cf2312e04d0dd93e5" id="r_af2d8cd57a92a738cf2312e04d0dd93e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPoint.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#af2d8cd57a92a738cf2312e04d0dd93e5">getPixel</a> (int r, int c, int index)</td></tr>
-<tr class="memdesc:af2d8cd57a92a738cf2312e04d0dd93e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the cartesian coordinates of a unit of the detector.  <br /></td></tr>
-<tr class="separator:af2d8cd57a92a738cf2312e04d0dd93e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9aaeb5802feab4cd9d5d8fe4ee1d7e06" id="r_a9aaeb5802feab4cd9d5d8fe4ee1d7e06"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPoint.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a9aaeb5802feab4cd9d5d8fe4ee1d7e06">getSource</a> (double *sinTable, double *cosTable, int index)</td></tr>
+<tr class="memdesc:a9aaeb5802feab4cd9d5d8fe4ee1d7e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the cartesian coordinates of the source.  <br /></td></tr>
+<tr class="separator:a9aaeb5802feab4cd9d5d8fe4ee1d7e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ae47d18f1fb51f2aa28602ddc0c8390" id="r_a2ae47d18f1fb51f2aa28602ddc0c8390"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPoint.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a2ae47d18f1fb51f2aa28602ddc0c8390">getPixel</a> (double *sinTable, double *cosTable, int r, int c, int index)</td></tr>
+<tr class="memdesc:a2ae47d18f1fb51f2aa28602ddc0c8390"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the cartesian coordinates of a unit of the detector.  <br /></td></tr>
+<tr class="separator:a2ae47d18f1fb51f2aa28602ddc0c8390"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3faf293b62178da1ea86d1f6dc3e891d" id="r_a3faf293b62178da1ea86d1f6dc3e891d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a3faf293b62178da1ea86d1f6dc3e891d">getSidesXPlanes</a> (double *planes)</td></tr>
 <tr class="memdesc:a3faf293b62178da1ea86d1f6dc3e891d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a coordinate of the two planes of the object's sides orthogonal to the x axis.  <br /></td></tr>
 <tr class="separator:a3faf293b62178da1ea86d1f6dc3e891d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -215,10 +213,6 @@ Variables</h2></td></tr>
 <tr class="separator:a5d996a3a6956800d0a86144e8acacc07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac76cf9baba8be1884b7b6a7a94c231b9" id="r_ac76cf9baba8be1884b7b6a7a94c231b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ac76cf9baba8be1884b7b6a7a94c231b9">gl_nPlanes</a> [3]</td></tr>
 <tr class="separator:ac76cf9baba8be1884b7b6a7a94c231b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a4030fc7091343101a8c8f0214fa9eb" id="r_a3a4030fc7091343101a8c8f0214fa9eb"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a3a4030fc7091343101a8c8f0214fa9eb">sineTable</a></td></tr>
-<tr class="separator:a3a4030fc7091343101a8c8f0214fa9eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdc76cb338bbcbfa2fd1a89b4ae10f34" id="r_afdc76cb338bbcbfa2fd1a89b4ae10f34"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#afdc76cb338bbcbfa2fd1a89b4ae10f34">cosineTable</a></td></tr>
-<tr class="separator:afdc76cb338bbcbfa2fd1a89b4ae10f34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An OpenMP implementation of the Siddon's projection algorithm. </p>
@@ -258,22 +252,6 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00046">46</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
-
-</div>
-</div>
-<a id="a5c5e47dfabf1cd414758dcd3c494d6f1" name="a5c5e47dfabf1cd414758dcd3c494d6f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c5e47dfabf1cd414758dcd3c494d6f1">&#9670;&#160;</a></span>TABLES_DIM</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define TABLES_DIM&#160;&#160;&#160;1024</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00047">47</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -342,7 +320,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The computed projection attenuation of the radiological path of a ray. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00448">448</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00446">446</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -407,7 +385,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00475">475</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00473">473</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -472,7 +450,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00221">221</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00215">215</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -517,7 +495,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The maximum parametric value a, representing the last intersection between ray and object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00147">147</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00141">141</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -557,7 +535,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The minimum parametric value a, representing the last intersection between ray and object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00171">171</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00165">165</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -618,12 +596,12 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 if ray is parallel to the planes, 1 otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00199">199</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00193">193</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
-<a id="af2d8cd57a92a738cf2312e04d0dd93e5" name="af2d8cd57a92a738cf2312e04d0dd93e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af2d8cd57a92a738cf2312e04d0dd93e5">&#9670;&#160;</a></span>getPixel()</h2>
+<a id="a2ae47d18f1fb51f2aa28602ddc0c8390" name="a2ae47d18f1fb51f2aa28602ddc0c8390"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ae47d18f1fb51f2aa28602ddc0c8390">&#9670;&#160;</a></span>getPixel()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -631,6 +609,18 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname"><a class="el" href="structPoint.html">Point</a> getPixel </td>
           <td>(</td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>sinTable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>cosTable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>r</em>, </td>
         </tr>
@@ -657,6 +647,8 @@ Here is the call graph for this function:</div>
 <p>Retrieves the cartesian coordinates of a unit of the detector. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramname">sinTable</td><td>An array containing a certain number of precalculated sin values. </td></tr>
+    <tr><td class="paramname">cosTable</td><td>An array containing a certain number of precalculated cos values. </td></tr>
     <tr><td class="paramname">r</td><td>The row of the detector matrix. </td></tr>
     <tr><td class="paramname">c</td><td>The column of the detector matrix. </td></tr>
     <tr><td class="paramname">index</td><td>A value that defines the angle being considered, and consequently, the source. </td></tr>
@@ -665,7 +657,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The coordinates of a unit of the detector, relative to the specified source. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00385">385</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00383">383</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -733,7 +725,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The range of parametric values of the planes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00269">269</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00263">263</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -766,7 +758,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00405">405</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00403">403</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -810,7 +802,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00419">419</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00417">417</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -843,7 +835,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00431">431</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00429">429</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -852,8 +844,8 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="abd5efe513d5c6927d35b8f9474a64c22" name="abd5efe513d5c6927d35b8f9474a64c22"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd5efe513d5c6927d35b8f9474a64c22">&#9670;&#160;</a></span>getSource()</h2>
+<a id="a9aaeb5802feab4cd9d5d8fe4ee1d7e06" name="a9aaeb5802feab4cd9d5d8fe4ee1d7e06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9aaeb5802feab4cd9d5d8fe4ee1d7e06">&#9670;&#160;</a></span>getSource()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -861,9 +853,25 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname"><a class="el" href="structPoint.html">Point</a> getSource </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>index</em></td><td>)</td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>sinTable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>cosTable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -871,13 +879,15 @@ Here is the call graph for this function:</div>
 <p>Retrieves the cartesian coordinates of the source. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramname">sinTable</td><td>An array containing a certain number of precalculated sin values. </td></tr>
+    <tr><td class="paramname">cosTable</td><td>An array containing a certain number of precalculated cos values. </td></tr>
     <tr><td class="paramname">index</td><td>A value that defines the angle being considered. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The coordinates of the source. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00366">366</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00362">362</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -906,7 +916,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The coordinate of a plane parallel relative to the YZ plane. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00113">113</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00107">107</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -935,7 +945,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The coordinate of a plane parallel relative to the XZ plane. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00124">124</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00118">118</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -964,12 +974,12 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The coordinate of a plane parallel relative to the XY plane. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00135">135</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00129">129</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
-<a id="a5000146a352c8329bb90f666a9cc7e77" name="a5000146a352c8329bb90f666a9cc7e77"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5000146a352c8329bb90f666a9cc7e77">&#9670;&#160;</a></span>initTables()</h2>
+<a id="af0d19fe4c3150a7feb2c29081941a6fc" name="af0d19fe4c3150a7feb2c29081941a6fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0d19fe4c3150a7feb2c29081941a6fc">&#9670;&#160;</a></span>initTables()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -989,7 +999,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">const int&#160;</td>
           <td class="paramname"><em>length</em>&#160;</td>
         </tr>
         <tr>
@@ -1010,7 +1020,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00072">72</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00068">68</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1040,7 +1050,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00597">597</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00603">603</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1101,7 +1111,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The length of the merged array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00315">315</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00309">309</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1176,7 +1186,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The length of the merged array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00353">353</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00347">347</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1221,7 +1231,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The minimum between <code>a</code> and <code>b</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00089">89</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00083">83</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1268,7 +1278,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The minimum between <code>a</code>, <code>b</code> and <code>c</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00102">102</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00096">96</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -1302,27 +1312,11 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 in case of writing failure, 1 otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00570">570</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00576">576</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="afdc76cb338bbcbfa2fd1a89b4ae10f34" name="afdc76cb338bbcbfa2fd1a89b4ae10f34"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdc76cb338bbcbfa2fd1a89b4ae10f34">&#9670;&#160;</a></span>cosineTable</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double* cosineTable</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00063">63</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
-
-</div>
-</div>
 <a id="a82bab47ee8b8b905b94a5dbe39d8669b" name="a82bab47ee8b8b905b94a5dbe39d8669b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a82bab47ee8b8b905b94a5dbe39d8669b">&#9670;&#160;</a></span>gl_angularTrajectory</h2>
 
@@ -1335,7 +1329,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00050">50</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00049">49</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1351,7 +1345,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00053">53</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00052">52</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1367,7 +1361,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00054">54</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00053">53</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1383,7 +1377,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00055">55</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00054">54</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1399,7 +1393,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00060">60</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00059">59</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1415,7 +1409,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00059">59</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00058">58</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1431,7 +1425,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00052">52</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00051">51</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1447,7 +1441,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00049">49</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00048">48</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1463,7 +1457,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00051">51</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00050">50</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1479,7 +1473,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00056">56</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00055">55</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1495,7 +1489,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00057">57</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00056">56</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1511,23 +1505,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00058">58</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
-
-</div>
-</div>
-<a id="a3a4030fc7091343101a8c8f0214fa9eb" name="a3a4030fc7091343101a8c8f0214fa9eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a4030fc7091343101a8c8f0214fa9eb">&#9670;&#160;</a></span>sineTable</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double* sineTable</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00062">62</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00057">57</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
