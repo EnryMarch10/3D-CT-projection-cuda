@@ -280,7 +280,7 @@ Ranges getRangeOfIndex(const double source, const double pixel, int isParallel, 
         voxelDim = gl_voxelYDim;
         firstPlane = getYPlane(0);
         lastPlane = getYPlane(gl_nPlanes[Y] - 1);
-    } else /* if (ax == Z) */ {
+    } else /* if (axis == Z) */ {
         voxelDim = gl_voxelZDim;
         firstPlane = getZPlane(0);
         lastPlane = getZPlane(gl_nPlanes[Z] - 1);
@@ -596,25 +596,18 @@ int readSetUP(FILE *filePointer)
 
 int main(int argc, char *argv[])
 {
-    FILE* inputFilePointer;
-    FILE* outputFilePointer;
+    FILE *inputFilePointer;
+    FILE *outputFilePointer;
 
     if (argc != 3) {
-// #ifdef BINARY
-//         fprintf(stderr, "Usage: %s input.dat output.dat\n"
-//                         "- The first parameter is the name of the input file.\n"
-//                         "- The second parameter is the name of a binary file to store the output at.\n",
-//                         argv[0]);
-// #else
         fprintf(stderr, "Usage: %s input.dat output.pgm\n"
                         "- The first parameter is the name of the input file.\n"
                         "- The second parameter is the name of a binary file to store the output at.\n",
                         argv[0]);
-// #endif
         return EXIT_FAILURE;
     }
-    const char* inputFileName = argv[1];
-    const char* outputFileName = argv[2];
+    const char *inputFileName = argv[1];
+    const char *outputFileName = argv[2];
 
     inputFilePointer = fopen(inputFileName, "rb");
     if (!inputFilePointer) {
@@ -645,20 +638,6 @@ int main(int argc, char *argv[])
 
     double totalTime = 0.0;
 
-// #ifdef BINARY
-//     outputFilePointer = fopen(outputFileName, "wb");
-//     if (!outputFileName) {
-//         fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
-//         return EXIT_FAILURE;
-//     }
-// #else
-    outputFilePointer = fopen(outputFileName, "w");
-    if (!outputFileName) {
-        fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
-        return EXIT_FAILURE;
-    }
-// #endif
-
     // Iterates over object subsection
     for (int slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
         int nOfSlices;
@@ -672,6 +651,10 @@ int main(int argc, char *argv[])
         // Read voxels coefficients
         if (!fread(grid, sizeof(double), gl_nVoxel[X] * gl_nVoxel[Z] * nOfSlices, inputFilePointer)) {
             fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
+            free(grid);
+            free(sineTable);
+            free(cosineTable);
+            free(attenuation);
             return EXIT_FAILURE;
         }
 
@@ -680,33 +663,19 @@ int main(int argc, char *argv[])
         computeProjections(slice, grid, attenuation, &absMaxValue, &absMinValue);
         totalTime += hpc_gettime() - partialTime;
     }
-    fprintf(stderr, "Execution time (s) %.2f\n", totalTime);
-    fflush(stderr);
+    fclose(inputFilePointer);
+    free(grid);
+    free(sineTable);
+    free(cosineTable);
+    printf("Execution time (s) %.2f\n", totalTime);
+    fflush(stdout);
 
-    // Write on file
-// #ifdef BINARY
-//     int matrixDetails[] = {nTheta + 1, nSidePixels};
-//     if (!fwrite(matrixDetails, sizeof(int), 2, outputFilePointer)) {
-//         fprintf(stderr, "Unable to write on file '%s'!\n", outputFileName);
-//         return EXIT_FAILURE;
-//     }
-//     double minMaxValues[] = {absMaxValue, absMinValue};
-//     if (!fwrite(minMaxValues, sizeof(double), 2, outputFilePointer)) {
-//         fprintf(stderr, "Unable to write on file '%s'!\n", outputFileName);
-//         return EXIT_FAILURE;
-//     }
-//     for (int i = 0; i <= nTheta; i++) {
-//         double angle = -gl_angularTrajectory / 2 + i * gl_positionsAngularDistance;
-//         if (!fwrite(&angle, sizeof(double), 1, outputFilePointer)) {
-//             fprintf(stderr, "Unable to write on file '%s'!\n", outputFileName);
-//             return EXIT_FAILURE;
-//         }
-//         if (!fwrite(attenuation + i * nSidePixels * nSidePixels, sizeof(double), nSidePixels * nSidePixels, outputFilePointer)) {
-//             fprintf(stderr, "Unable to write on file '%s'!\n", outputFileName);
-//             return EXIT_FAILURE;
-//         }
-//     }
-// #else
+    outputFilePointer = fopen(outputFileName, "w");
+    if (!outputFileName) {
+        fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
+        free(attenuation);
+        return EXIT_FAILURE;
+    }
     // Iterates over each attenuation value computed, prints a value between [0-255]
     fprintf(outputFilePointer, "P2\n%d %d\n255", nSidePixels, nSidePixels * (nTheta + 1));
     for (double positionIndex = 0; positionIndex <= nTheta; positionIndex++) {
@@ -721,11 +690,6 @@ int main(int argc, char *argv[])
             }
         }
     }
-// #endif
-
-    free(grid);
-    free(attenuation);
-
-    fclose(inputFilePointer);
     fclose(outputFilePointer);
+    free(attenuation);
 }

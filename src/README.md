@@ -20,7 +20,22 @@ Then using one of the specified targets you can run:
 make [TARGET] [VARIABLE=VALUE]
 ```
 
-The **C** files are compiled inside `build/obj/` and their executables (linked version) can be found in `build/bin/`.
+Execute this command to generate some simple projection images:
+```shell
+make images WORK_SIZE=400
+```
+
+> [!NOTE]
+> This command is designed for quick and simple use, providing an overview of the output file system tree.
+
+The generated file system tree will be:
+- `build` contains miscellaneous files obtained from the source code.
+  - `obj` contains the compiled source code.
+  - `bin` contains the executables, `obj/*` linked version.
+- `input` contains generated input `.dat` files.
+- `output` contains output `.pgm` files and possibly their `.png` format.
+
+Execute `make purge` to clean everything.
 
 ### Input Generation
 

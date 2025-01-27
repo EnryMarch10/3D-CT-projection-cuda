@@ -8,7 +8,7 @@ DIR_OBJ := $(DIR_BUILD)/obj
 
 DIRS := $(DIR_BIN) $(DIR_OBJ) $(DIR_BUILD)
 
-## PROGRAMS
+### PROGRAMS ###
 
 #SERIAL := serial
 OPENMP := omp
@@ -39,7 +39,6 @@ NVLDLIBS += -lm
 
 all: $(TARGETS) $(EXE_INPUT)
 
-$(INPUT): $(EXE_INPUT)
 $(EXE_INPUT): $(TARGET_INPUT)
 $(TARGET_INPUT): CFLAGS += -fopenmp
 
@@ -52,27 +51,6 @@ $(TARGET_OMP): CFLAGS += -fopenmp
 
 $(CUDA): $(EXE_CUDA)
 $(EXE_CUDA): $(TARGET_CUDA)
-
-help:
-	@echo
-	@echo "Available targets:"
-	@echo
-	@echo " - Data:"
-	@echo
-	@echo "     inputs    generate all input files, you can change the dimensions,"
-	@echo "               by default the variable WORK_SIZE is set to 2352"
-	@echo
-	@echo " - Code:"
-	@echo
-	@echo "       help    prints this message"
-	@echo "        all    compile everything (default)"
-	@echo "   inputgen    compile input generator program"
-#	@echo "     serial    compile serial program"
-	@echo "        omp    compile parallel OpenMP program"
-	@echo "       cuda    compile CUDA program"
-	@echo "      clean    cleanup generated executables"
-	@echo "      purge    brutally removes build/* with all contents"
-	@echo
 
 .PRECIOUS: $(DIR_OBJ)/%.o
 
@@ -106,8 +84,7 @@ clean:
 	-\rm -f $(addprefix $(DIR_OBJ)/, $(addsuffix .o, $(EXE))) $(addprefix $(DIR_BIN)/, $(EXE))
 	-\rm -df $(DIRS)
 
-purge:
-	-\rm -rf $(DIR_BUILD)
+### DATA ###
 
 ## INPUT
 
@@ -133,6 +110,72 @@ $(DIR_INPUT)/$(CUBE).dat: $(DIR_BIN)/$(EXE_INPUT)
 	@mkdir -p $(DIR_INPUT)
 	$< $@ $(CUBE) $(WORK_SIZE)
 
+## OUTPUT
+
+DIR_OUTPUT := output
+
+outputs: $(addprefix $(DIR_OUTPUT)/, $(addsuffix .pgm, $(SHAPES)))
+
+$(DIR_OUTPUT)/$(CUBE_WITH_SPHERICAL_HOLE).pgm: $(DIR_BIN)/$(EXE_OMP) $(DIR_INPUT)/$(CUBE_WITH_SPHERICAL_HOLE).dat
+	@mkdir -p $(DIR_OUTPUT)
+	$< $(word 2,$^) $@
+
+$(DIR_OUTPUT)/$(HALF_SPHERE).pgm: $(DIR_BIN)/$(EXE_OMP) $(DIR_INPUT)/$(HALF_SPHERE).dat
+	@mkdir -p $(DIR_OUTPUT)
+	$< $(word 2,$^) $@
+
+$(DIR_OUTPUT)/$(CUBE).pgm: $(DIR_BIN)/$(EXE_OMP) $(DIR_INPUT)/$(CUBE).dat
+	@mkdir -p $(DIR_OUTPUT)
+	$< $(word 2,$^) $@
+
+images: $(addprefix $(DIR_OUTPUT)/, $(addsuffix .png, $(SHAPES)))
+
+$(DIR_OUTPUT)/$(CUBE_WITH_SPHERICAL_HOLE).png: $(DIR_OUTPUT)/$(CUBE_WITH_SPHERICAL_HOLE).pgm
+	convert $^ $@
+
+$(DIR_OUTPUT)/$(HALF_SPHERE).png: $(DIR_OUTPUT)/$(HALF_SPHERE).pgm
+	convert $^ $@
+
+$(DIR_OUTPUT)/$(CUBE).png: $(DIR_OUTPUT)/$(CUBE).pgm
+	convert $^ $@
+
+### GENERAL ###
+
+help:
+	@echo
+	@echo "Available targets:"
+	@echo
+	@echo " General:"
+	@echo "       help    prints this message"
+	@echo "      purge    brutally removes build/*, input/* and output/*"
+	@echo "               with all contents"
+	@echo
+	@echo " Code:"
+	@echo
+	@echo "        all    compile everything (default)"
+	@echo "   inputgen    compile input generator program"
+#	@echo "     serial    compile serial program"
+	@echo "        omp    compile parallel OpenMP program"
+	@echo "       cuda    compile CUDA program"
+	@echo "      clean    cleanup generated executables"
+	@echo
+	@echo " Data:"
+	@echo
+	@echo "     inputs    generate all input files, you can change the dimensions,"
+	@echo "               by default the variable WORK_SIZE is set to 2352"
+	@echo "    outputs    generate all output files"
+	@echo "               use OpenMP executable"
+	@echo "               for inputs WORK_SIZE can be specified"
+	@echo "     images    generate all output files in .png format"
+	@echo "               use OpenMP executable"
+	@echo "               for inputs WORK_SIZE can be specified"
+	@echo
+
+purge:
+	-\rm -rf $(DIR_BUILD)
+	-\rm -rf $(DIR_INPUT)
+	-\rm -rf $(DIR_OUTPUT)
+
 ## Special targets
 
-.PHONY: all help clean purge $(TARGETS) $(EXE) $(SHAPES)
+.PHONY: all help clean purge $(TARGETS) $(EXE)
