@@ -446,8 +446,7 @@ void getSidesZPlanes(double *planes)
 double computeAbsorption(Point source, Point pixel, double *a, int lenA, int slice, double *f)
 {
     const double d12 = sqrt(pow(pixel.x - source.x, 2) + pow(pixel.y - source.y, 2) + pow(pixel.z - source.z, 2));
-
-    double attenuation = 0.0;
+    double g = 0.0;
 
     for (int i = 0; i < lenA - 1; i++) {
         const double segments = d12 * (a[i + 1] - a[i]);
@@ -456,9 +455,9 @@ double computeAbsorption(Point source, Point pixel, double *a, int lenA, int sli
         const int yRow = min3((source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / gl_voxelYDim, gl_nVoxel[Y] - 1, OBJ_BUFFER - 1);
         const int zRow = min((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / gl_voxelZDim, gl_nVoxel[Z] - 1);
 
-        attenuation += f[yRow * gl_nVoxel[X] * gl_nVoxel[Z] + zRow * gl_nVoxel[Z] + xRow] * segments;
+        g += f[yRow * gl_nVoxel[X] * gl_nVoxel[Z] + zRow * gl_nVoxel[Z] + xRow] * segments;
     }
-    return attenuation;
+    return g;
 }
 
 /**
@@ -466,22 +465,17 @@ double computeAbsorption(Point source, Point pixel, double *a, int lenA, int sli
  *
  * @param slice It is a number that indicates the first voxel in the y axis from which the projection is being computed.
  * @param f It is an array that contains the coefficients of attenuation of the voxels contained in the sub-section.
- * @param attenuation It is the resulting array that contains the value of the computed projection attenuation for each pixel.
- * @param absMax It is the maximum projection attenuation computed.
- * @param absMin It is the minimum projection attenuation computed.
+ * @param g It is the resulting array that contains the value of the computed projection attenuation for each pixel.
+ * @param gMin It is the minimum projection attenuation computed.
+ * @param gMax It is the maximum projection attenuation computed.
  */
-void computeProjections(int slice, double *f, double *attenuation, double *absMax, double *absMin)
+void computeProjections(int slice, double *f, double *g, double *gMin, double *gMax)
 {
     const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1; // Number of angular positions
     const int nSidePixels = gl_detectorSideLength / gl_pixelDim;
 
-    double amax = -INFINITY;
-    double amin = INFINITY;
-    double temp[3][2];
-    double aMerged[gl_nPlanes[X] + gl_nPlanes[X] + gl_nPlanes[X]];
-    double aX[gl_nPlanes[X]];
-    double aY[gl_nPlanes[Y]];
-    double aZ[gl_nPlanes[Z]];
+    double l_gMin = INFINITY;
+    double l_gMax = -INFINITY;
 
     double *sinTable;
     double *cosTable;
@@ -494,9 +488,14 @@ void computeProjections(int slice, double *f, double *attenuation, double *absMa
         const Point source = getSource(sinTable, cosTable, positionIndex);
 
         // Iterates over each pixel of the detector
-#pragma omp parallel for collapse(2) schedule(dynamic) default(none) shared(sinTable, cosTable, nSidePixels, positionIndex, source, slice, f, attenuation, nTheta, gl_nVoxel) private(temp, aX, aY, aZ, aMerged) reduction(min:amin) reduction(max:amax)
+#pragma omp parallel for collapse(2) schedule(dynamic) default(none) shared(sinTable, cosTable, nSidePixels, positionIndex, source, slice, f, g, nTheta, gl_nVoxel, gl_nPlanes) reduction(min:l_gMin) reduction(max:l_gMax)
         for (int r = 0; r < nSidePixels; r++) {
             for (int c = 0; c < nSidePixels; c++) {
+                double a[3][2];
+                double aMerged[gl_nPlanes[X] + gl_nPlanes[Y] + gl_nPlanes[Z]];
+                double aX[gl_nPlanes[X]];
+                double aY[gl_nPlanes[Y]];
+                double aZ[gl_nPlanes[Z]];
                 Point pixel;
 
                 // Gets the pixel's center cartesian coordinates
@@ -507,20 +506,20 @@ void computeProjections(int slice, double *f, double *attenuation, double *absMa
                 double sidesPlanes[2];
                 int isParallel = -1;
                 getSidesXPlanes(sidesPlanes);
-                if (!getIntersection(source.x, pixel.x, sidesPlanes, 2, &temp[X][0])) {
+                if (!getIntersection(source.x, pixel.x, sidesPlanes, 2, &a[X][0])) {
                     isParallel = X;
                 }
                 getSidesYPlanes(sidesPlanes, slice);
-                if (!getIntersection(source.y, pixel.y, sidesPlanes, 2, &temp[Y][0])) {
+                if (!getIntersection(source.y, pixel.y, sidesPlanes, 2, &a[Y][0])) {
                     isParallel = Y;
                 }
                 getSidesZPlanes(sidesPlanes);
-                if (!getIntersection(source.z, pixel.z, sidesPlanes, 2, &temp[Z][0])) {
+                if (!getIntersection(source.z, pixel.z, sidesPlanes, 2, &a[Z][0])) {
                     isParallel = Z;
                 }
 
-                aMin = getAMin(temp, isParallel);
-                aMax = getAMax(temp, isParallel);
+                aMin = getAMin(a, isParallel);
+                aMax = getAMax(a, isParallel);
 
                 if (aMin < aMax) {
                     // Computes Min-Max plane indexes
@@ -554,17 +553,17 @@ void computeProjections(int slice, double *f, double *attenuation, double *absMa
 
                     // Associates each segment to the respective voxel Nx + Ny + Nz
                     const int pixelIndex = positionIndex * nSidePixels * nSidePixels + r * nSidePixels + c;
-                    attenuation[pixelIndex] += computeAbsorption(source, pixel, aMerged, lenA, slice, f);
-                    amax = fmax(amax, attenuation[pixelIndex]);
-                    amin = fmin(amin, attenuation[pixelIndex]);
+                    g[pixelIndex] += computeAbsorption(source, pixel, aMerged, lenA, slice, f);
+                    l_gMax = fmax(l_gMax, g[pixelIndex]);
+                    l_gMin = fmin(l_gMin, g[pixelIndex]);
                 }
             }
         }
     }
     free(sinTable);
     free(cosTable);
-    *absMax = amax;
-    *absMin = amin;
+    *gMax = l_gMax;
+    *gMin = l_gMin;
 }
 
 /**
@@ -631,11 +630,11 @@ int main(int argc, char *argv[])
     // Number of angular positions
     const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1;
     // Array containing the coefficients of each voxel
-    double *grid = (double *) malloc(sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * OBJ_BUFFER);
+    double *f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * OBJ_BUFFER);
     // Array containing the computed attenuation detected in each pixel of the detector
-    double *attenuation = (double *) calloc(nSidePixels * nSidePixels * nTheta, sizeof(double));
+    double *g = (double *) calloc(nSidePixels * nSidePixels * nTheta, sizeof(double));
     // Each thread will have its own variable to store its minimum and maximum attenuation computed
-    double absMaxValue, absMinValue;
+    double gMaxValue, gMinValue;
 
     double totalTime = 0.0;
     // Iterates over object subsection
@@ -649,27 +648,27 @@ int main(int argc, char *argv[])
         }
 
         // Read voxels coefficients
-        if (!fread(grid, sizeof(double), gl_nVoxel[X] * gl_nVoxel[Z] * nOfSlices, inputFilePointer)) {
+        if (!fread(f, sizeof(double), gl_nVoxel[X] * gl_nVoxel[Z] * nOfSlices, inputFilePointer)) {
             fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
-            free(grid);
-            free(attenuation);
+            free(f);
+            free(g);
             return EXIT_FAILURE;
         }
 
         // Computes subsection projection
         double partialTime = hpc_gettime();
-        computeProjections(slice, grid, attenuation, &absMaxValue, &absMinValue);
+        computeProjections(slice, f, g, &gMinValue, &gMaxValue);
         totalTime += hpc_gettime() - partialTime;
     }
     fclose(inputFilePointer);
-    free(grid);
+    free(f);
     printf("Execution time (s) %.2f\n", totalTime);
     fflush(stdout);
 
     outputFilePointer = fopen(outputFileName, "w");
     if (!outputFileName) {
         fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
-        free(attenuation);
+        free(g);
         return EXIT_FAILURE;
     }
     // Iterates over each attenuation value computed, prints a value between [0-255]
@@ -681,13 +680,13 @@ int main(int argc, char *argv[])
             fprintf(outputFilePointer, "\n");
             for (int j = 0; j < nSidePixels; j++) {
                 int pixelIndex = positionIndex * nSidePixels * nSidePixels + i * nSidePixels + j;
-                int color = (attenuation[pixelIndex] - absMinValue) * 255 / (absMaxValue - absMinValue);
+                int color = (g[pixelIndex] - gMinValue) * 255 / (gMaxValue - gMinValue);
                 fprintf(outputFilePointer, "%d ", color);
             }
         }
     }
     fclose(outputFilePointer);
-    free(attenuation);
+    free(g);
 
     return EXIT_SUCCESS;
 }
