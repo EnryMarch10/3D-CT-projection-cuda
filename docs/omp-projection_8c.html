@@ -178,9 +178,9 @@ Functions</h2></td></tr>
 <tr class="memitem:af0caf76e76bd487d95a3eb3ce0ade25f" id="r_af0caf76e76bd487d95a3eb3ce0ade25f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#af0caf76e76bd487d95a3eb3ce0ade25f">computeAbsorption</a> (<a class="el" href="structPoint.html">Point</a> source, <a class="el" href="structPoint.html">Point</a> pixel, double *a, int lenA, int slice, double *f)</td></tr>
 <tr class="memdesc:af0caf76e76bd487d95a3eb3ce0ade25f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the projection attenuation of the radiological path of a ray.  <br /></td></tr>
 <tr class="separator:af0caf76e76bd487d95a3eb3ce0ade25f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6413034e11f929b4a4ddfdda721db18f" id="r_a6413034e11f929b4a4ddfdda721db18f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a6413034e11f929b4a4ddfdda721db18f">computeProjections</a> (int slice, double *f, double *attenuation, double *absMax, double *absMin)</td></tr>
-<tr class="memdesc:a6413034e11f929b4a4ddfdda721db18f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the projection of a sub-section of the object into the detector for each source position.  <br /></td></tr>
-<tr class="separator:a6413034e11f929b4a4ddfdda721db18f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabf7920b507f8bc88a35746500ceb56c" id="r_aabf7920b507f8bc88a35746500ceb56c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aabf7920b507f8bc88a35746500ceb56c">computeProjections</a> (int slice, double *f, double *g, double *gMin, double *gMax)</td></tr>
+<tr class="memdesc:aabf7920b507f8bc88a35746500ceb56c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the projection of a sub-section of the object into the detector for each source position.  <br /></td></tr>
+<tr class="separator:aabf7920b507f8bc88a35746500ceb56c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a094543d6ca60bd3a7c9904f3e5c5d0e5" id="r_a094543d6ca60bd3a7c9904f3e5c5d0e5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a094543d6ca60bd3a7c9904f3e5c5d0e5">readSetUP</a> (FILE *filePointer)</td></tr>
 <tr class="memdesc:a094543d6ca60bd3a7c9904f3e5c5d0e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the environment values used to compute the voxel grid from the specified binary file.  <br /></td></tr>
 <tr class="separator:a094543d6ca60bd3a7c9904f3e5c5d0e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -329,8 +329,8 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="a6413034e11f929b4a4ddfdda721db18f" name="a6413034e11f929b4a4ddfdda721db18f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6413034e11f929b4a4ddfdda721db18f">&#9670;&#160;</a></span>computeProjections()</h2>
+<a id="aabf7920b507f8bc88a35746500ceb56c" name="aabf7920b507f8bc88a35746500ceb56c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabf7920b507f8bc88a35746500ceb56c">&#9670;&#160;</a></span>computeProjections()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -351,19 +351,19 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>attenuation</em>, </td>
+          <td class="paramname"><em>g</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>absMax</em>, </td>
+          <td class="paramname"><em>gMin</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">double *&#160;</td>
-          <td class="paramname"><em>absMin</em>&#160;</td>
+          <td class="paramname"><em>gMax</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -378,18 +378,18 @@ Here is the call graph for this function:</div>
   <table class="params">
     <tr><td class="paramname">slice</td><td>It is a number that indicates the first voxel in the y axis from which the projection is being computed. </td></tr>
     <tr><td class="paramname">f</td><td>It is an array that contains the coefficients of attenuation of the voxels contained in the sub-section. </td></tr>
-    <tr><td class="paramname">attenuation</td><td>It is the resulting array that contains the value of the computed projection attenuation for each pixel. </td></tr>
-    <tr><td class="paramname">absMax</td><td>It is the maximum projection attenuation computed. </td></tr>
-    <tr><td class="paramname">absMin</td><td>It is the minimum projection attenuation computed. </td></tr>
+    <tr><td class="paramname">g</td><td>It is the resulting array that contains the value of the computed projection attenuation for each pixel. </td></tr>
+    <tr><td class="paramname">gMin</td><td>It is the minimum projection attenuation computed. </td></tr>
+    <tr><td class="paramname">gMax</td><td>It is the maximum projection attenuation computed. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00473">473</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00472">472</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="omp-projection_8c_a6413034e11f929b4a4ddfdda721db18f_cgraph.png" border="0" usemap="#aomp-projection_8c_a6413034e11f929b4a4ddfdda721db18f_cgraph" alt=""/></div>
+<div class="center"><img src="omp-projection_8c_aabf7920b507f8bc88a35746500ceb56c_cgraph.png" border="0" usemap="#aomp-projection_8c_aabf7920b507f8bc88a35746500ceb56c_cgraph" alt=""/></div>
 </div>
 
 </div>
@@ -1050,7 +1050,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00603">603</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00602">602</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>
@@ -1312,7 +1312,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 in case of writing failure, 1 otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00576">576</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00575">575</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
 
 </div>
 </div>

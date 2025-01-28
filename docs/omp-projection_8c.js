@@ -1,7 +1,7 @@
 var omp_projection_8c =
 [
     [ "computeAbsorption", "omp-projection_8c.html#af0caf76e76bd487d95a3eb3ce0ade25f", null ],
-    [ "computeProjections", "omp-projection_8c.html#a6413034e11f929b4a4ddfdda721db18f", null ],
+    [ "computeProjections", "omp-projection_8c.html#aabf7920b507f8bc88a35746500ceb56c", null ],
     [ "getAllIntersections", "omp-projection_8c.html#aab23497116712e73fd615f6bdaa2766e", null ],
     [ "getAMax", "omp-projection_8c.html#aef436783a4bc76a348cf39c942c42d01", null ],
     [ "getAMin", "omp-projection_8c.html#a73679a64b017a5578d232a5627587c50", null ],
