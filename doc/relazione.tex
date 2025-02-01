@@ -257,7 +257,7 @@ diverse.
 
 Considerando quanto già visto nel modello matematico, nel nostro caso l'algoritmo di Siddon si occupa di calcolare la matrice
 \(M\), mentre il vettore \(f\) deve essere già noto in partenza.
-Questa dati devono essere determinati per poter procedere con la computazione.
+Questi dati devono essere determinati per poter procedere con la computazione.
 
 L'algoritmo svolge una computazione equivalente a quella descritta nell'\autoref{eq:law_lambert-beer_discrete}:
 \begin{equation*}
@@ -351,7 +351,7 @@ Le tre diverse configurazioni, fornite da \cite{Colletta2024}, sono state qui ri
   \item Una \textbf{semi-sfera}: stabilita la lunghezza del raggio della semisfera che si intende rappresentare, gli elementi
         all'interno della regione semisferica sono posti ad 1, altrimenti a 0.
   \item Un \textbf{cubo con cavità sferica}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi
-        all'interno della regione cubica, ad eccezione da quelli la cui distanza da un punto stabilito all'interno dell'oggetto
+        all'interno della regione cubica, ad eccezione di quelli la cui distanza da un punto stabilito all'interno dell'oggetto
         sia inferiore ad un raggio stabilito, sono posti ad 1, altrimenti a 0.
 \end{itemize}
 
@@ -429,7 +429,7 @@ Quando la sorgente ruota in un senso nelle specifiche posizioni dell'orbita, il 
 La sorgente è approssimata ad un punto, che indica la posizione a partire dalla quale sono diretti i raggi.
 Le posizioni considerate sono più di una e sono distribuite, nell'implementazione trattata, lungo una traiettoria circolare
 (o una sezione di essa) intorno all'oggetto.
-Rimane da stabilirne ciascuna coordinata nello spazio.
+Rimane da stabilire ciascuna coordinata nello spazio.
 
 Conoscendo l'estensione angolare \(\theta\) della sezione della traiettoria considerata e la distanza angolare \(\alpha\) tra
 ciascuna posizione, si è scelto l'uso delle coordinate polari, dove una posizione è individuata dalla distanza dall'origine e
@@ -505,7 +505,7 @@ pixel stesso.
 Secondo questo approccio, il numero \(n_p\) di raggi usati per il calcolo della proiezione coincide con il numero di pixel del
 rilevatore.
 
-Il rilevatore è sempre ortogonale all'asse che congiunge la sorgente ed il centro del corpo.
+Il rilevatore è sempre ortogonale all'asse che congiunge la sorgente con il centro del corpo.
 
 Le coordinate cartesiane del centro di un'unità del rilevatore, al variare dell'angolo considerato, sono \((X', Y', Z')\),
 derivate dalla posizione \((X, Y, Z)\), ricoperta nel caso in cui il rilevatore sia ortogonale all'asse \(y\).
@@ -731,7 +731,7 @@ In questo modo:
         tra \([0, 1]\) si hanno punti interni al segmento, vedi \autoref{fig:CT_Siddon_ranges}.
 \end{itemize}
 
-Il punto di intersezione di un raggio ed un piano lo si ottiene risolvendo in \(a\) il sistema lineare dato dall'equazione del
+Il punto di intersezione di un raggio ed un piano si ottiene risolvendo in \(a\) il sistema lineare dato dall'equazione del
 piano e una componente della retta come di seguito:
 \begin{equation}
   \begin{aligned}
