@@ -114,15 +114,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1a52ee8d82009a5d8ab663067aefca36" id="r_a1a52ee8d82009a5d8ab663067aefca36"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hpc_8h.html#a1a52ee8d82009a5d8ab663067aefca36">hpc_gettime</a> (void)</td></tr>
+<tr class="memitem:a1a52ee8d82009a5d8ab663067aefca36" id="r_a1a52ee8d82009a5d8ab663067aefca36"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="hpc_8h.html#a1a52ee8d82009a5d8ab663067aefca36">hpc_gettime</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a>)</td></tr>
 <tr class="separator:a1a52ee8d82009a5d8ab663067aefca36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Miscellaneous utility functions for the HPC course. </p>
 <dl class="section author"><dt>Author</dt><dd>Enrico Marchionni (<a href="#" onclick="location.href='mai'+'lto:'+'enr'+'ic'+'o.m'+'ar'+'chi'+'on'+'ni@'+'st'+'udi'+'o.'+'uni'+'bo'+'.it'; return false;">enric<span class="obfuscator">.nosp@m.</span>o.ma<span class="obfuscator">.nosp@m.</span>rchio<span class="obfuscator">.nosp@m.</span>nni@<span class="obfuscator">.nosp@m.</span>studi<span class="obfuscator">.nosp@m.</span>o.un<span class="obfuscator">.nosp@m.</span>ibo.i<span class="obfuscator">.nosp@m.</span>t</a>) </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>2025-01</dd></dl>
-<p>This header file provides a function double <code>hpc_gettime()</code> that returns the elapsed time (in seconds) since "the epoch". The function uses the timing routing of the underlying parallel framework (OpenMP or MPI), if enabled; otherwise, the default is to use the <code>clock_gettime()</code> function.</p>
-<p>IMPORTANT NOTE: the function <code>clock_gettime()</code> is a POSIX extension; therefore, to use it you MUST add:</p>
+<p>This header file provides a function double <code>hpc_gettime()</code> that returns the elapsed time (in seconds) since "the epoch". The function uses the timing routing of the underlying parallel framework (OpenMP or MPI), if enabled; otherwise, the default is to use the <code><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d" title="Computes the projection of a sub-section of the object into the detector for each source position on ...">clock_gettime()</a></code> function.</p>
+<p>IMPORTANT NOTE: the function <code><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d" title="Computes the projection of a sub-section of the object into the detector for each source position on ...">clock_gettime()</a></code> is a POSIX extension; therefore, to use it you MUST add:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define _XOPEN_SOURCE 600</span></div>
 </div><!-- fragment --><p>at the beginning of your program, BEFORE any other include.T </p><dl class="section copyright"><dt>Copyright</dt><dd><div class="fragment"><div class="line">This file is part of 3D-CT-projection-cuda</div>
 <div class="line">(https://github.com/EnryMarch10/3D-CT-projection-cuda).</div>
@@ -151,9 +151,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double hpc_gettime </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> hpc_gettime </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>

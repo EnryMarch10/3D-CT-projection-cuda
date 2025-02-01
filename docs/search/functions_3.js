@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['merge_0',['merge',['../omp-projection_8c.html#ae093475516e0af47d7370aab234e102f',1,'omp-projection.c']]],
-  ['merge3_1',['merge3',['../omp-projection_8c.html#ad79f89bbd9169631ffe9fdd39f762492',1,'omp-projection.c']]],
-  ['min_2',['min',['../omp-projection_8c.html#abd8bbcfabb3ddef2ccaafb9928a37b95',1,'omp-projection.c']]],
-  ['min3_3',['min3',['../omp-projection_8c.html#a242710ffc6c186821800ab581fc06174',1,'omp-projection.c']]]
+  ['initenvironment_0',['initEnvironment',['../cuda-projection_8cu.html#a8c59fb0bb9f47e26d4d4832d9a0883e4',1,'cuda-projection.cu']]],
+  ['inittables_1',['inittables',['../cuda-projection_8cu.html#ac61f6c57af71fe19922bef02f61c31bc',1,'initTables(double *const sinTable, double *const cosTable, const int length):&#160;cuda-projection.cu'],['../omp-projection_8c.html#af0d19fe4c3150a7feb2c29081941a6fc',1,'initTables(double *sinTable, double *cosTable, const int length):&#160;omp-projection.c']]]
 ];

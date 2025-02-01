@@ -123,8 +123,8 @@ Input Generation</h2>
 <p>Usage:</p>
 <div class="fragment"><div class="line">./build/bin/inputgen DEST [OBJECT] [PIXELS]</div>
 </div><!-- fragment --><p>Where:</p><ul>
-<li><code>DEST</code>: is the output file name, it is suggested to use <code>input/cube.dat</code> for example.</li>
-<li><code>[OBJECT]</code>: can be: <code>cube</code> (default), <code>cube_with_spherical_hole</code> or <code>half_sphere</code>.</li>
+<li><code>DEST</code>: is the output file name, it is suggested to use <code>input/Cube.dat</code> for example.</li>
+<li><code>[OBJECT]</code>: can be: <code>Cube</code> (default), <code>CubeWithSphericalHole</code> or <code>HalfSphere</code>.</li>
 <li><code>[PIXELS]</code>: is the number of pixels per side of the detector, every other parameter is set based to its value, if no value is given, default is <code>2352</code>.</li>
 </ul>
 <p>This is a similar version of the one proposed by <a href="https://github.com/mmarzolla/3D-CT-projection-openmp.git">Lorenzo Colletta</a>. It uses the same functions to generate the input, and parallelizes the CPU computation in the same way.</p>
@@ -142,6 +142,18 @@ CPU Siddon's Projection</h2>
 </ul>
 <blockquote class="doxtable">
 <p>&zwj;[!TIP] Compile with: <code>make omp</code>. </p>
+</blockquote>
+<h2><a class="anchor" id="nvidia-gpu-siddons-projection"></a>
+NVIDIA GPU Siddon's Projection</h2>
+<p>The source file <code><a class="el" href="cuda-projection_8cu.html" title="A CUDA implementation of the Siddon&#39;s projection algorithm.">cuda-projection.cu</a></code> contains an CUDA parallel implementation of the Siddon's projection algorithm.</p>
+<p>Usage:</p>
+<div class="fragment"><div class="line">./build/bin/cuda-projection INPUT OUTPUT</div>
+</div><!-- fragment --><p>Where:</p><ul>
+<li><code>INPUT</code>: is the input file name of the 3D object, for example <code>input/cube.dat</code>.</li>
+<li><code>OUTPUT</code>: is the output file name of the 2D projections, for example if compiled in normal mode it could be <code>output/cube.pgm</code>, if compiled in binary mode it could be <code>output/cube.dat</code>.</li>
+</ul>
+<blockquote class="doxtable">
+<p>&zwj;[!TIP] Compile with: <code>make cuda</code>. To compile CUDA sources in DEBUG mode run: <code>make cuda DEBUG=yes</code>. </p>
 </blockquote>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

@@ -37,9 +37,6 @@ The generated file system tree will be:
 
 Execute `make purge` to clean everything.
 
-> [!TIP]
-> To compile CUDA sources in DEBUG mode run make with: `make cuda DEBUG=yes`.
-
 ### Input Generation
 
 The source file `inputgen.c` contains the code necessary to generate the input files used as 3D inputs for the projection
@@ -82,3 +79,22 @@ Where:
 
 > [!TIP]
 > Compile with: `make omp`.
+
+### NVIDIA GPU Siddon's Projection
+
+The source file `cuda-projection.cu` contains an CUDA parallel implementation of the Siddon's projection algorithm.
+
+Usage:
+
+```shell
+./build/bin/cuda-projection INPUT OUTPUT
+```
+
+Where:
+- `INPUT`: is the input file name of the 3D object, for example `input/cube.dat`.
+- `OUTPUT`: is the output file name of the 2D projections, for example if compiled in normal mode it could be `output/cube.pgm`,
+  if compiled in binary mode it could be `output/cube.dat`.
+
+> [!TIP]
+> Compile with: `make cuda`.
+> To compile CUDA sources in DEBUG mode run: `make cuda DEBUG=yes`.
