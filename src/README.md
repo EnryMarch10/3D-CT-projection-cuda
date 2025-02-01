@@ -37,6 +37,9 @@ The generated file system tree will be:
 
 Execute `make purge` to clean everything.
 
+> [!TIP]
+> To compile CUDA sources in DEBUG mode run make with: `make cuda DEBUG=yes`.
+
 ### Input Generation
 
 The source file `inputgen.c` contains the code necessary to generate the input files used as 3D inputs for the projection
@@ -49,8 +52,8 @@ Usage:
 ```
 
 Where:
-- `DEST`: is the output file name, it is suggested to use `input/cube.dat` for example.
-- `[OBJECT]`: can be: `cube` (default), `cube_with_spherical_hole` or `half_sphere`.
+- `DEST`: is the output file name, it is suggested to use `input/Cube.dat` for example.
+- `[OBJECT]`: can be: `Cube` (default), `CubeWithSphericalHole` or `HalfSphere`.
 - `[PIXELS]`: is the number of pixels per side of the detector, every other parameter is set based to its value, if no value is
   given, default is `2352`.
 

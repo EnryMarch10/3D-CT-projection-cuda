@@ -4,15 +4,23 @@
     ],
     "cSpell.words": [
         "DISI",
+        "fopenmp",
         "inputgen",
+        "NVCC",
+        "NVCFLAGS",
+        "NVLDLIBS",
+        "OPENMP",
         "Siddon",
-        "sinogramma"
+        "sinogramma",
+        "XOPEN"
     ],
     "files.associations": {
+        "*.cu": "cuda",
         "stdio.h": "c",
         "stdlib.h": "c",
         "common.h": "c",
         "hpc.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "assert.h": "c"
     }
 }
