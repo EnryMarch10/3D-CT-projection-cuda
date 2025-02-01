@@ -38,9 +38,9 @@
 #define N_PIXEL_ALONG_SIDE (DETECTOR_SIDE_LENGTH / PIXEL_DIM)
 // #define DEFAULT_WORK_SIZE 2352 // default work size, equals to floor(DETECTOR_SIDE_LENGTH / PIXEL_DIM)
 
-#define CUBE "cube"
-#define SPHERE "half_sphere"
-#define CUBE_WITH_SPHERICAL_HOLE "cube_with_spherical_hole"
+#define CUBE "Cube"
+#define CUBE_WITH_SPHERICAL_HOLE "CubeWithSphericalHole"
+#define SPHERE "HalfSphere"
 
 /*
  * The following global variables are defined as according to common.h header file.
@@ -67,6 +67,25 @@ int gl_voxelZDim = VOXEL_Z_DIM;
 int gl_nVoxel[3] = {N_VOXEL_X, N_VOXEL_Y, N_VOXEL_Z};
 int gl_nPlanes[3] = {N_PLANES_X, N_PLANES_Y, N_PLANES_Z};
 
+static void printSizeMaxGB(const char *name, size_t size) {
+    if (size > 1024) {
+        double approximation = size / 1024.0;
+        if (approximation > 1024.0) {
+            approximation = approximation / 1024.0;
+            if (approximation > 1024.0) {
+                approximation = approximation / 1024.0;
+                printf("%s %.2lf GB\n", name, approximation);
+            } else {
+                printf("%s %.1lf MB\n", name, approximation);
+            }
+        } else {
+            printf("%s %lf KB\n", name, approximation);
+        }
+    } else {
+        printf("%s %lu B\n", name, size);
+    }
+}
+
 /**
  * @brief Stores the environment values used to compute the voxel grid into the specified binary file.
  *
@@ -75,23 +94,24 @@ int gl_nPlanes[3] = {N_PLANES_X, N_PLANES_Y, N_PLANES_Z};
  */
 unsigned long writeSetUp(FILE *filePointer)
 {
-    int setUp[] = { gl_pixelDim,
-                    gl_angularTrajectory,
-                    gl_positionsAngularDistance,
-                    gl_objectSideLength,
-                    gl_detectorSideLength,
-                    gl_distanceObjectDetector,
-                    gl_distanceObjectSource,
-                    gl_voxelXDim,
-                    gl_voxelYDim,
-                    gl_voxelZDim,
-                    gl_nVoxel[0],
-                    gl_nVoxel[1],
-                    gl_nVoxel[2],
-                    gl_nPlanes[0],
-                    gl_nPlanes[1],
-                    gl_nPlanes[2],
-                    };
+    int setUp[] = {
+        gl_pixelDim,
+        gl_angularTrajectory,
+        gl_positionsAngularDistance,
+        gl_objectSideLength,
+        gl_detectorSideLength,
+        gl_distanceObjectDetector,
+        gl_distanceObjectSource,
+        gl_voxelXDim,
+        gl_voxelYDim,
+        gl_voxelZDim,
+        gl_nVoxel[0],
+        gl_nVoxel[1],
+        gl_nVoxel[2],
+        gl_nPlanes[0],
+        gl_nPlanes[1],
+        gl_nPlanes[2]
+    };
 
     if (!fwrite(setUp, sizeof(int), sizeof(setUp) / sizeof(int), filePointer)) {
         return 0;
@@ -296,7 +316,7 @@ int main(int argc, char *argv[])
     }
 
     printf("Output file details:\n");
-    printf("\tVoxel model size: %lu byte\n", sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * gl_nVoxel[Y]);
+    printSizeMaxGB("\tVoxel model size:", sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * gl_nVoxel[Y]);
     printf("\tImage type: %lu bit real\n", sizeof(double) * 8);
     printf("\tImage width: %d pixels\n", gl_nVoxel[X]);
     printf("\tImage height: %d pixels\n", gl_nVoxel[Z]);
@@ -306,4 +326,6 @@ int main(int argc, char *argv[])
 
     fclose(filePointer);
     free(grid);
+
+    return EXIT_SUCCESS;
 }

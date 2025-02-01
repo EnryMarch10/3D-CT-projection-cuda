@@ -10,7 +10,13 @@ DIRS := $(DIR_BIN) $(DIR_OBJ) $(DIR_BUILD)
 
 ### PROGRAMS ###
 
-#SERIAL := serial
+ifeq ($(DEBUG),yes)
+	MACROS += -DDEBUG
+else
+	MACROS += -DNO_CUDA_CHECK_ERROR
+endif
+
+# SERIAL := serial
 OPENMP := omp
 CUDA := cuda
 
@@ -18,14 +24,18 @@ TARGETS := $(OPENMP) $(CUDA) # $(SERIAL)
 
 EXE_INPUT := inputgen
 TARGET_INPUT := $(addprefix $(DIR_BIN)/, $(EXE_INPUT))
-# EXE_SERIAL := skyline
+EXE_SERIAL := projection
 # TARGET_SERIAL := $(addprefix $(DIR_BIN)/, $(EXE_SERIAL))
-EXE_OMP := $(basename $(wildcard omp-*.c))
+EXE_OMP_PROJECTION := omp-$(EXE_SERIAL)
+TARGET_OMP_PROJECTION := $(addprefix $(DIR_BIN)/, $(EXE_OMP_PROJECTION))
+EXE_OMP :=  $(filter-out $(EXE_OMP_PROJECTION), $(basename $(wildcard omp-*.c)))
 TARGET_OMP := $(addprefix $(DIR_BIN)/, $(EXE_OMP))
-EXE_CUDA := $(basename $(wildcard cuda-*.cu))
+EXE_CUDA_PROJECTION := cuda-$(EXE_SERIAL)
+TARGET_CUDA_PROJECTION := $(addprefix $(DIR_BIN)/, $(EXE_CUDA_PROJECTION))
+EXE_CUDA := $(filter-out $(EXE_CUDA_PROJECTION), $(basename $(wildcard cuda-*.c)))
 TARGET_CUDA := $(addprefix $(DIR_BIN)/, $(EXE_CUDA))
 
-EXE := $(EXE_INPUT) $(EXE_OMP) $(EXE_CUDA) # $(EXE_SERIAL)
+EXE := $(EXE_INPUT) $(EXE_OMP) $(EXE_CUDA) $(EXE_OMP_PROJECTION) $(EXE_CUDA_PROJECTION) # $(EXE_SERIAL)
 
 # C
 CC = gcc
@@ -36,7 +46,6 @@ LDLIBS += -lm
 # CUDA
 NVCC := nvcc
 NVCFLAGS += -Wno-deprecated-gpu-targets
-NVLDLIBS += -lm
 
 all: $(TARGETS) $(EXE_INPUT)
 
@@ -47,12 +56,16 @@ $(TARGET_INPUT): LFLAGS += -fopenmp
 # $(SERIAL): $(EXE_SERIAL)
 # $(EXE_SERIAL): $(TARGET_SERIAL)
 
-$(OPENMP): $(EXE_OMP)
+$(OPENMP): $(EXE_OMP_PROJECTION) $(EXE_OMP)
+$(EXE_OMP_PROJECTION): $(TARGET_OMP_PROJECTION)
+$(TARGET_OMP_PROJECTION): CFLAGS += -fopenmp
+$(TARGET_OMP_PROJECTION): LFLAGS += -fopenmp
 $(EXE_OMP): $(TARGET_OMP)
 $(TARGET_OMP): CFLAGS += -fopenmp
 $(TARGET_OMP): LFLAGS += -fopenmp
 
-$(CUDA): $(EXE_CUDA)
+$(CUDA): $(EXE_CUDA_PROJECTION) $(EXE_CUDA)
+$(EXE_CUDA_PROJECTION): $(TARGET_CUDA_PROJECTION)
 $(EXE_CUDA): $(TARGET_CUDA)
 
 .PRECIOUS: $(DIR_OBJ)/%.o
@@ -71,13 +84,13 @@ $(DIR_OBJ)/%.o: %.c hpc.h
 
 $(DIR_BIN)/%: %.cu
 	@mkdir -p $(DIR_BIN)
-	$(NVCC) $(NVCFLAGS) $^ -o $@ $(NVLDLIBS)
+	$(NVCC) $(MACROS) $(NVCFLAGS) $^ -o $@
 
 # INPUT
 
 $(DIR_BIN)/$(EXE_INPUT): $(DIR_OBJ)/$(EXE_INPUT).o
 	@mkdir -p $(DIR_BIN)
-	$(CC) $(LFLAGS) $^ -o $@
+	$(CC) $(LFLAGS) $^ -o $@ $(LDLIBS)
 
 $(DIR_OBJ)/$(EXE_INPUT).o: $(EXE_INPUT).c
 	@mkdir -p $(DIR_OBJ)
@@ -89,27 +102,37 @@ clean:
 
 ### DATA ###
 
+ifndef WORK_SIZE
+    SUFFIX_SIZE=default
+else
+    SUFFIX_SIZE=$(WORK_SIZE)
+endif
+
 ## INPUT
 
 DIR_INPUT := input
 
-CUBE_WITH_SPHERICAL_HOLE := cube_with_spherical_hole
-HALF_SPHERE := half_sphere
-CUBE := cube
+CUBE_WITH_SPHERICAL_HOLE := CubeWithSphericalHole
+HALF_SPHERE := HalfSphere
+CUBE := Cube
 
-SHAPES := $(CUBE_WITH_SPHERICAL_HOLE) $(HALF_SPHERE) $(CUBE)
+CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX := $(CUBE_WITH_SPHERICAL_HOLE)-$(SUFFIX_SIZE)
+HALF_SPHERE_WITH_SUFFIX := $(HALF_SPHERE)-$(SUFFIX_SIZE)
+CUBE_WITH_SUFFIX := $(CUBE)-$(SUFFIX_SIZE)
+
+SHAPES := $(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX) $(HALF_SPHERE_WITH_SUFFIX) $(CUBE_WITH_SUFFIX)
 
 inputs: $(addprefix $(DIR_INPUT)/, $(addsuffix .dat, $(SHAPES)))
 
-$(DIR_INPUT)/$(CUBE_WITH_SPHERICAL_HOLE).dat: $(DIR_BIN)/$(EXE_INPUT)
+$(DIR_INPUT)/$(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX).dat: $(DIR_BIN)/$(EXE_INPUT)
 	@mkdir -p $(DIR_INPUT)
 	$< $@ $(CUBE_WITH_SPHERICAL_HOLE) $(WORK_SIZE)
 
-$(DIR_INPUT)/$(HALF_SPHERE).dat: $(DIR_BIN)/$(EXE_INPUT)
+$(DIR_INPUT)/$(HALF_SPHERE_WITH_SUFFIX).dat: $(DIR_BIN)/$(EXE_INPUT)
 	@mkdir -p $(DIR_INPUT)
 	$< $@ $(HALF_SPHERE) $(WORK_SIZE)
 
-$(DIR_INPUT)/$(CUBE).dat: $(DIR_BIN)/$(EXE_INPUT)
+$(DIR_INPUT)/$(CUBE_WITH_SUFFIX).dat: $(DIR_BIN)/$(EXE_INPUT)
 	@mkdir -p $(DIR_INPUT)
 	$< $@ $(CUBE) $(WORK_SIZE)
 
@@ -117,29 +140,62 @@ $(DIR_INPUT)/$(CUBE).dat: $(DIR_BIN)/$(EXE_INPUT)
 
 DIR_OUTPUT := output
 
-outputs: $(addprefix $(DIR_OUTPUT)/, $(addsuffix .pgm, $(SHAPES)))
+# OpenMP
 
-$(DIR_OUTPUT)/$(CUBE_WITH_SPHERICAL_HOLE).pgm: $(DIR_BIN)/$(EXE_OMP) $(DIR_INPUT)/$(CUBE_WITH_SPHERICAL_HOLE).dat
-	@mkdir -p $(DIR_OUTPUT)
+DIR_OUTPUT_OMP := output/omp
+
+omp_outputs: $(addprefix $(DIR_OUTPUT_OMP)/, $(addsuffix .pgm, $(SHAPES)))
+
+$(DIR_OUTPUT_OMP)/$(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX).pgm: $(DIR_BIN)/$(EXE_OMP_PROJECTION) $(DIR_INPUT)/$(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX).dat
+	@mkdir -p $(DIR_OUTPUT_OMP)
 	$< $(word 2,$^) $@
 
-$(DIR_OUTPUT)/$(HALF_SPHERE).pgm: $(DIR_BIN)/$(EXE_OMP) $(DIR_INPUT)/$(HALF_SPHERE).dat
-	@mkdir -p $(DIR_OUTPUT)
+$(DIR_OUTPUT_OMP)/$(HALF_SPHERE_WITH_SUFFIX).pgm: $(DIR_BIN)/$(EXE_OMP_PROJECTION) $(DIR_INPUT)/$(HALF_SPHERE_WITH_SUFFIX).dat
+	@mkdir -p $(DIR_OUTPUT_OMP)
 	$< $(word 2,$^) $@
 
-$(DIR_OUTPUT)/$(CUBE).pgm: $(DIR_BIN)/$(EXE_OMP) $(DIR_INPUT)/$(CUBE).dat
-	@mkdir -p $(DIR_OUTPUT)
+$(DIR_OUTPUT_OMP)/$(CUBE_WITH_SUFFIX).pgm: $(DIR_BIN)/$(EXE_OMP_PROJECTION) $(DIR_INPUT)/$(CUBE_WITH_SUFFIX).dat
+	@mkdir -p $(DIR_OUTPUT_OMP)
 	$< $(word 2,$^) $@
 
-images: $(addprefix $(DIR_OUTPUT)/, $(addsuffix .png, $(SHAPES)))
+omp_images: $(addprefix $(DIR_OUTPUT_OMP)/, $(addsuffix .png, $(SHAPES)))
 
-$(DIR_OUTPUT)/$(CUBE_WITH_SPHERICAL_HOLE).png: $(DIR_OUTPUT)/$(CUBE_WITH_SPHERICAL_HOLE).pgm
+$(DIR_OUTPUT_OMP)/$(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX).png: $(DIR_OUTPUT_OMP)/$(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX).pgm
 	convert $^ $@
 
-$(DIR_OUTPUT)/$(HALF_SPHERE).png: $(DIR_OUTPUT)/$(HALF_SPHERE).pgm
+$(DIR_OUTPUT_OMP)/$(HALF_SPHERE_WITH_SUFFIX).png: $(DIR_OUTPUT_OMP)/$(HALF_SPHERE_WITH_SUFFIX).pgm
 	convert $^ $@
 
-$(DIR_OUTPUT)/$(CUBE).png: $(DIR_OUTPUT)/$(CUBE).pgm
+$(DIR_OUTPUT_OMP)/$(CUBE_WITH_SUFFIX).png: $(DIR_OUTPUT_OMP)/$(CUBE_WITH_SUFFIX).pgm
+	convert $^ $@
+
+# OpenMP
+
+DIR_OUTPUT_CUDA := output/cuda
+
+cuda_outputs: $(addprefix $(DIR_OUTPUT_CUDA)/, $(addsuffix .pgm, $(SHAPES)))
+
+$(DIR_OUTPUT_CUDA)/$(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX).pgm: $(DIR_BIN)/$(EXE_CUDA_PROJECTION) $(DIR_INPUT)/$(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX).dat
+	@mkdir -p $(DIR_OUTPUT_CUDA)
+	$< $(word 2,$^) $@
+
+$(DIR_OUTPUT_CUDA)/$(HALF_SPHERE_WITH_SUFFIX).pgm: $(DIR_BIN)/$(EXE_CUDA_PROJECTION) $(DIR_INPUT)/$(HALF_SPHERE_WITH_SUFFIX).dat
+	@mkdir -p $(DIR_OUTPUT_CUDA)
+	$< $(word 2,$^) $@
+
+$(DIR_OUTPUT_CUDA)/$(CUBE_WITH_SUFFIX).pgm: $(DIR_BIN)/$(EXE_CUDA_PROJECTION) $(DIR_INPUT)/$(CUBE_WITH_SUFFIX).dat
+	@mkdir -p $(DIR_OUTPUT_CUDA)
+	$< $(word 2,$^) $@
+
+cuda_images: $(addprefix $(DIR_OUTPUT_CUDA)/, $(addsuffix .png, $(SHAPES)))
+
+$(DIR_OUTPUT_CUDA)/$(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX).png: $(DIR_OUTPUT_CUDA)/$(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX).pgm
+	convert $^ $@
+
+$(DIR_OUTPUT_CUDA)/$(HALF_SPHERE_WITH_SUFFIX).png: $(DIR_OUTPUT_CUDA)/$(HALF_SPHERE_WITH_SUFFIX).pgm
+	convert $^ $@
+
+$(DIR_OUTPUT_CUDA)/$(CUBE_WITH_SUFFIX).png: $(DIR_OUTPUT_CUDA)/$(CUBE_WITH_SUFFIX).pgm
 	convert $^ $@
 
 ### GENERAL ###
@@ -149,29 +205,36 @@ help:
 	@echo "Available targets:"
 	@echo
 	@echo " General:"
-	@echo "       help    prints this message"
-	@echo "      purge    brutally removes build/*, input/* and output/*"
-	@echo "               with all contents"
+	@echo "        help    prints this message"
+	@echo "       purge    brutally removes build/*, input/* and output/*"
+	@echo "                with all contents"
 	@echo
 	@echo " Code:"
 	@echo
-	@echo "        all    compile everything (default)"
-	@echo "   inputgen    compile input generator program"
-#	@echo "     serial    compile serial program"
-	@echo "        omp    compile parallel OpenMP program"
-	@echo "       cuda    compile CUDA program"
-	@echo "      clean    cleanup generated executables"
+	@echo "         all    compile everything (default)"
+	@echo "    inputgen    compile input generator program"
+#	@echo "      serial    compile serial program"
+	@echo "         omp    compile parallel OpenMP program"
+	@echo "        cuda    compile CUDA program,"
+	@echo "                add DEBUG=yes if youu want to debug"
+	@echo "       clean    cleanup generated executables"
 	@echo
 	@echo " Data:"
 	@echo
-	@echo "     inputs    generate all input files, you can change the dimensions,"
-	@echo "               by default the variable WORK_SIZE is set to 2352"
-	@echo "    outputs    generate all output files"
-	@echo "               use OpenMP executable"
-	@echo "               for inputs WORK_SIZE can be specified"
-	@echo "     images    generate all output files in .png format"
-	@echo "               use OpenMP executable"
-	@echo "               for inputs WORK_SIZE can be specified"
+	@echo "      inputs    generate all input files, you can change the dimensions,"
+	@echo "                by default the variable WORK_SIZE is set to 2352"
+	@echo " omp_outputs    generate all output files"
+	@echo "                use OpenMP executable"
+	@echo "                for inputs WORK_SIZE can be specified"
+	@echo "  omp_images    generate all output files in .png format"
+	@echo "                use OpenMP executable"
+	@echo "                for inputs WORK_SIZE can be specified"
+	@echo "cuda_outputs    generate all output files"
+	@echo "                use CUDA executable"
+	@echo "                for inputs WORK_SIZE can be specified"
+	@echo " cuda_images    generate all output files in .png format"
+	@echo "                use CUDA executable"
+	@echo "                for inputs WORK_SIZE can be specified"
 	@echo
 
 purge:
