@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['readsetup_0',['readSetUP',['../omp-projection_8c.html#a094543d6ca60bd3a7c9904f3e5c5d0e5',1,'omp-projection.c']]]
+  ['kernel_5fcomputeprojections_0',['kernel_computeProjections',['../cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d',1,'cuda-projection.cu']]]
 ];

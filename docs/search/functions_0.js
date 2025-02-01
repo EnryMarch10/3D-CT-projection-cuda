@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['computeabsorption_0',['computeAbsorption',['../omp-projection_8c.html#af0caf76e76bd487d95a3eb3ce0ade25f',1,'omp-projection.c']]],
-  ['computeprojections_1',['computeProjections',['../omp-projection_8c.html#aabf7920b507f8bc88a35746500ceb56c',1,'omp-projection.c']]]
+  ['atomicmaxdouble_0',['atomicMaxDouble',['../cuda-projection_8cu.html#a3fd79c0584c62772fe1d567661aa0027',1,'cuda-projection.cu']]],
+  ['atomicmindouble_1',['atomicMinDouble',['../cuda-projection_8cu.html#af64aeee4fe94fa937cbce91f5d34890d',1,'cuda-projection.cu']]]
 ];

@@ -1,19 +1,5 @@
 var searchData=
 [
-  ['generatecubeslice_0',['generateCubeSlice',['../inputgen_8c.html#a5fbdf425bf803c4332c4498ffbe74909',1,'inputgen.c']]],
-  ['generatecubewithsphereslice_1',['generateCubeWithSphereSlice',['../inputgen_8c.html#a298ee4693eb0da7b2c3d8463980b1820',1,'inputgen.c']]],
-  ['generatesphereslice_2',['generateSphereSlice',['../inputgen_8c.html#aaac2e4fb3f1983ddea402bafb44c6ae7',1,'inputgen.c']]],
-  ['getallintersections_3',['getAllIntersections',['../omp-projection_8c.html#aab23497116712e73fd615f6bdaa2766e',1,'omp-projection.c']]],
-  ['getamax_4',['getAMax',['../omp-projection_8c.html#aef436783a4bc76a348cf39c942c42d01',1,'omp-projection.c']]],
-  ['getamin_5',['getAMin',['../omp-projection_8c.html#a73679a64b017a5578d232a5627587c50',1,'omp-projection.c']]],
-  ['getintersection_6',['getIntersection',['../omp-projection_8c.html#adaf13d80c79b3cac8b8ee8143dbf4dd6',1,'omp-projection.c']]],
-  ['getpixel_7',['getPixel',['../omp-projection_8c.html#a2ae47d18f1fb51f2aa28602ddc0c8390',1,'omp-projection.c']]],
-  ['getrangeofindex_8',['getRangeOfIndex',['../omp-projection_8c.html#aa5c9680241b94ef3b5d5dd53bcefe022',1,'omp-projection.c']]],
-  ['getsidesxplanes_9',['getSidesXPlanes',['../omp-projection_8c.html#a3faf293b62178da1ea86d1f6dc3e891d',1,'omp-projection.c']]],
-  ['getsidesyplanes_10',['getSidesYPlanes',['../omp-projection_8c.html#a04ddea75013aee6a91318a641550c95a',1,'omp-projection.c']]],
-  ['getsideszplanes_11',['getSidesZPlanes',['../omp-projection_8c.html#ab468469d53baf0666599c7d93e031449',1,'omp-projection.c']]],
-  ['getsource_12',['getSource',['../omp-projection_8c.html#a9aaeb5802feab4cd9d5d8fe4ee1d7e06',1,'omp-projection.c']]],
-  ['getxplane_13',['getXPlane',['../omp-projection_8c.html#ac102667a9825b0e57cc343819a1d7143',1,'omp-projection.c']]],
-  ['getyplane_14',['getYPlane',['../omp-projection_8c.html#ac956c9cf71374f10800f6f646cbfd539',1,'omp-projection.c']]],
-  ['getzplane_15',['getZPlane',['../omp-projection_8c.html#a9e002b12657825ed4f491fe96ac76186',1,'omp-projection.c']]]
+  ['computeabsorption_0',['computeabsorption',['../cuda-projection_8cu.html#ab10e4b2d21f7c51c35a200587b43a80d',1,'computeAbsorption(const int slice, const Point source, const Point pixel, const double *const a, const int lenA, const double *const f):&#160;cuda-projection.cu'],['../omp-projection_8c.html#af0caf76e76bd487d95a3eb3ce0ade25f',1,'computeAbsorption(Point source, Point pixel, double *a, int lenA, int slice, double *f):&#160;omp-projection.c']]],
+  ['computeprojections_1',['computeprojections',['../cuda-projection_8cu.html#a3b68d9b9f686ca9edff51a109700f0bc',1,'computeProjections(const int slice, double *f, const size_t sizeF, const int nTheta, const int nSidePixels, const char isFirst):&#160;cuda-projection.cu'],['../omp-projection_8c.html#aabf7920b507f8bc88a35746500ceb56c',1,'computeProjections(int slice, double *f, double *g, double *gMin, double *gMax):&#160;omp-projection.c']]]
 ];

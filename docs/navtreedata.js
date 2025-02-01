@@ -30,7 +30,8 @@ var NAVTREE =
       [ "Structure", "md__2home_2enry_2Software_23D-CT-projection-cuda_2src_2README.html#structure", [
         [ "Makefile", "md__2home_2enry_2Software_23D-CT-projection-cuda_2src_2README.html#makefile", null ],
         [ "Input Generation", "md__2home_2enry_2Software_23D-CT-projection-cuda_2src_2README.html#input-generation", null ],
-        [ "CPU Siddon's Projection", "md__2home_2enry_2Software_23D-CT-projection-cuda_2src_2README.html#cpu-siddons-projection", null ]
+        [ "CPU Siddon's Projection", "md__2home_2enry_2Software_23D-CT-projection-cuda_2src_2README.html#cpu-siddons-projection", null ],
+        [ "NVIDIA GPU Siddon's Projection", "md__2home_2enry_2Software_23D-CT-projection-cuda_2src_2README.html#nvidia-gpu-siddons-projection", null ]
       ] ]
     ] ],
     [ "Data Structures", "annotated.html", [

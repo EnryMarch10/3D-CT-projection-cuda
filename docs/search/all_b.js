@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['ranges_0',['Ranges',['../structRanges.html',1,'']]],
-  ['readsetup_1',['readSetUP',['../omp-projection_8c.html#a094543d6ca60bd3a7c9904f3e5c5d0e5',1,'omp-projection.c']]]
+  ['point_0',['Point',['../structPoint.html',1,'']]],
+  ['projection_1',['projection',['../md__2home_2enry_2Software_23D-CT-projection-cuda_2src_2README.html#cpu-siddons-projection',1,'CPU Siddon&apos;s Projection'],['../md__2home_2enry_2Software_23D-CT-projection-cuda_2src_2README.html#nvidia-gpu-siddons-projection',1,'NVIDIA GPU Siddon&apos;s Projection']]],
+  ['projection_20algorithm_2',['CUDA implementation of a tomographic projection algorithm',['../index.html',1,'']]]
 ];

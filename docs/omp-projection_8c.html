@@ -116,102 +116,102 @@ Include dependency graph for omp-projection.c:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a28e9af725dfe6fdf44b8d2fc2661d8e6" id="r_a28e9af725dfe6fdf44b8d2fc2661d8e6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a28e9af725dfe6fdf44b8d2fc2661d8e6">OBJ_BUFFER</a>&#160;&#160;&#160;100</td></tr>
+<tr class="memitem:a28e9af725dfe6fdf44b8d2fc2661d8e6" id="r_a28e9af725dfe6fdf44b8d2fc2661d8e6"><td class="memItemLeft" align="right" valign="top">#<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">define</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a28e9af725dfe6fdf44b8d2fc2661d8e6">OBJ_BUFFER</a>&#160;&#160;&#160;100</td></tr>
 <tr class="separator:a28e9af725dfe6fdf44b8d2fc2661d8e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:af0d19fe4c3150a7feb2c29081941a6fc" id="r_af0d19fe4c3150a7feb2c29081941a6fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#af0d19fe4c3150a7feb2c29081941a6fc">initTables</a> (double *sinTable, double *cosTable, const int length)</td></tr>
+<tr class="memitem:af0d19fe4c3150a7feb2c29081941a6fc" id="r_af0d19fe4c3150a7feb2c29081941a6fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#af0d19fe4c3150a7feb2c29081941a6fc">initTables</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">sinTable</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">cosTable</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">length</a>)</td></tr>
 <tr class="memdesc:af0d19fe4c3150a7feb2c29081941a6fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes <code>sin</code> and <code>cos</code> tables, with default values for a certain length.  <br /></td></tr>
 <tr class="separator:af0d19fe4c3150a7feb2c29081941a6fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd8bbcfabb3ddef2ccaafb9928a37b95" id="r_abd8bbcfabb3ddef2ccaafb9928a37b95"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#abd8bbcfabb3ddef2ccaafb9928a37b95">min</a> (int a, int b)</td></tr>
+<tr class="memitem:abd8bbcfabb3ddef2ccaafb9928a37b95" id="r_abd8bbcfabb3ddef2ccaafb9928a37b95"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#abd8bbcfabb3ddef2ccaafb9928a37b95">min</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">a</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">b</a>)</td></tr>
 <tr class="memdesc:abd8bbcfabb3ddef2ccaafb9928a37b95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the minimum value between <code>a</code> and <code>b</code>.  <br /></td></tr>
 <tr class="separator:abd8bbcfabb3ddef2ccaafb9928a37b95"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a242710ffc6c186821800ab581fc06174" id="r_a242710ffc6c186821800ab581fc06174"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a242710ffc6c186821800ab581fc06174">min3</a> (int a, int b, int c)</td></tr>
+<tr class="memitem:a242710ffc6c186821800ab581fc06174" id="r_a242710ffc6c186821800ab581fc06174"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a242710ffc6c186821800ab581fc06174">min3</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">a</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">b</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">c</a>)</td></tr>
 <tr class="memdesc:a242710ffc6c186821800ab581fc06174"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the minimum value between <code>a</code>, <code>b</code> and <code>c</code>.  <br /></td></tr>
 <tr class="separator:a242710ffc6c186821800ab581fc06174"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac102667a9825b0e57cc343819a1d7143" id="r_ac102667a9825b0e57cc343819a1d7143"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ac102667a9825b0e57cc343819a1d7143">getXPlane</a> (int index)</td></tr>
+<tr class="memitem:ac102667a9825b0e57cc343819a1d7143" id="r_ac102667a9825b0e57cc343819a1d7143"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ac102667a9825b0e57cc343819a1d7143">getXPlane</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> index)</td></tr>
 <tr class="memdesc:ac102667a9825b0e57cc343819a1d7143"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the coordinate of a plane parallel relative to the YZ plane.  <br /></td></tr>
 <tr class="separator:ac102667a9825b0e57cc343819a1d7143"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac956c9cf71374f10800f6f646cbfd539" id="r_ac956c9cf71374f10800f6f646cbfd539"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ac956c9cf71374f10800f6f646cbfd539">getYPlane</a> (int index)</td></tr>
+<tr class="memitem:ac956c9cf71374f10800f6f646cbfd539" id="r_ac956c9cf71374f10800f6f646cbfd539"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ac956c9cf71374f10800f6f646cbfd539">getYPlane</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> index)</td></tr>
 <tr class="memdesc:ac956c9cf71374f10800f6f646cbfd539"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the coordinate of a plane parallel relative to the XZ plane.  <br /></td></tr>
 <tr class="separator:ac956c9cf71374f10800f6f646cbfd539"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e002b12657825ed4f491fe96ac76186" id="r_a9e002b12657825ed4f491fe96ac76186"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a9e002b12657825ed4f491fe96ac76186">getZPlane</a> (int index)</td></tr>
+<tr class="memitem:a9e002b12657825ed4f491fe96ac76186" id="r_a9e002b12657825ed4f491fe96ac76186"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a9e002b12657825ed4f491fe96ac76186">getZPlane</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> index)</td></tr>
 <tr class="memdesc:a9e002b12657825ed4f491fe96ac76186"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the coordinate of a plane parallel relative to the XY plane.  <br /></td></tr>
 <tr class="separator:a9e002b12657825ed4f491fe96ac76186"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef436783a4bc76a348cf39c942c42d01" id="r_aef436783a4bc76a348cf39c942c42d01"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aef436783a4bc76a348cf39c942c42d01">getAMax</a> (double a[3][2], int isParallel)</td></tr>
+<tr class="memitem:aef436783a4bc76a348cf39c942c42d01" id="r_aef436783a4bc76a348cf39c942c42d01"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aef436783a4bc76a348cf39c942c42d01">getAMax</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">a</a>[3][2], <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">isParallel</a>)</td></tr>
 <tr class="memdesc:aef436783a4bc76a348cf39c942c42d01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the maximum parametric value a, representing the last intersection between ray and object.  <br /></td></tr>
 <tr class="separator:aef436783a4bc76a348cf39c942c42d01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73679a64b017a5578d232a5627587c50" id="r_a73679a64b017a5578d232a5627587c50"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a73679a64b017a5578d232a5627587c50">getAMin</a> (double a[3][2], int isParallel)</td></tr>
+<tr class="memitem:a73679a64b017a5578d232a5627587c50" id="r_a73679a64b017a5578d232a5627587c50"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a73679a64b017a5578d232a5627587c50">getAMin</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">a</a>[3][2], <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">isParallel</a>)</td></tr>
 <tr class="memdesc:a73679a64b017a5578d232a5627587c50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the minimum parametric value a, representing the fist intersection between ray and object.  <br /></td></tr>
 <tr class="separator:a73679a64b017a5578d232a5627587c50"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adaf13d80c79b3cac8b8ee8143dbf4dd6" id="r_adaf13d80c79b3cac8b8ee8143dbf4dd6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#adaf13d80c79b3cac8b8ee8143dbf4dd6">getIntersection</a> (double source, double pixel, double *plane, int nPlanes, double *a)</td></tr>
+<tr class="memitem:adaf13d80c79b3cac8b8ee8143dbf4dd6" id="r_adaf13d80c79b3cac8b8ee8143dbf4dd6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#adaf13d80c79b3cac8b8ee8143dbf4dd6">getIntersection</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">source</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">pixel</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">plane</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">nPlanes</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">a</a>)</td></tr>
 <tr class="memdesc:adaf13d80c79b3cac8b8ee8143dbf4dd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the the intersections between a ray and a set of planes.  <br /></td></tr>
 <tr class="separator:adaf13d80c79b3cac8b8ee8143dbf4dd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab23497116712e73fd615f6bdaa2766e" id="r_aab23497116712e73fd615f6bdaa2766e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aab23497116712e73fd615f6bdaa2766e">getAllIntersections</a> (const double source, const double pixel, const <a class="el" href="structRanges.html">Ranges</a> planeIndexesRanges, double *a, <a class="el" href="common_8h.html#ae3996976d8ffb3e58d88f58227473f8e">Axis</a> axis)</td></tr>
-<tr class="memdesc:aab23497116712e73fd615f6bdaa2766e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the coordinates of the planes necessary to compute the intersections with the ray. Then it calls <a class="el" href="omp-projection_8c.html#adaf13d80c79b3cac8b8ee8143dbf4dd6">getIntersection()</a>.  <br /></td></tr>
+<tr class="memitem:aab23497116712e73fd615f6bdaa2766e" id="r_aab23497116712e73fd615f6bdaa2766e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aab23497116712e73fd615f6bdaa2766e">getAllIntersections</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">source</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">pixel</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="structRanges.html">Ranges</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">planeIndexesRanges</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">a</a>, <a class="el" href="common_8h.html#ae3996976d8ffb3e58d88f58227473f8e">Axis</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">axis</a>)</td></tr>
+<tr class="memdesc:aab23497116712e73fd615f6bdaa2766e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the coordinates of the planes necessary to compute the intersections with the ray. Then it calls <a class="el" href="cuda-projection_8cu.html#aa1bd06cab74345ea623c48785299736e">getIntersection()</a>.  <br /></td></tr>
 <tr class="separator:aab23497116712e73fd615f6bdaa2766e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5c9680241b94ef3b5d5dd53bcefe022" id="r_aa5c9680241b94ef3b5d5dd53bcefe022"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structRanges.html">Ranges</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aa5c9680241b94ef3b5d5dd53bcefe022">getRangeOfIndex</a> (const double source, const double pixel, int isParallel, double aMin, double aMax, <a class="el" href="common_8h.html#ae3996976d8ffb3e58d88f58227473f8e">Axis</a> axis)</td></tr>
+<tr class="memitem:aa5c9680241b94ef3b5d5dd53bcefe022" id="r_aa5c9680241b94ef3b5d5dd53bcefe022"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structRanges.html">Ranges</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aa5c9680241b94ef3b5d5dd53bcefe022">getRangeOfIndex</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">source</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">pixel</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">isParallel</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">aMin</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">aMax</a>, <a class="el" href="common_8h.html#ae3996976d8ffb3e58d88f58227473f8e">Axis</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">axis</a>)</td></tr>
 <tr class="memdesc:aa5c9680241b94ef3b5d5dd53bcefe022"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the range of parametric values of the planes.  <br /></td></tr>
 <tr class="separator:aa5c9680241b94ef3b5d5dd53bcefe022"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae093475516e0af47d7370aab234e102f" id="r_ae093475516e0af47d7370aab234e102f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ae093475516e0af47d7370aab234e102f">merge</a> (double *a, double *b, int lenA, int lenB, double *c)</td></tr>
+<tr class="memitem:ae093475516e0af47d7370aab234e102f" id="r_ae093475516e0af47d7370aab234e102f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ae093475516e0af47d7370aab234e102f">merge</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">a</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">b</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">lenA</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">lenB</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">c</a>)</td></tr>
 <tr class="memdesc:ae093475516e0af47d7370aab234e102f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merges two sorted arrays into one single sorted array.  <br /></td></tr>
 <tr class="separator:ae093475516e0af47d7370aab234e102f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad79f89bbd9169631ffe9fdd39f762492" id="r_ad79f89bbd9169631ffe9fdd39f762492"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ad79f89bbd9169631ffe9fdd39f762492">merge3</a> (double *a, double *b, double *c, int lenA, int lenB, int lenC, double *merged)</td></tr>
+<tr class="memitem:ad79f89bbd9169631ffe9fdd39f762492" id="r_ad79f89bbd9169631ffe9fdd39f762492"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ad79f89bbd9169631ffe9fdd39f762492">merge3</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">a</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">b</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">c</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">lenA</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">lenB</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">lenC</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">merged</a>)</td></tr>
 <tr class="memdesc:ad79f89bbd9169631ffe9fdd39f762492"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merges three sorted arrays into one single sorted array.  <br /></td></tr>
 <tr class="separator:ad79f89bbd9169631ffe9fdd39f762492"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9aaeb5802feab4cd9d5d8fe4ee1d7e06" id="r_a9aaeb5802feab4cd9d5d8fe4ee1d7e06"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPoint.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a9aaeb5802feab4cd9d5d8fe4ee1d7e06">getSource</a> (double *sinTable, double *cosTable, int index)</td></tr>
+<tr class="memitem:a9aaeb5802feab4cd9d5d8fe4ee1d7e06" id="r_a9aaeb5802feab4cd9d5d8fe4ee1d7e06"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPoint.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a9aaeb5802feab4cd9d5d8fe4ee1d7e06">getSource</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">sinTable</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">cosTable</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> index)</td></tr>
 <tr class="memdesc:a9aaeb5802feab4cd9d5d8fe4ee1d7e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the cartesian coordinates of the source.  <br /></td></tr>
 <tr class="separator:a9aaeb5802feab4cd9d5d8fe4ee1d7e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ae47d18f1fb51f2aa28602ddc0c8390" id="r_a2ae47d18f1fb51f2aa28602ddc0c8390"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPoint.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a2ae47d18f1fb51f2aa28602ddc0c8390">getPixel</a> (double *sinTable, double *cosTable, int r, int c, int index)</td></tr>
+<tr class="memitem:a2ae47d18f1fb51f2aa28602ddc0c8390" id="r_a2ae47d18f1fb51f2aa28602ddc0c8390"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPoint.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a2ae47d18f1fb51f2aa28602ddc0c8390">getPixel</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">sinTable</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">cosTable</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">r</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">c</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> index)</td></tr>
 <tr class="memdesc:a2ae47d18f1fb51f2aa28602ddc0c8390"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the cartesian coordinates of a unit of the detector.  <br /></td></tr>
 <tr class="separator:a2ae47d18f1fb51f2aa28602ddc0c8390"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3faf293b62178da1ea86d1f6dc3e891d" id="r_a3faf293b62178da1ea86d1f6dc3e891d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a3faf293b62178da1ea86d1f6dc3e891d">getSidesXPlanes</a> (double *planes)</td></tr>
+<tr class="memitem:a3faf293b62178da1ea86d1f6dc3e891d" id="r_a3faf293b62178da1ea86d1f6dc3e891d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a3faf293b62178da1ea86d1f6dc3e891d">getSidesXPlanes</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">planes</a>)</td></tr>
 <tr class="memdesc:a3faf293b62178da1ea86d1f6dc3e891d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a coordinate of the two planes of the object's sides orthogonal to the x axis.  <br /></td></tr>
 <tr class="separator:a3faf293b62178da1ea86d1f6dc3e891d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04ddea75013aee6a91318a641550c95a" id="r_a04ddea75013aee6a91318a641550c95a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a04ddea75013aee6a91318a641550c95a">getSidesYPlanes</a> (double *planes, int slice)</td></tr>
+<tr class="memitem:a04ddea75013aee6a91318a641550c95a" id="r_a04ddea75013aee6a91318a641550c95a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a04ddea75013aee6a91318a641550c95a">getSidesYPlanes</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">planes</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">slice</a>)</td></tr>
 <tr class="memdesc:a04ddea75013aee6a91318a641550c95a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a coordinate of the two planes of the object's sides orthogonal to the y axis.  <br /></td></tr>
 <tr class="separator:a04ddea75013aee6a91318a641550c95a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab468469d53baf0666599c7d93e031449" id="r_ab468469d53baf0666599c7d93e031449"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ab468469d53baf0666599c7d93e031449">getSidesZPlanes</a> (double *planes)</td></tr>
+<tr class="memitem:ab468469d53baf0666599c7d93e031449" id="r_ab468469d53baf0666599c7d93e031449"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ab468469d53baf0666599c7d93e031449">getSidesZPlanes</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">planes</a>)</td></tr>
 <tr class="memdesc:ab468469d53baf0666599c7d93e031449"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a coordinate of the two planes of the object's sides orthogonal to the z axis.  <br /></td></tr>
 <tr class="separator:ab468469d53baf0666599c7d93e031449"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0caf76e76bd487d95a3eb3ce0ade25f" id="r_af0caf76e76bd487d95a3eb3ce0ade25f"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#af0caf76e76bd487d95a3eb3ce0ade25f">computeAbsorption</a> (<a class="el" href="structPoint.html">Point</a> source, <a class="el" href="structPoint.html">Point</a> pixel, double *a, int lenA, int slice, double *f)</td></tr>
+<tr class="memitem:af0caf76e76bd487d95a3eb3ce0ade25f" id="r_af0caf76e76bd487d95a3eb3ce0ade25f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#af0caf76e76bd487d95a3eb3ce0ade25f">computeAbsorption</a> (<a class="el" href="structPoint.html">Point</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">source</a>, <a class="el" href="structPoint.html">Point</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">pixel</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">a</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">lenA</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">slice</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">f</a>)</td></tr>
 <tr class="memdesc:af0caf76e76bd487d95a3eb3ce0ade25f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the projection attenuation of the radiological path of a ray.  <br /></td></tr>
 <tr class="separator:af0caf76e76bd487d95a3eb3ce0ade25f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabf7920b507f8bc88a35746500ceb56c" id="r_aabf7920b507f8bc88a35746500ceb56c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aabf7920b507f8bc88a35746500ceb56c">computeProjections</a> (int slice, double *f, double *g, double *gMin, double *gMax)</td></tr>
+<tr class="memitem:aabf7920b507f8bc88a35746500ceb56c" id="r_aabf7920b507f8bc88a35746500ceb56c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aabf7920b507f8bc88a35746500ceb56c">computeProjections</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">slice</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">f</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">g</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">gMin</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">gMax</a>)</td></tr>
 <tr class="memdesc:aabf7920b507f8bc88a35746500ceb56c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the projection of a sub-section of the object into the detector for each source position.  <br /></td></tr>
 <tr class="separator:aabf7920b507f8bc88a35746500ceb56c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a094543d6ca60bd3a7c9904f3e5c5d0e5" id="r_a094543d6ca60bd3a7c9904f3e5c5d0e5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a094543d6ca60bd3a7c9904f3e5c5d0e5">readSetUP</a> (FILE *filePointer)</td></tr>
+<tr class="memitem:a094543d6ca60bd3a7c9904f3e5c5d0e5" id="r_a094543d6ca60bd3a7c9904f3e5c5d0e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a094543d6ca60bd3a7c9904f3e5c5d0e5">readSetUP</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">FILE</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">filePointer</a>)</td></tr>
 <tr class="memdesc:a094543d6ca60bd3a7c9904f3e5c5d0e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the environment values used to compute the voxel grid from the specified binary file.  <br /></td></tr>
 <tr class="separator:a094543d6ca60bd3a7c9904f3e5c5d0e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97" id="r_a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a0ddf1224851353fc92bfbff6f499fa97">main</a> (int argc, char *argv[])</td></tr>
+<tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97" id="r_a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a0ddf1224851353fc92bfbff6f499fa97">main</a> (<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">argc</a>, <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">char</a> *<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">argv</a>[])</td></tr>
 <tr class="separator:a0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a940cce926de7747b907c22eb8b72246a" id="r_a940cce926de7747b907c22eb8b72246a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a940cce926de7747b907c22eb8b72246a">gl_pixelDim</a></td></tr>
+<tr class="memitem:a940cce926de7747b907c22eb8b72246a" id="r_a940cce926de7747b907c22eb8b72246a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a940cce926de7747b907c22eb8b72246a">gl_pixelDim</a></td></tr>
 <tr class="separator:a940cce926de7747b907c22eb8b72246a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82bab47ee8b8b905b94a5dbe39d8669b" id="r_a82bab47ee8b8b905b94a5dbe39d8669b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a82bab47ee8b8b905b94a5dbe39d8669b">gl_angularTrajectory</a></td></tr>
+<tr class="memitem:a82bab47ee8b8b905b94a5dbe39d8669b" id="r_a82bab47ee8b8b905b94a5dbe39d8669b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a82bab47ee8b8b905b94a5dbe39d8669b">gl_angularTrajectory</a></td></tr>
 <tr class="separator:a82bab47ee8b8b905b94a5dbe39d8669b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb3e000e6f55f45391e0b79100bf619f" id="r_afb3e000e6f55f45391e0b79100bf619f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#afb3e000e6f55f45391e0b79100bf619f">gl_positionsAngularDistance</a></td></tr>
+<tr class="memitem:afb3e000e6f55f45391e0b79100bf619f" id="r_afb3e000e6f55f45391e0b79100bf619f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#afb3e000e6f55f45391e0b79100bf619f">gl_positionsAngularDistance</a></td></tr>
 <tr class="separator:afb3e000e6f55f45391e0b79100bf619f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad30413822fd888874fe9e8f54326a561" id="r_ad30413822fd888874fe9e8f54326a561"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ad30413822fd888874fe9e8f54326a561">gl_objectSideLength</a></td></tr>
+<tr class="memitem:ad30413822fd888874fe9e8f54326a561" id="r_ad30413822fd888874fe9e8f54326a561"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ad30413822fd888874fe9e8f54326a561">gl_objectSideLength</a></td></tr>
 <tr class="separator:ad30413822fd888874fe9e8f54326a561"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee8e6a99dbbbb96f5669b7d529ff3190" id="r_aee8e6a99dbbbb96f5669b7d529ff3190"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aee8e6a99dbbbb96f5669b7d529ff3190">gl_detectorSideLength</a></td></tr>
+<tr class="memitem:aee8e6a99dbbbb96f5669b7d529ff3190" id="r_aee8e6a99dbbbb96f5669b7d529ff3190"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#aee8e6a99dbbbb96f5669b7d529ff3190">gl_detectorSideLength</a></td></tr>
 <tr class="separator:aee8e6a99dbbbb96f5669b7d529ff3190"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42f7b138cba63b74c508dd1ade4500e1" id="r_a42f7b138cba63b74c508dd1ade4500e1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a42f7b138cba63b74c508dd1ade4500e1">gl_distanceObjectDetector</a></td></tr>
+<tr class="memitem:a42f7b138cba63b74c508dd1ade4500e1" id="r_a42f7b138cba63b74c508dd1ade4500e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a42f7b138cba63b74c508dd1ade4500e1">gl_distanceObjectDetector</a></td></tr>
 <tr class="separator:a42f7b138cba63b74c508dd1ade4500e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adaa658b3763f0bad6f1f3dc5e9bc6adc" id="r_adaa658b3763f0bad6f1f3dc5e9bc6adc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#adaa658b3763f0bad6f1f3dc5e9bc6adc">gl_distanceObjectSource</a></td></tr>
+<tr class="memitem:adaa658b3763f0bad6f1f3dc5e9bc6adc" id="r_adaa658b3763f0bad6f1f3dc5e9bc6adc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#adaa658b3763f0bad6f1f3dc5e9bc6adc">gl_distanceObjectSource</a></td></tr>
 <tr class="separator:adaa658b3763f0bad6f1f3dc5e9bc6adc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada6c819e0083eab58e09e039b837283e" id="r_ada6c819e0083eab58e09e039b837283e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ada6c819e0083eab58e09e039b837283e">gl_voxelXDim</a></td></tr>
+<tr class="memitem:ada6c819e0083eab58e09e039b837283e" id="r_ada6c819e0083eab58e09e039b837283e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ada6c819e0083eab58e09e039b837283e">gl_voxelXDim</a></td></tr>
 <tr class="separator:ada6c819e0083eab58e09e039b837283e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03ad0df29f82f5ed25557bd36ea503dc" id="r_a03ad0df29f82f5ed25557bd36ea503dc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a03ad0df29f82f5ed25557bd36ea503dc">gl_voxelYDim</a></td></tr>
+<tr class="memitem:a03ad0df29f82f5ed25557bd36ea503dc" id="r_a03ad0df29f82f5ed25557bd36ea503dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a03ad0df29f82f5ed25557bd36ea503dc">gl_voxelYDim</a></td></tr>
 <tr class="separator:a03ad0df29f82f5ed25557bd36ea503dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35d74500da7cdf09d6499f1bd064320b" id="r_a35d74500da7cdf09d6499f1bd064320b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a35d74500da7cdf09d6499f1bd064320b">gl_voxelZDim</a></td></tr>
+<tr class="memitem:a35d74500da7cdf09d6499f1bd064320b" id="r_a35d74500da7cdf09d6499f1bd064320b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a35d74500da7cdf09d6499f1bd064320b">gl_voxelZDim</a></td></tr>
 <tr class="separator:a35d74500da7cdf09d6499f1bd064320b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d996a3a6956800d0a86144e8acacc07" id="r_a5d996a3a6956800d0a86144e8acacc07"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a5d996a3a6956800d0a86144e8acacc07">gl_nVoxel</a> [3]</td></tr>
+<tr class="memitem:a5d996a3a6956800d0a86144e8acacc07" id="r_a5d996a3a6956800d0a86144e8acacc07"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#a5d996a3a6956800d0a86144e8acacc07">gl_nVoxel</a> [3]</td></tr>
 <tr class="separator:a5d996a3a6956800d0a86144e8acacc07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac76cf9baba8be1884b7b6a7a94c231b9" id="r_ac76cf9baba8be1884b7b6a7a94c231b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ac76cf9baba8be1884b7b6a7a94c231b9">gl_nPlanes</a> [3]</td></tr>
+<tr class="memitem:ac76cf9baba8be1884b7b6a7a94c231b9" id="r_ac76cf9baba8be1884b7b6a7a94c231b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="omp-projection_8c.html#ac76cf9baba8be1884b7b6a7a94c231b9">gl_nPlanes</a> [3]</td></tr>
 <tr class="separator:ac76cf9baba8be1884b7b6a7a94c231b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -246,7 +246,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define OBJ_BUFFER&#160;&#160;&#160;100</td>
+          <td class="memname">#<a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">define</a> OBJ_BUFFER&#160;&#160;&#160;100</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -263,7 +263,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double computeAbsorption </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> computeAbsorption </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structPoint.html">Point</a>&#160;</td>
           <td class="paramname"><em>source</em>, </td>
@@ -277,25 +277,25 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>lenA</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>slice</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>f</em>&#160;</td>
         </tr>
         <tr>
@@ -336,33 +336,33 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void computeProjections </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a> computeProjections </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>slice</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>f</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>g</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>gMin</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>gMax</em>&#160;</td>
         </tr>
         <tr>
@@ -401,27 +401,27 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void getAllIntersections </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a> getAllIntersections </td>
           <td>(</td>
-          <td class="paramtype">const double&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td>
           <td class="paramname"><em>source</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const double&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td>
           <td class="paramname"><em>pixel</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="structRanges.html">Ranges</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="structRanges.html">Ranges</a>&#160;</td>
           <td class="paramname"><em>planeIndexesRanges</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
@@ -438,7 +438,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Computes the coordinates of the planes necessary to compute the intersections with the ray. Then it calls <a class="el" href="omp-projection_8c.html#adaf13d80c79b3cac8b8ee8143dbf4dd6">getIntersection()</a>. </p>
+<p>Computes the coordinates of the planes necessary to compute the intersections with the ray. Then it calls <a class="el" href="cuda-projection_8cu.html#aa1bd06cab74345ea623c48785299736e">getIntersection()</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>Represents the coordinate of the source. </td></tr>
@@ -466,15 +466,15 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double getAMax </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> getAMax </td>
           <td>(</td>
-          <td class="paramtype">double&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td>
           <td class="paramname"><em>a</em>[3][2], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>isParallel</em>&#160;</td>
         </tr>
         <tr>
@@ -496,6 +496,11 @@ Here is the call graph for this function:</div>
 <dl class="section return"><dt>Returns</dt><dd>The maximum parametric value a, representing the last intersection between ray and object. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00141">141</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="omp-projection_8c_aef436783a4bc76a348cf39c942c42d01_cgraph.png" border="0" usemap="#aomp-projection_8c_aef436783a4bc76a348cf39c942c42d01_cgraph" alt=""/></div>
+</div>
 
 </div>
 </div>
@@ -506,15 +511,15 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double getAMin </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> getAMin </td>
           <td>(</td>
-          <td class="paramtype">double&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td>
           <td class="paramname"><em>a</em>[3][2], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>isParallel</em>&#160;</td>
         </tr>
         <tr>
@@ -536,6 +541,11 @@ Here is the call graph for this function:</div>
 <dl class="section return"><dt>Returns</dt><dd>The minimum parametric value a, representing the last intersection between ray and object. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00165">165</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="omp-projection_8c_a73679a64b017a5578d232a5627587c50_cgraph.png" border="0" usemap="#aomp-projection_8c_a73679a64b017a5578d232a5627587c50_cgraph" alt=""/></div>
+</div>
 
 </div>
 </div>
@@ -546,33 +556,33 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int getIntersection </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> getIntersection </td>
           <td>(</td>
-          <td class="paramtype">double&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td>
           <td class="paramname"><em>source</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td>
           <td class="paramname"><em>pixel</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>plane</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>nPlanes</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>a</em>&#160;</td>
         </tr>
         <tr>
@@ -597,6 +607,11 @@ Here is the call graph for this function:</div>
 <dl class="section return"><dt>Returns</dt><dd>0 if ray is parallel to the planes, 1 otherwise. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00193">193</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="omp-projection_8c_adaf13d80c79b3cac8b8ee8143dbf4dd6_cgraph.png" border="0" usemap="#aomp-projection_8c_adaf13d80c79b3cac8b8ee8143dbf4dd6_cgraph" alt=""/></div>
+</div>
 
 </div>
 </div>
@@ -609,31 +624,31 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname"><a class="el" href="structPoint.html">Point</a> getPixel </td>
           <td>(</td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>sinTable</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>cosTable</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>r</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>c</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>index</em>&#160;</td>
         </tr>
         <tr>
@@ -658,6 +673,11 @@ Here is the call graph for this function:</div>
 <dl class="section return"><dt>Returns</dt><dd>The coordinates of a unit of the detector, relative to the specified source. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00383">383</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="omp-projection_8c_a2ae47d18f1fb51f2aa28602ddc0c8390_cgraph.png" border="0" usemap="#aomp-projection_8c_a2ae47d18f1fb51f2aa28602ddc0c8390_cgraph" alt=""/></div>
+</div>
 
 </div>
 </div>
@@ -670,31 +690,31 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname"><a class="el" href="structRanges.html">Ranges</a> getRangeOfIndex </td>
           <td>(</td>
-          <td class="paramtype">const double&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td>
           <td class="paramname"><em>source</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const double&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td>
           <td class="paramname"><em>pixel</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>isParallel</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td>
           <td class="paramname"><em>aMin</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a>&#160;</td>
           <td class="paramname"><em>aMax</em>, </td>
         </tr>
         <tr>
@@ -741,9 +761,9 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void getSidesXPlanes </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a> getSidesXPlanes </td>
           <td>(</td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>planes</em></td><td>)</td>
           <td></td>
         </tr>
@@ -774,15 +794,15 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void getSidesYPlanes </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a> getSidesYPlanes </td>
           <td>(</td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>planes</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>slice</em>&#160;</td>
         </tr>
         <tr>
@@ -818,9 +838,9 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void getSidesZPlanes </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a> getSidesZPlanes </td>
           <td>(</td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>planes</em></td><td>)</td>
           <td></td>
         </tr>
@@ -853,19 +873,19 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname"><a class="el" href="structPoint.html">Point</a> getSource </td>
           <td>(</td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>sinTable</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>cosTable</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>index</em>&#160;</td>
         </tr>
         <tr>
@@ -888,6 +908,11 @@ Here is the call graph for this function:</div>
 <dl class="section return"><dt>Returns</dt><dd>The coordinates of the source. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00362">362</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="omp-projection_8c_a9aaeb5802feab4cd9d5d8fe4ee1d7e06_cgraph.png" border="0" usemap="#aomp-projection_8c_a9aaeb5802feab4cd9d5d8fe4ee1d7e06_cgraph" alt=""/></div>
+</div>
 
 </div>
 </div>
@@ -898,9 +923,9 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double getXPlane </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> getXPlane </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>index</em></td><td>)</td>
           <td></td>
         </tr>
@@ -927,9 +952,9 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double getYPlane </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> getYPlane </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>index</em></td><td>)</td>
           <td></td>
         </tr>
@@ -956,9 +981,9 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">double getZPlane </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> getZPlane </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>index</em></td><td>)</td>
           <td></td>
         </tr>
@@ -985,21 +1010,21 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void initTables </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">void</a> initTables </td>
           <td>(</td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>sinTable</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>cosTable</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">const</a> <a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>length</em>&#160;</td>
         </tr>
         <tr>
@@ -1021,6 +1046,11 @@ Here is the call graph for this function:</div>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00068">68</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="omp-projection_8c_af0d19fe4c3150a7feb2c29081941a6fc_cgraph.png" border="0" usemap="#aomp-projection_8c_af0d19fe4c3150a7feb2c29081941a6fc_cgraph" alt=""/></div>
+</div>
 
 </div>
 </div>
@@ -1031,15 +1061,15 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int main </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> main </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>argc</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">char</a> *&#160;</td>
           <td class="paramname"><em>argv</em>[]&#160;</td>
         </tr>
         <tr>
@@ -1061,33 +1091,33 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int merge </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> merge </td>
           <td>(</td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>b</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>lenA</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>lenB</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>c</em>&#160;</td>
         </tr>
         <tr>
@@ -1112,6 +1142,11 @@ Here is the call graph for this function:</div>
 <dl class="section return"><dt>Returns</dt><dd>The length of the merged array. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00309">309</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="omp-projection_8c_ae093475516e0af47d7370aab234e102f_cgraph.png" border="0" usemap="#aomp-projection_8c_ae093475516e0af47d7370aab234e102f_cgraph" alt=""/></div>
+</div>
 
 </div>
 </div>
@@ -1122,45 +1157,45 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int merge3 </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> merge3 </td>
           <td>(</td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>b</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>c</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>lenA</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>lenB</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>lenC</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">double</a> *&#160;</td>
           <td class="paramname"><em>merged</em>&#160;</td>
         </tr>
         <tr>
@@ -1202,15 +1237,15 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int min </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> min </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>b</em>&#160;</td>
         </tr>
         <tr>
@@ -1232,6 +1267,11 @@ Here is the call graph for this function:</div>
 <dl class="section return"><dt>Returns</dt><dd>The minimum between <code>a</code> and <code>b</code>. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00083">83</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="omp-projection_8c_abd8bbcfabb3ddef2ccaafb9928a37b95_cgraph.png" border="0" usemap="#aomp-projection_8c_abd8bbcfabb3ddef2ccaafb9928a37b95_cgraph" alt=""/></div>
+</div>
 
 </div>
 </div>
@@ -1242,21 +1282,21 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int min3 </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> min3 </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>a</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>b</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a>&#160;</td>
           <td class="paramname"><em>c</em>&#160;</td>
         </tr>
         <tr>
@@ -1294,9 +1334,9 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int readSetUP </td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> readSetUP </td>
           <td>(</td>
-          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">FILE</a> *&#160;</td>
           <td class="paramname"><em>filePointer</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1313,6 +1353,11 @@ Here is the call graph for this function:</div>
 <dl class="section return"><dt>Returns</dt><dd>0 in case of writing failure, 1 otherwise. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="omp-projection_8c_source.html#l00575">575</a> of file <a class="el" href="omp-projection_8c_source.html">omp-projection.c</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="omp-projection_8c_a094543d6ca60bd3a7c9904f3e5c5d0e5_cgraph.png" border="0" usemap="#aomp-projection_8c_a094543d6ca60bd3a7c9904f3e5c5d0e5_cgraph" alt=""/></div>
+</div>
 
 </div>
 </div>
@@ -1324,7 +1369,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_angularTrajectory</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_angularTrajectory</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1340,7 +1385,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_detectorSideLength</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_detectorSideLength</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1356,7 +1401,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_distanceObjectDetector</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_distanceObjectDetector</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1372,7 +1417,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_distanceObjectSource</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_distanceObjectSource</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1388,7 +1433,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_nPlanes[3]</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_nPlanes[3]</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1404,7 +1449,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_nVoxel[3]</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_nVoxel[3]</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1420,7 +1465,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_objectSideLength</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_objectSideLength</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1436,7 +1481,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_pixelDim</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_pixelDim</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1452,7 +1497,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_positionsAngularDistance</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_positionsAngularDistance</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1468,7 +1513,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_voxelXDim</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_voxelXDim</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1484,7 +1529,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_voxelYDim</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_voxelYDim</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1500,7 +1545,7 @@ Here is the call graph for this function:</div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int gl_voxelZDim</td>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a571e0ddb5b3aa1722cb53149024dc39d">int</a> gl_voxelZDim</td>
         </tr>
       </table>
 </div><div class="memdoc">

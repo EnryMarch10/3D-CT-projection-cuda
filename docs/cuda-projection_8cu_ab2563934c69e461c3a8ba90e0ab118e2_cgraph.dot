@@ -1,0 +1,15 @@
+digraph "getRangeOfIndex"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="getRangeOfIndex",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Retrieves the range of parametric values of the planes."];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="getXPlane",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$cuda-projection_8cu.html#a30e6cc5931d5bafdb95b6dda9c7dd913",tooltip="Computes the coordinate of a plane parallel relative to the YZ plane."];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="getYPlane",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$cuda-projection_8cu.html#a2c504341fff29c5776f014aa9b081236",tooltip="Computes the coordinate of a plane parallel relative to the XZ plane."];
+  Node1 -> Node4 [id="edge3_Node000001_Node000004",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="getZPlane",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$cuda-projection_8cu.html#a2a96cf9dfe8913a9efb73ffba3c35822",tooltip="Computes the coordinate of a plane parallel relative to the XY plane."];
+}
