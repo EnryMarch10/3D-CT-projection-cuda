@@ -32,8 +32,8 @@ The generated file system tree will be:
 - `build` contains miscellaneous files obtained from the source code.
   - `obj` contains the compiled source code.
   - `bin` contains the executables, `obj/*` linked version.
-- `input` contains generated input `.dat` files.
-- `output` contains output `.pgm` files and possibly their `.png` format.
+- `inputs` contains generated input `.dat` files.
+- `outputs` contains output `.pgm` files and possibly their `.png` format.
 
 Execute `make purge` to clean everything.
 
