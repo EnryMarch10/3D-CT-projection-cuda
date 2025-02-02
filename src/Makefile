@@ -10,12 +10,6 @@ DIRS := $(DIR_BIN) $(DIR_OBJ) $(DIR_BUILD)
 
 ### PROGRAMS ###
 
-ifeq ($(DEBUG),yes)
-	MACROS += -DDEBUG
-else
-	MACROS += -DNO_CUDA_CHECK_ERROR
-endif
-
 # SERIAL := serial
 OPENMP := omp
 CUDA := cuda
@@ -45,7 +39,21 @@ LDLIBS += -lm
 
 # CUDA
 NVCC := nvcc
-NVCFLAGS += -Wno-deprecated-gpu-targets
+NVCFLAGS += -Xcompiler "-Wall -Werror" -Wno-deprecated-gpu-targets
+
+ifeq ($(DEBUG),all)
+	CFLAGS += -DDEBUG -DPRINT_VARIABLES
+	NVCFLAGS += -lineinfo $(MACROS)
+else ifeq ($(DEBUG),yes)
+	CFLAGS += -DDEBUG
+	NVCFLAGS += -lineinfo $(MACROS)
+else
+# The following macro optimize the final code:
+# -DNDEBUG - avoids for example assertions checks
+# -DNO_CUDA_CHECK_ERROR - avoids hpc.h checks on cuda kernel errors during execution
+	MACROS += -DNDEBUG
+	NVCFLAGS += $(MACROS) -DNO_CUDA_CHECK_ERROR
+endif
 
 all: $(TARGETS) $(EXE_INPUT)
 
@@ -84,7 +92,7 @@ $(DIR_OBJ)/%.o: %.c hpc.h
 
 $(DIR_BIN)/%: %.cu
 	@mkdir -p $(DIR_BIN)
-	$(NVCC) $(MACROS) $(NVCFLAGS) $^ -o $@
+	$(NVCC) $(NVCFLAGS) $^ -o $@
 
 # INPUT
 
@@ -120,7 +128,7 @@ CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX := $(CUBE_WITH_SPHERICAL_HOLE)$(SUFFIX_SIZE
 HALF_SPHERE_WITH_SUFFIX := $(HALF_SPHERE)$(SUFFIX_SIZE)
 CUBE_WITH_SUFFIX := $(CUBE)$(SUFFIX_SIZE)
 
-SHAPES := $(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX) $(HALF_SPHERE_WITH_SUFFIX) $(CUBE_WITH_SUFFIX)
+SHAPES := $(CUBE_WITH_SUFFIX) $(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX) $(HALF_SPHERE_WITH_SUFFIX)
 
 inputs: $(addprefix $(DIR_INPUT)/, $(addsuffix .dat, $(SHAPES)))
 
@@ -140,9 +148,14 @@ $(DIR_INPUT)/$(CUBE_WITH_SUFFIX).dat: $(DIR_BIN)/$(EXE_INPUT)
 
 DIR_OUTPUT := outputs
 
+# General
+
+outputs: omp_outputs cuda_outputs
+images: omp_images cuda_images
+
 # OpenMP
 
-DIR_OUTPUT_OMP := output/omp
+DIR_OUTPUT_OMP := $(DIR_OUTPUT)/omp
 
 omp_outputs: $(addprefix $(DIR_OUTPUT_OMP)/, $(addsuffix .pgm, $(SHAPES)))
 
@@ -171,7 +184,7 @@ $(DIR_OUTPUT_OMP)/$(CUBE_WITH_SUFFIX).png: $(DIR_OUTPUT_OMP)/$(CUBE_WITH_SUFFIX)
 
 # OpenMP
 
-DIR_OUTPUT_CUDA := output/cuda
+DIR_OUTPUT_CUDA := $(DIR_OUTPUT)/cuda
 
 cuda_outputs: $(addprefix $(DIR_OUTPUT_CUDA)/, $(addsuffix .pgm, $(SHAPES)))
 
@@ -223,6 +236,12 @@ help:
 	@echo
 	@echo "      inputs    generate all input files, you can change the dimensions,"
 	@echo "                by default the variable WORK_SIZE is set to 2352"
+	@echo "     outputs    generate all output files"
+	@echo "                use OpenMP executable anmd then CUDA executable"
+	@echo "                for inputs WORK_SIZE can be specified"
+	@echo "      images    generate all output files in .png format"
+	@echo "                use OpenMP executable anmd then CUDA executable"
+	@echo "                for inputs WORK_SIZE can be specified"
 	@echo " omp_outputs    generate all output files"
 	@echo "                use OpenMP executable"
 	@echo "                for inputs WORK_SIZE can be specified"

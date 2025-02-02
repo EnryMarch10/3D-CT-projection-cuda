@@ -7,5 +7,5 @@ digraph "getSidesXPlanes"
   rankdir="LR";
   Node1 [id="Node000001",label="getSidesXPlanes",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Computes a coordinate of the two planes of the object's sides orthogonal to the x axis."];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="getXPlane",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$cuda-projection_8cu.html#a30e6cc5931d5bafdb95b6dda9c7dd913",tooltip="Computes the coordinate of a plane parallel relative to the YZ plane."];
+  Node2 [id="Node000002",label="getXPlane",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$cuda-projection_8cu.html#aa71204182baf78f56be2c28c0e885d97",tooltip="Computes the coordinate of a plane parallel relative to the YZ plane."];
 }

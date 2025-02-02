@@ -56,50 +56,49 @@
 #define MAX_CONSTANT_MEMORY 8192u // 8 KB in Bytes
 #define MAX_TABLES_SIZE (MAX_CONSTANT_MEMORY / sizeof(double)) // 8 KB in doubles
 // Cuda limits
-#define BLKDIM_STEP 16 // Max is usually 32, but for some GPUs the amount of registers is not enough in that case
+#define BLKDIM_STEP 16u // Max is usually 32, but for some GPUs the amount of registers is not enough in that case
 #define BLKDIM (BLKDIM_STEP * BLKDIM_STEP)
 
-__constant__ int d_pixelDim;
-__constant__ int d_angularTrajectory;
-__constant__ int d_positionsAngularDistance;
-__constant__ int d_voxelXDim;
-__constant__ int d_voxelYDim;
-__constant__ int d_voxelZDim;
+__constant__ unsigned short d_pixelDim;
+__constant__ unsigned short d_angularTrajectory;
+__constant__ unsigned short d_positionsAngularDistance;
+__constant__ unsigned short d_voxelXDim;
+__constant__ unsigned short d_voxelYDim;
+__constant__ unsigned short d_voxelZDim;
 
-__constant__ int d_objectSideLength;
-__constant__ int d_detectorSideLength;
-__constant__ int d_distanceObjectDetector;
-__constant__ int d_distanceObjectSource;
+__constant__ unsigned d_objectSideLength;
+__constant__ unsigned d_detectorSideLength;
+__constant__ unsigned d_distanceObjectDetector;
+__constant__ unsigned d_distanceObjectSource;
 
-__constant__ int d_nVoxel[3];
-__constant__ int d_nPlanes[3];
+__constant__ unsigned short d_nVoxel[3];
+__constant__ unsigned short d_nPlanes[3];
 
 __constant__ double d_gl_sinTable[MAX_TABLES_SIZE];
 __constant__ double d_gl_cosTable[MAX_TABLES_SIZE];
 
-__device__ int d_OBJ_BUFFER;
+__device__ unsigned short d_OBJ_BUFFER;
 
 __device__ double d_gMin;
 __device__ double d_gMax;
 
 /************************************************* HOST *************************************************/
 
-int OBJ_BUFFER;
+unsigned short OBJ_BUFFER;
 
-int gl_pixelDim;
-int gl_angularTrajectory;
-int gl_positionsAngularDistance;
-int gl_voxelXDim;
-int gl_voxelYDim;
-int gl_voxelZDim;
+unsigned short gl_pixelDim;
+unsigned short gl_angularTrajectory;
+unsigned short gl_positionsAngularDistance;
+unsigned short gl_voxelXDim;
+unsigned short gl_voxelYDim;
+unsigned short gl_voxelZDim;
+unsigned short gl_nVoxel[3];
+unsigned short gl_nPlanes[3];
 
-int gl_objectSideLength;
-int gl_detectorSideLength;
-int gl_distanceObjectDetector;
-int gl_distanceObjectSource;
-
-int gl_nVoxel[3];
-int gl_nPlanes[3];
+unsigned gl_objectSideLength;
+unsigned gl_detectorSideLength;
+unsigned gl_distanceObjectDetector;
+unsigned gl_distanceObjectSource;
 
 double *gl_sinTable, *gl_cosTable;
 
@@ -112,11 +111,11 @@ double *d_f, *d_g;
  * @param cosTable An array containing a certain number of cos values to precalculate.
  * @param length The length of the arrays.
  */
-void initTables(double *const sinTable, double *const cosTable, const int length)
+void initTables(double *const sinTable, double *const cosTable, const unsigned short length)
 {
-    for (int positionIndex = 0; positionIndex < length; positionIndex++) {
-        sinTable[positionIndex] = sin((-gl_angularTrajectory / 2 + positionIndex * gl_positionsAngularDistance) * M_PI / 180);
-        cosTable[positionIndex] = cos((-gl_angularTrajectory / 2 + positionIndex * gl_positionsAngularDistance) * M_PI / 180);
+    for (unsigned short positionIndex = 0; positionIndex < length; positionIndex++) {
+        sinTable[positionIndex] = sin((-(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance) * M_PI / 180);
+        cosTable[positionIndex] = cos((-(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance) * M_PI / 180);
     }
 }
 
@@ -127,9 +126,9 @@ void initTables(double *const sinTable, double *const cosTable, const int length
  * @return The coordinate of a plane parallel relative to the YZ plane.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
-__device__ double getXPlane(const int index)
+__device__ double getXPlane(const unsigned short index)
 {
-    return -d_objectSideLength / 2 + index * d_voxelXDim;
+    return -(double) d_objectSideLength / 2 + (double) index * d_voxelXDim;
 }
 
 /**
@@ -139,9 +138,9 @@ __device__ double getXPlane(const int index)
  * @return The coordinate of a plane parallel relative to the XZ plane.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
-__device__ double getYPlane(const int index)
+__device__ double getYPlane(const unsigned short index)
 {
-    return -d_objectSideLength / 2 + index * d_voxelYDim;
+    return -(double) d_objectSideLength / 2 + (double) index * d_voxelYDim;
 }
 
 /**
@@ -151,9 +150,9 @@ __device__ double getYPlane(const int index)
  * @return The coordinate of a plane parallel relative to the XY plane.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
-__device__ double getZPlane(const int index)
+__device__ double getZPlane(const unsigned short index)
 {
-    return -d_objectSideLength / 2 + index * d_voxelZDim;
+    return -(double) d_objectSideLength / 2 + (double) index * d_voxelZDim;
 }
 
 /**
@@ -211,18 +210,18 @@ __device__ double getAMin(double a[3][2], const char isParallel)
  *
  * @param source Represents the coordinate of the source.
  * @param pixel Represents the coordinate of a unit of the detector, relative to the specified source.
- * @param plane It is an array that contains the coordinates of each plane.
+ * @param planes It is an array that contains the coordinates of each plane.
  * @param nPlanes Specifies the number of planes.
  * @param a It is an array that will be filled with the parametric values that identify the intersection points between the
  * ray and each plane.
  * @return 0 if ray is parallel to the planes, 1 otherwise.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
-__device__ int getIntersection(const double source, const double pixel, const double *const plane, const int nPlanes, double *const a)
+__device__ char getIntersection(const double source, const double pixel, const double *const planes, const unsigned short nPlanes, double *const a)
 {
     if (source - pixel != 0) {
-        for (int i = 0; i < nPlanes; i++) {
-            a[i] = (plane[i] - source) / (pixel - source);
+        for (unsigned short i = 0; i < nPlanes; i++) {
+            a[i] = (planes[i] - source) / (pixel - source);
         }
         return 1;
     }
@@ -256,25 +255,25 @@ __device__ void getAllIntersections(const double source, const double pixel, con
             d = d_voxelXDim;
             if (pixel - source < 0) {
                 plane[0] = getXPlane(end);
-                d = -d_voxelXDim;
+                d = -(double) d_voxelXDim;
             }
         } else if (axis == Y) {
             plane[0] = getYPlane(start);
             d = d_voxelYDim;
             if (pixel - source < 0) {
                 plane[0] = getYPlane(end);
-                d = -d_voxelYDim;
+                d = -(double) d_voxelYDim;
             }
         } else /* if (axis == Z) */ {
             plane[0] = getZPlane(start);
             d = d_voxelZDim;
             if (pixel - source < 0) {
                 plane[0] = getZPlane(end);
-                d = -d_voxelZDim;
+                d = -(double) d_voxelZDim;
             }
         }
 
-        for (int i = 1; i < end - start; i++) {
+        for (unsigned short i = 1; i < end - start; i++) {
             plane[i] = plane[i - 1] + d;
         }
         getIntersection(source, pixel, plane, end - start, a);
@@ -297,7 +296,7 @@ __device__ Ranges getRangeOfIndex(const double source, const double pixel, const
 {
     Ranges idxs;
     double firstPlane, lastPlane;
-    int voxelDim;
+    unsigned short voxelDim;
 
     if (axis == X) {
         voxelDim = d_voxelXDim;
@@ -340,9 +339,9 @@ __device__ Ranges getRangeOfIndex(const double source, const double pixel, const
  * @return The length of the merged array.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
-__device__ int merge(const double *const a, const double *const b, const int lenA, const int lenB, double *const c)
+__device__ unsigned short merge(const double *const a, const double *const b, const unsigned short lenA, const unsigned short lenB, double *const c)
 {
-    int i = 0, j = 0, k = 0;
+    unsigned short i = 0, j = 0, k = 0;
     while (j < lenA && k < lenB) {
         if (a[j] < b[k]) {
             c[i] = a[j];
@@ -379,11 +378,11 @@ __device__ int merge(const double *const a, const double *const b, const int len
  * @return The length of the merged array.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
-__device__ int merge3(const double *const a, const double *const b, const double *const c, const int lenA, const int lenB, const int lenC, double *const merged)
+__device__ unsigned short merge3(const double *const a, const double *const b, const double *const c, const unsigned short lenA, const unsigned short lenB, const unsigned short lenC, double *const merged)
 {
     assert(lenA + lenB + lenC <= MAX_PLANES_x3);
     double ab[MAX_PLANES_x3];
-    const int length = merge(a, b, lenA, lenB, ab);
+    const unsigned short length = merge(a, b, lenA, lenB, ab);
     return merge(ab, c, length, lenC, merged);
 }
 
@@ -396,7 +395,7 @@ __device__ int merge3(const double *const a, const double *const b, const double
  * @return The coordinates of the source.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
-__device__ Point getSource(const double *const sinTable, const double *const cosTable, const int index)
+__device__ Point getSource(const double *const sinTable, const double *const cosTable, const unsigned short index)
 {
     Point source;
 
@@ -418,16 +417,16 @@ __device__ Point getSource(const double *const sinTable, const double *const cos
  * @return The coordinates of a unit of the detector, relative to the specified source.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
-__device__ Point getPixel(const double *const sinTable, const double *const cosTable, const int r, const int c, const int index)
+__device__ Point getPixel(const double *const sinTable, const double *const cosTable, const unsigned r, const unsigned c, const unsigned short index)
 {
     Point pixel;
     const double sinAngle = sinTable[index];
     const double cosAngle = cosTable[index];
     const double elementOffset = d_detectorSideLength / 2 - d_pixelDim / 2;
 
-    pixel.x = -d_distanceObjectDetector * sinAngle + cosAngle * (-elementOffset + d_pixelDim * c);
-    pixel.y = -d_distanceObjectDetector * cosAngle - sinAngle * (-elementOffset + d_pixelDim * c);
-    pixel.z = -elementOffset + d_pixelDim * r;
+    pixel.x = -(double) d_distanceObjectDetector * sinAngle + cosAngle * (-elementOffset + (double) d_pixelDim * c);
+    pixel.y = -(double) d_distanceObjectDetector * cosAngle - sinAngle * (-elementOffset + (double) d_pixelDim * c);
+    pixel.z = -elementOffset + (double) d_pixelDim * r;
 
     return pixel;
 }
@@ -453,7 +452,7 @@ __device__ void getSidesXPlanes(double *const planes)
  * In this case this limits the planes considered.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
-__device__ void getSidesYPlanes(double *const planes, const int slice)
+__device__ void getSidesYPlanes(double *const planes, const unsigned short slice)
 {
     planes[0] = getYPlane(slice);
     planes[1] = getYPlane(min(d_nPlanes[Y] - 1, d_OBJ_BUFFER + slice));
@@ -484,19 +483,21 @@ __device__ void getSidesZPlanes(double *const planes)
  * @return The computed projection attenuation of the radiological path of a ray.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
-__device__ double computeAbsorption(const int slice, const Point source, const Point pixel, const double *const a, const int lenA, const double *const f)
+__device__ double computeAbsorption(const unsigned short slice, const Point source, const Point pixel, const double *const a, const unsigned short lenA, const double *const f)
 {
     const double d12 = sqrt(pow(pixel.x - source.x, 2) + pow(pixel.y - source.y, 2) + pow(pixel.z - source.z, 2));
     double g = 0.0;
 
-    for (int i = 0; i < lenA - 1; i++) {
-        const double segments = d12 * (a[i + 1] - a[i]);
-        const double aMid = (a[i + 1] + a[i]) / 2;
-        const int xRow = min((int) (source.x + aMid * (pixel.x - source.x) - getXPlane(0)) / d_voxelXDim, d_nVoxel[X] - 1);
-        const int yRow = min((int) (source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / d_voxelYDim, min(d_nVoxel[Y] - 1, d_OBJ_BUFFER - 1));
-        const int zRow = min((int) (source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / d_voxelZDim, d_nVoxel[Z] - 1);
+    if (lenA > 0) {
+        for (unsigned short i = 0; i < lenA - 1; i++) {
+            const double segments = d12 * (a[i + 1] - a[i]);
+            const double aMid = (a[i + 1] + a[i]) / 2;
+            const unsigned short xRow = min((int) ((source.x + aMid * (pixel.x - source.x) - getXPlane(0)) / d_voxelXDim), d_nVoxel[X] - 1);
+            const unsigned short yRow = min((int) ((source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / d_voxelYDim), min(d_nVoxel[Y] - 1, d_OBJ_BUFFER - 1));
+            const unsigned short zRow = min((int) ((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / d_voxelZDim), d_nVoxel[Z] - 1);
 
-        g += f[(unsigned long) yRow * d_nVoxel[X] * d_nVoxel[Z] + (unsigned long) zRow * d_nVoxel[Z] + xRow] * segments;
+            g += f[(unsigned) yRow * d_nVoxel[X] * d_nVoxel[Z] + (unsigned) zRow * d_nVoxel[Z] + xRow] * segments;
+        }
     }
     return g;
 }
@@ -550,12 +551,12 @@ __device__ __forceinline__ double atomicMaxDouble(double *const addr, const doub
  * @param isFirst Tells if `g` array is uninitialized or it is not, this function initializes it if necessary.
  * @return __global__ Indicates that this is a CUDA kernel function, so it is executed on the device (GPU) and not the host (CPU).
  */
-__global__ void kernel_computeProjections(const int slice, const int nTheta, const int nSidePixels, const double *const f, double *const g, const char isFirst) {
+__global__ void kernel_computeProjections(const unsigned short slice, const unsigned short nTheta, const unsigned nSidePixels, const double *const f, double *const g, const char isFirst) {
     __shared__ double l_gMins[BLKDIM];
     __shared__ double l_gMaxs[BLKDIM];
-    const int l_index = threadIdx.x + threadIdx.y * blockDim.x;
-    const int r = threadIdx.y + blockIdx.y * blockDim.y;
-    const int c = threadIdx.x + blockIdx.x * blockDim.x;
+    const unsigned l_index = threadIdx.x + threadIdx.y * blockDim.x;
+    const unsigned r = threadIdx.y + blockIdx.y * blockDim.y;
+    const unsigned c = threadIdx.x + blockIdx.x * blockDim.x;
     l_gMins[l_index] = INFINITY;
     l_gMaxs[l_index] = -INFINITY;
 
@@ -570,7 +571,7 @@ __global__ void kernel_computeProjections(const int slice, const int nTheta, con
         double aY[MAX_PLANES];
         double aZ[MAX_PLANES];
         // Iterates over each source
-        for (int positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+        for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
             const Point source = getSource(d_gl_sinTable, d_gl_cosTable, positionIndex);
 
             // Computes the attenuation over a single pixel of the detector
@@ -596,7 +597,7 @@ __global__ void kernel_computeProjections(const int slice, const int nTheta, con
             aMin = getAMin(a, isParallel);
             aMax = getAMax(a, isParallel);
 
-            const int pixelIndex = positionIndex * nSidePixels * nSidePixels + r * nSidePixels + c;
+            const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + r * nSidePixels + c;
             if (isFirst) {
                 g[pixelIndex] = 0.0;
             }
@@ -608,9 +609,9 @@ __global__ void kernel_computeProjections(const int slice, const int nTheta, con
                 indices[Z] = getRangeOfIndex(source.z, pixel.z, isParallel, aMin, aMax, Z);
 
                 // Computes lengths of the arrays containing parametric value of the intersection with each set of parallel planes
-                int lenX = max(0, indices[X].maxIndx - indices[X].minIndx);
-                int lenY = max(0, indices[Y].maxIndx - indices[Y].minIndx);
-                int lenZ = max(0, indices[Z].maxIndx - indices[Z].minIndx);
+                const unsigned short lenX = max(0, indices[X].maxIndx - indices[X].minIndx);
+                const unsigned short lenY = max(0, indices[Y].maxIndx - indices[Y].minIndx);
+                const unsigned short lenZ = max(0, indices[Z].maxIndx - indices[Z].minIndx);
 
                 // Computes ray-planes intersection Nx + Ny + Nz
                 getAllIntersections(source.x, pixel.x, indices[X], aX, X);
@@ -618,17 +619,17 @@ __global__ void kernel_computeProjections(const int slice, const int nTheta, con
                 getAllIntersections(source.z, pixel.z, indices[Z], aZ, Z);
 
                 // Computes segments Nx + Ny + Nz
-                merge3(aX, aY, aZ, lenX, lenY, lenZ, aMerged);
+                const unsigned short lenA = merge3(aX, aY, aZ, lenX, lenY, lenZ, aMerged);
 
                 // Associates each segment to the respective voxel Nx + Ny + Nz
-                g[pixelIndex] += computeAbsorption(slice, source, pixel, aMerged, lenX + lenY + lenZ, f);
+                g[pixelIndex] += computeAbsorption(slice, source, pixel, aMerged, lenA, f);
                 l_gMins[l_index] = fmin(l_gMins[l_index], g[pixelIndex]);
                 l_gMaxs[l_index] = fmax(l_gMaxs[l_index], g[pixelIndex]);
             }
         }
     }
 
-    int b_size = blockDim.x / 2;
+    unsigned b_size = blockDim.x / 2;
     __syncthreads();
     while (b_size > 0) {
         if (l_index < b_size) {
@@ -706,10 +707,10 @@ void termEnvironment(double *g, size_t sizeG, double *gMin, double *gMax) {
  * @param gMin It is the minimum attenuation computed.
  * @param gMax It is the maximum attenuation computed.
  */
-void initEnvironment(size_t *sizeF, size_t sizeG, const int nTheta, const int nSidePixels, double *gMin, double *gMax) {
+void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, const unsigned nSidePixels, double *gMin, double *gMax) {
 #ifdef DEBUG
     printf("CONFIG (threads and blocks):\n");
-    const int tmp = (nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP;
+    const unsigned short tmp = (nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP;
     printf("%s = %dx%d\n", "2D grid", tmp, tmp);
     printf("%s = %dx%d\n\n", "2D block", BLKDIM_STEP, BLKDIM_STEP);
     printf("%s = %d\n", "N blocks", tmp * tmp);
@@ -782,7 +783,7 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const int nTheta, const int nS
  * @param nTheta It is the number of angular positions.
  * @param isFirst Tells if `g` array is uninitialized or it is not, this function tells to initialize it if necessary.
  */
-void computeProjections(const int slice, double *f, const size_t sizeF, const int nTheta, const int nSidePixels, const char isFirst)
+void computeProjections(const unsigned short slice, double *f, const size_t sizeF, const unsigned short nTheta, const unsigned nSidePixels, const char isFirst)
 {
 #ifdef DEBUG
     static unsigned short it = 0;
@@ -799,50 +800,58 @@ void computeProjections(const int slice, double *f, const size_t sizeF, const in
  * @brief Reads the environment values used to compute the voxel grid from the specified binary file.
  *
  * @param filePointer It is the file pointer to read the values from.
- * @return EXIT_FAILURE in case of writing failure, EXIT_SUCCESS otherwise.
+ * @return EXIT_FAILURE in case of reading failure, EXIT_SUCCESS otherwise.
  */
-int readSetUP(FILE *filePointer)
+int readSetUP(FILE *const filePointer)
 {
-    int buffer[16];
-    if (!fread(buffer, sizeof(int), sizeof(buffer) / sizeof(int), filePointer)) {
+    unsigned short buffer0[12];
+    if (!fread(buffer0, sizeof(unsigned short), sizeof(buffer0) / sizeof(unsigned short), filePointer)) {
         return EXIT_FAILURE;
     }
+    unsigned char i = 0;
+    gl_pixelDim = buffer0[i++];
+    gl_angularTrajectory = buffer0[i++];
+    gl_positionsAngularDistance = buffer0[i++];
+    gl_voxelXDim = buffer0[i++];
+    gl_voxelYDim = buffer0[i++];
+    gl_voxelZDim = buffer0[i++];
+    gl_nVoxel[X] = buffer0[i++];
+    gl_nVoxel[Y] = buffer0[i++];
+    gl_nVoxel[Z] = buffer0[i++];
+    gl_nPlanes[X] = buffer0[i++];
+    gl_nPlanes[Y] = buffer0[i++];
+    gl_nPlanes[Z] = buffer0[i];
 
-    int i = 0;
-    gl_pixelDim = buffer[i++];
-    gl_angularTrajectory = buffer[i++];
-    gl_positionsAngularDistance = buffer[i++];
-    gl_objectSideLength = buffer[i++];
-    gl_detectorSideLength = buffer[i++];
-    gl_distanceObjectDetector = buffer[i++];
-    gl_distanceObjectSource = buffer[i++];
-    gl_voxelXDim = buffer[i++];
-    gl_voxelYDim = buffer[i++];
-    gl_voxelZDim = buffer[i++];
-    gl_nVoxel[X] = buffer[i++];
-    gl_nVoxel[Y] = buffer[i++];
-    gl_nVoxel[Z] = buffer[i++];
-    gl_nPlanes[X] = buffer[i++];
-    gl_nPlanes[Y] = buffer[i++];
-    gl_nPlanes[Z] = buffer[i];
-#ifdef DEBUG
-    printf("INT\n");
-    printf("gl_pixelDim = %d\n", gl_pixelDim);
-    printf("gl_angularTrajectory = %d\n", gl_angularTrajectory);
-    printf("gl_positionsAngularDistance = %d\n", gl_positionsAngularDistance);
-    printf("gl_voxelXDim = %d\n", gl_voxelXDim);
-    printf("gl_voxelYDim = %d\n", gl_voxelYDim);
-    printf("gl_voxelZDim = %d\n", gl_voxelZDim);
-    printf("gl_nVoxel[X] = %d\n", gl_nVoxel[X]);
-    printf("gl_nVoxel[Y] = %d\n", gl_nVoxel[Y]);
-    printf("gl_nVoxel[Z] = %d\n", gl_nVoxel[Z]);
-    printf("gl_nPlanes[X] = %d\n", gl_nPlanes[X]);
-    printf("gl_nPlanes[Y] = %d\n", gl_nPlanes[Y]);
-    printf("gl_nPlanes[Z] = %d\n", gl_nPlanes[Z]);
-    printf("gl_objectSideLength = %d\n", gl_objectSideLength);
-    printf("gl_detectorSideLength = %d\n", gl_detectorSideLength);
-    printf("gl_distanceObjectDetector = %d\n", gl_distanceObjectDetector);
-    printf("gl_distanceObjectSource = %d\n", gl_distanceObjectSource);
+    unsigned buffer1[4];
+    if (!fread(buffer1, sizeof(unsigned), sizeof(buffer1) / sizeof(unsigned), filePointer)) {
+        return EXIT_FAILURE;
+    }
+    i = 0;
+    gl_objectSideLength = buffer1[i++];
+    gl_detectorSideLength = buffer1[i++];
+    gl_distanceObjectDetector = buffer1[i++];
+    gl_distanceObjectSource = buffer1[i];
+
+#ifdef PRINT_VARIABLES
+    printf("Variables READ:\n");
+    printf("- unsigned short:\n");
+    printf("    gl_pixelDim = %hu\n", gl_pixelDim);
+    printf("    gl_angularTrajectory = %hu\n", gl_angularTrajectory);
+    printf("    gl_positionsAngularDistance = %hu\n", gl_positionsAngularDistance);
+    printf("    gl_voxelXDim = %hu\n", gl_voxelXDim);
+    printf("    gl_voxelYDim = %hu\n", gl_voxelYDim);
+    printf("    gl_voxelZDim = %hu\n", gl_voxelZDim);
+    printf("    gl_nVoxel[X] = %hu\n", gl_nVoxel[X]);
+    printf("    gl_nVoxel[Y] = %hu\n", gl_nVoxel[Y]);
+    printf("    gl_nVoxel[Z] = %hu\n", gl_nVoxel[Z]);
+    printf("    gl_nPlanes[X] = %hu\n", gl_nPlanes[X]);
+    printf("    gl_nPlanes[Y] = %hu\n", gl_nPlanes[Y]);
+    printf("    gl_nPlanes[Z] = %hu\n", gl_nPlanes[Z]);
+    printf("- unsigned:\n");
+    printf("    gl_objectSideLength = %u\n", gl_objectSideLength);
+    printf("    gl_detectorSideLength = %u\n", gl_detectorSideLength);
+    printf("    gl_distanceObjectDetector = %u\n", gl_distanceObjectDetector);
+    printf("    gl_distanceObjectSource = %u\n", gl_distanceObjectSource);
 #endif
 
     return EXIT_SUCCESS;
@@ -850,9 +859,6 @@ int readSetUP(FILE *filePointer)
 
 int main(int argc, char *argv[])
 {
-    FILE *inputFilePointer;
-    FILE *outputFilePointer;
-
     if (argc != 3) {
         fprintf(stderr, "Usage: %s input.dat output.pgm\n"
                         "- The first parameter is the name of the input file.\n"
@@ -860,10 +866,10 @@ int main(int argc, char *argv[])
                         argv[0]);
         return EXIT_FAILURE;
     }
-    const char *inputFileName = argv[1];
-    const char *outputFileName = argv[2];
+    const char *const inputFileName = argv[1];
+    const char *const outputFileName = argv[2];
 
-    inputFilePointer = fopen(inputFileName, "rb");
+    FILE *const inputFilePointer = fopen(inputFileName, "rb");
     if (!inputFilePointer) {
         fprintf(stderr, "Unable to open file '%s'!\n", inputFileName);
         return EXIT_FAILURE;
@@ -878,12 +884,12 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     // Number of angular positions
-    const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1;
+    const unsigned short nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1;
     if (nTheta > MAX_TABLES_SIZE) {
         fprintf(stderr, "Number of positions required %u is too large, max %lu!\n", nTheta, MAX_TABLES_SIZE);
         exit(EXIT_FAILURE);
     }
-    const int nSidePixels = gl_detectorSideLength / gl_pixelDim;
+    const unsigned nSidePixels = gl_detectorSideLength / gl_pixelDim;
     // Size of the array containing the computed attenuation detected in each pixel of the detector
     const size_t sizeG = sizeof(double) * nSidePixels * nSidePixels * nTheta;
     // Minimum and maximum attenuation computed
@@ -891,12 +897,12 @@ int main(int argc, char *argv[])
     size_t sizeF;
     initEnvironment(&sizeF, sizeG, nTheta, nSidePixels, &gMinValue, &gMaxValue);
     // Array containing the coefficients of each voxel
-    double *f = (double *) malloc(sizeF);
+    double *const f = (double *) malloc(sizeF);
 
     double totalTime = 0.0;
     // Iterates over object subsections
-    for (int slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
-        int nOfSlices;
+    for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
+        unsigned short nOfSlices;
 
         if (gl_nVoxel[Y] - slice < OBJ_BUFFER) {
             nOfSlices = gl_nVoxel[Y] - slice;
@@ -920,12 +926,12 @@ int main(int argc, char *argv[])
     fclose(inputFilePointer);
     free(f);
     // Array containing the computed attenuation detected in each pixel of the detector
-    double *g = (double *) malloc(sizeG);
+    double *const g = (double *) malloc(sizeG);
     termEnvironment(g, sizeG, &gMinValue, &gMaxValue);
     printf("Execution time (s) %.2f\n", totalTime);
     fflush(stdout);
 
-    outputFilePointer = fopen(outputFileName, "w");
+    FILE *const outputFilePointer = fopen(outputFileName, "w");
     if (!outputFileName) {
         fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
         free(g);
@@ -933,13 +939,13 @@ int main(int argc, char *argv[])
     }
     // Iterates over each attenuation value computed, prints a value between [0-255]
     fprintf(outputFilePointer, "P2\n%d %d\n255", nSidePixels, nSidePixels * nTheta);
-    for (int positionIndex = 0; positionIndex < nTheta; positionIndex++) {
-        const double angle = -((double) gl_angularTrajectory) / 2 + (double) positionIndex * gl_positionsAngularDistance;
+    for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+        const double angle = -(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance;
         fprintf(outputFilePointer, "\n#%lf", angle);
-        for (int i = 0; i < nSidePixels; i++) {
+        for (unsigned i = 0; i < nSidePixels; i++) {
             fprintf(outputFilePointer, "\n");
-            for (int j = 0; j < nSidePixels; j++) {
-                const int pixelIndex = positionIndex * nSidePixels * nSidePixels + i * nSidePixels + j;
+            for (unsigned j = 0; j < nSidePixels; j++) {
+                const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + i * nSidePixels + j;
                 const int color = (g[pixelIndex] - gMinValue) * 255 / (gMaxValue - gMinValue);
                 fprintf(outputFilePointer, "%d ", color);
             }

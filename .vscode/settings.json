@@ -21,6 +21,7 @@
         "common.h": "c",
         "hpc.h": "c",
         "time.h": "c",
-        "assert.h": "c"
+        "assert.h": "c",
+        "math.h": "c"
     }
 }

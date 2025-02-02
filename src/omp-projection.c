@@ -43,33 +43,34 @@
 #include "hpc.h"
 #include "common.h"
 
-#define OBJ_BUFFER 100
+#define OBJ_BUFFER 100u
 
-int gl_pixelDim;
-int gl_angularTrajectory;
-int gl_positionsAngularDistance;
-int gl_objectSideLength;
-int gl_detectorSideLength;
-int gl_distanceObjectDetector;
-int gl_distanceObjectSource;
-int gl_voxelXDim;
-int gl_voxelYDim;
-int gl_voxelZDim;
-int gl_nVoxel[3];
-int gl_nPlanes[3];
+unsigned short gl_pixelDim;
+unsigned short gl_angularTrajectory;
+unsigned short gl_positionsAngularDistance;
+unsigned short gl_voxelXDim;
+unsigned short gl_voxelYDim;
+unsigned short gl_voxelZDim;
+unsigned short gl_nVoxel[3];
+unsigned short gl_nPlanes[3];
+
+unsigned gl_objectSideLength;
+unsigned gl_detectorSideLength;
+unsigned gl_distanceObjectDetector;
+unsigned gl_distanceObjectSource;
 
 /**
  * @brief Initializes `sin` and `cos` tables, with default values for a certain length.
  *
- * @param sinTable An array containing a certain number of precalculated sin values.
- * @param cosTable An array containing a certain number of precalculated cos values.
+ * @param sinTable An array containing a certain number of sin values to precalculate.
+ * @param cosTable An array containing a certain number of cos values to precalculate.
  * @param length The length of the arrays.
  */
-void initTables(double *sinTable, double *cosTable, const int length)
+void initTables(double *const sinTable, double *const cosTable, const unsigned short length)
 {
-    for (int positionIndex = 0; positionIndex < length; positionIndex++) {
-        sinTable[positionIndex] = sin((-gl_angularTrajectory / 2 + positionIndex * gl_positionsAngularDistance) * M_PI / 180);
-        cosTable[positionIndex] = cos((-gl_angularTrajectory / 2 + positionIndex * gl_positionsAngularDistance) * M_PI / 180);
+    for (unsigned short positionIndex = 0; positionIndex < length; positionIndex++) {
+        sinTable[positionIndex] = sin((-(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance) * M_PI / 180);
+        cosTable[positionIndex] = cos((-(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance) * M_PI / 180);
     }
 }
 
@@ -104,9 +105,9 @@ int min3(int a, int b, int c)
  * @param index It is the index of the plane to be returned where 0 is the index of the smallest-valued coordinate plane.
  * @return The coordinate of a plane parallel relative to the YZ plane.
  */
-double getXPlane(int index)
+double getXPlane(const unsigned short index)
 {
-    return -(gl_objectSideLength / 2) + index * gl_voxelXDim;
+    return -(double) gl_objectSideLength / 2 + (double) index * gl_voxelXDim;
 }
 
 /**
@@ -115,9 +116,9 @@ double getXPlane(int index)
  * @param index It is the index of the plane to be returned where 0 is the index of the smallest-valued coordinate plane.
  * @return The coordinate of a plane parallel relative to the XZ plane.
  */
-double getYPlane(int index)
+double getYPlane(const unsigned short index)
 {
-    return -(gl_objectSideLength / 2) + index * gl_voxelYDim;
+    return -(double) gl_objectSideLength / 2 + (double) index * gl_voxelYDim;
 }
 
 /**
@@ -126,9 +127,9 @@ double getYPlane(int index)
  * @param index It is the index of the plane to be returned where 0 is the index of the smallest-valued coordinate plane.
  * @return The coordinate of a plane parallel relative to the XY plane.
  */
-double getZPlane(int index)
+double getZPlane(const unsigned short index)
 {
-    return -(gl_objectSideLength / 2) + index * gl_voxelZDim;
+    return -(double) gl_objectSideLength / 2 + (double) index * gl_voxelZDim;
 }
 
 /**
@@ -138,7 +139,7 @@ double getZPlane(int index)
  * @param isParallel It is a value corresponding to the axis to which the array is orthogonal, -1 otherwise.
  * @return The maximum parametric value a, representing the last intersection between ray and object.
  */
-double getAMax(double a[3][2], int isParallel)
+double getAMax(double a[3][2], const char isParallel)
 {
     double tempMax[3];
     double aMax = 1;
@@ -162,7 +163,7 @@ double getAMax(double a[3][2], int isParallel)
  * @param isParallel It is a value corresponding to the axis to which the array is orthogonal, -1 otherwise.
  * @return The minimum parametric value a, representing the last intersection between ray and object.
  */
-double getAMin(double a[3][2], int isParallel)
+double getAMin(double a[3][2], const char isParallel)
 {
     double tempMin[3];
     double aMin = 0;
@@ -184,17 +185,17 @@ double getAMin(double a[3][2], int isParallel)
  *
  * @param source Represents the coordinate of the source.
  * @param pixel Represents the coordinate of a unit of the detector, relative to the specified source.
- * @param plane It is an array that contains the coordinates of each plane.
+ * @param planes It is an array that contains the coordinates of each plane.
  * @param nPlanes Specifies the number of planes.
  * @param a It is an array that will be filled with the parametric values that identify the intersection points between the
  * ray and each plane.
  * @return 0 if ray is parallel to the planes, 1 otherwise.
  */
-int getIntersection(double source, double pixel, double *plane, int nPlanes, double *a)
+int getIntersection(const double source, const double pixel, const double *const planes, const unsigned short nPlanes, double *const a)
 {
     if (source - pixel != 0) {
         for (int i = 0; i < nPlanes; i++) {
-            a[i] = (plane[i] - source) / (pixel - source);
+            a[i] = (planes[i] - source) / (pixel - source);
         }
         return 1;
     }
@@ -207,12 +208,12 @@ int getIntersection(double source, double pixel, double *plane, int nPlanes, dou
  *
  * @param source Represents the coordinate of the source.
  * @param pixel Represents the coordinate of a unit of the detector, relative to the specified source.
- * @param planeIndexes It is a structure containing the index ranges for planes.
+ * @param planeIndexesRanges It is a structure containing the index ranges for planes.
  * @param a It is an array that will be filled with the parametric values that identify the intersection points between the
  * ray and each plane.
  * @param axis It is the axis orthogonal to the set of planes to which compute the intersection.
  */
-void getAllIntersections(const double source, const double pixel, const Ranges planeIndexesRanges, double *a, Axis axis)
+void getAllIntersections(const double source, const double pixel, const Ranges planeIndexesRanges, double *const a, const Axis axis)
 {
     int start = 0, end = 0;
     double d;
@@ -244,7 +245,7 @@ void getAllIntersections(const double source, const double pixel, const Ranges p
             }
         }
 
-        for (int i = 1; i < end - start; i++) {
+        for (unsigned short i = 1; i < end - start; i++) {
             plane[i] = plane[i - 1] + d;
         }
         getIntersection(source, pixel, plane, end - start, a);
@@ -262,11 +263,11 @@ void getAllIntersections(const double source, const double pixel, const Ranges p
  * @param axis It is the axis orthogonal to the plane.
  * @return The range of parametric values of the planes.
  */
-Ranges getRangeOfIndex(const double source, const double pixel, int isParallel, double aMin, double aMax, Axis axis)
+Ranges getRangeOfIndex(const double source, const double pixel, const char isParallel, const double aMin, const double aMax, const Axis axis)
 {
     Ranges idxs;
     double firstPlane, lastPlane;
-    int voxelDim;
+    unsigned short voxelDim;
 
     if (axis == X) {
         voxelDim = gl_voxelXDim;
@@ -308,7 +309,7 @@ Ranges getRangeOfIndex(const double source, const double pixel, int isParallel, 
  * @param c It is the computed merged array.
  * @return The length of the merged array.
  */
-int merge(double *a, double *b, int lenA, int lenB, double *c)
+int merge(const double *const a, const double *const b, const unsigned short lenA, const unsigned short lenB, double *const c)
 {
     int i = 0, j = 0, k = 0;
     while (j < lenA && k < lenB) {
@@ -346,11 +347,11 @@ int merge(double *a, double *b, int lenA, int lenB, double *c)
  * @param merged It is the computed merged array.
  * @return The length of the merged array.
  */
-int merge3(double *a, double *b, double *c, int lenA, int lenB, int lenC, double *merged)
+unsigned short merge3(const double *const a, const double *const b, const double *const c, const unsigned short lenA, const unsigned short lenB, const unsigned short lenC, double *const merged)
 {
     double ab[lenA + lenB];
-    merge(a, b, lenA, lenB, ab);
-    return merge(ab, c, lenA + lenB, lenC, merged);
+    const unsigned short length = merge(a, b, lenA, lenB, ab);
+    return merge(ab, c, length, lenC, merged);
 }
 
 /**
@@ -361,7 +362,7 @@ int merge3(double *a, double *b, double *c, int lenA, int lenB, int lenC, double
  * @param index A value that defines the angle being considered.
  * @return The coordinates of the source.
  */
-Point getSource(double *sinTable, double *cosTable, int index)
+Point getSource(const double *const sinTable, const double *const cosTable, const unsigned short index)
 {
     Point source;
 
@@ -382,16 +383,16 @@ Point getSource(double *sinTable, double *cosTable, int index)
  * @param index A value that defines the angle being considered, and consequently, the source.
  * @return The coordinates of a unit of the detector, relative to the specified source.
  */
-Point getPixel(double *sinTable, double *cosTable, int r, int c, int index)
+Point getPixel(const double *const sinTable, const double *const cosTable, const unsigned r, const unsigned c, const unsigned short index)
 {
     Point pixel;
     const double sinAngle = sinTable[index];
     const double cosAngle = cosTable[index];
     const double elementOffset =  gl_detectorSideLength / 2 - gl_pixelDim / 2;
 
-    pixel.x = -gl_distanceObjectDetector * sinAngle + cosAngle * (-elementOffset + gl_pixelDim * c);
-    pixel.y = -gl_distanceObjectDetector * cosAngle - sinAngle * (-elementOffset + gl_pixelDim * c);
-    pixel.z = -elementOffset + gl_pixelDim * r;
+    pixel.x = -(double) gl_distanceObjectDetector * sinAngle + cosAngle * (-elementOffset + (double) gl_pixelDim * c);
+    pixel.y = -(double) gl_distanceObjectDetector * cosAngle - sinAngle * (-elementOffset + (double) gl_pixelDim * c);
+    pixel.z = -elementOffset + (double) gl_pixelDim * r;
 
     return pixel;
 }
@@ -402,7 +403,7 @@ Point getPixel(double *sinTable, double *cosTable, int r, int c, int index)
  * @param planes It is a pointer to an array of two elements,
  * each one of them is the coordinate of a plane parallel relative to the YZ plane.
  */
-void getSidesXPlanes(double *planes)
+void getSidesXPlanes(double *const planes)
 {
     planes[0] = getXPlane(0);
     planes[1] = getXPlane(gl_nPlanes[X] - 1);
@@ -416,7 +417,7 @@ void getSidesXPlanes(double *planes)
  * @param slice It is a number that indicates the first voxel in the y axis from which the projection is being computed.
  * In this case this limits the planes considered.
  */
-void getSidesYPlanes(double *planes, int slice)
+void getSidesYPlanes(double *const planes, const unsigned short slice)
 {
     planes[0] = getYPlane(slice);
     planes[1] = getYPlane(min(gl_nPlanes[Y] - 1, OBJ_BUFFER + slice));
@@ -428,7 +429,7 @@ void getSidesYPlanes(double *planes, int slice)
  * @param planes It is a pointer to an array of two elements,
  * each one of them is the coordinate of a plane parallel relative to the XY plane.
  */
-void getSidesZPlanes(double *planes)
+void getSidesZPlanes(double *const planes)
 {
     planes[0] = getZPlane(0);
     planes[1] = getZPlane(gl_nPlanes[Z] - 1);
@@ -437,27 +438,29 @@ void getSidesZPlanes(double *planes)
 /**
  * @brief Computes the projection attenuation of the radiological path of a ray.
  *
+ * @param slice It is a number that indicates the first voxel in the y axis from which the projection is being computed.
  * @param source Represents the coordinate of the source.
  * @param pixel Represents the coordinate of the unit of the detector.
  * @param a It is an array that contains all intersection points merged, expressed parametrically.
  * @param lenA It is the length of the corresponding array.
- * @param slice It is a number that indicates the first voxel in the y axis from which the projection is being computed.
  * @param f It is an array of the coefficients of attenuation for each voxel.
  * @return The computed projection attenuation of the radiological path of a ray.
  */
-double computeAbsorption(Point source, Point pixel, double *a, int lenA, int slice, double *f)
+double computeAbsorption(const unsigned short slice, const Point source, const Point pixel, const double *const a, const unsigned short lenA, const double *const f)
 {
     const double d12 = sqrt(pow(pixel.x - source.x, 2) + pow(pixel.y - source.y, 2) + pow(pixel.z - source.z, 2));
     double g = 0.0;
 
-    for (int i = 0; i < lenA - 1; i++) {
-        const double segments = d12 * (a[i + 1] - a[i]);
-        const double aMid = (a[i + 1] + a[i]) / 2;
-        const int xRow = min((source.x + aMid * (pixel.x - source.x) - getXPlane(0)) / gl_voxelXDim, gl_nVoxel[X] - 1);
-        const int yRow = min3((source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / gl_voxelYDim, gl_nVoxel[Y] - 1, OBJ_BUFFER - 1);
-        const int zRow = min((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / gl_voxelZDim, gl_nVoxel[Z] - 1);
+    if (lenA > 0) {
+        for (unsigned short i = 0; i < lenA - 1; i++) {
+            const double segments = d12 * (a[i + 1] - a[i]);
+            const double aMid = (a[i + 1] + a[i]) / 2;
+            const unsigned short xRow = min((source.x + aMid * (pixel.x - source.x) - getXPlane(0)) / gl_voxelXDim, gl_nVoxel[X] - 1);
+            const unsigned short yRow = min3((source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / gl_voxelYDim, gl_nVoxel[Y] - 1, OBJ_BUFFER - 1);
+            const unsigned short zRow = min((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / gl_voxelZDim, gl_nVoxel[Z] - 1);
 
-        g += f[yRow * gl_nVoxel[X] * gl_nVoxel[Z] + zRow * gl_nVoxel[Z] + xRow] * segments;
+            g += f[(unsigned) yRow * gl_nVoxel[X] * gl_nVoxel[Z] + (unsigned) zRow * gl_nVoxel[Z] + xRow] * segments;
+        }
     }
     return g;
 }
@@ -471,10 +474,10 @@ double computeAbsorption(Point source, Point pixel, double *a, int lenA, int sli
  * @param gMin It is the minimum projection attenuation computed.
  * @param gMax It is the maximum projection attenuation computed.
  */
-void computeProjections(int slice, double *f, double *g, double *gMin, double *gMax)
+void computeProjections(const unsigned short slice, double *f, double *g, double *gMin, double *gMax)
 {
-    const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1; // Number of angular positions
-    const int nSidePixels = gl_detectorSideLength / gl_pixelDim;
+    const unsigned short nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1; // Number of angular positions
+    const unsigned nSidePixels = gl_detectorSideLength / gl_pixelDim;
 
     double l_gMin = INFINITY;
     double l_gMax = -INFINITY;
@@ -486,27 +489,26 @@ void computeProjections(int slice, double *f, double *g, double *gMin, double *g
     initTables(sinTable, cosTable, nTheta);
 
     // Iterates over each source
-    for (int positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+    for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
         const Point source = getSource(sinTable, cosTable, positionIndex);
 
         // Iterates over each pixel of the detector
 #pragma omp parallel for collapse(2) schedule(dynamic) default(none) shared(sinTable, cosTable, nSidePixels, positionIndex, source, slice, f, g, nTheta, gl_nVoxel, gl_nPlanes) reduction(min:l_gMin) reduction(max:l_gMax)
-        for (int r = 0; r < nSidePixels; r++) {
-            for (int c = 0; c < nSidePixels; c++) {
+        for (unsigned r = 0; r < nSidePixels; r++) {
+            for (unsigned c = 0; c < nSidePixels; c++) {
                 double a[3][2];
                 double aMerged[gl_nPlanes[X] + gl_nPlanes[Y] + gl_nPlanes[Z]];
                 double aX[gl_nPlanes[X]];
                 double aY[gl_nPlanes[Y]];
                 double aZ[gl_nPlanes[Z]];
-                Point pixel;
 
                 // Gets the pixel's center cartesian coordinates
-                pixel = getPixel(sinTable, cosTable, r, c, positionIndex);
+                const Point pixel = getPixel(sinTable, cosTable, r, c, positionIndex);
 
                 // Computes Min-Max parametric values
                 double aMin, aMax;
                 double sidesPlanes[2];
-                int isParallel = -1;
+                char isParallel = -1;
                 getSidesXPlanes(sidesPlanes);
                 if (!getIntersection(source.x, pixel.x, sidesPlanes, 2, &a[X][0])) {
                     isParallel = X;
@@ -543,7 +545,6 @@ void computeProjections(int slice, double *f, double *g, double *gMin, double *g
                     if (lenZ < 0) {
                         lenZ = 0;
                     }
-                    const int lenA = lenX + lenY + lenZ;
 
                     // Computes ray-planes intersection Nx + Ny + Nz
                     getAllIntersections(source.x, pixel.x, indices[X], aX, X);
@@ -551,11 +552,11 @@ void computeProjections(int slice, double *f, double *g, double *gMin, double *g
                     getAllIntersections(source.z, pixel.z, indices[Z], aZ, Z);
 
                     // Computes segments Nx + Ny + Nz
-                    merge3(aX, aY, aZ, lenX, lenY, lenZ, aMerged);
+                    const unsigned short lenA = merge3(aX, aY, aZ, lenX, lenY, lenZ, aMerged);
 
                     // Associates each segment to the respective voxel Nx + Ny + Nz
-                    const int pixelIndex = positionIndex * nSidePixels * nSidePixels + r * nSidePixels + c;
-                    g[pixelIndex] += computeAbsorption(source, pixel, aMerged, lenA, slice, f);
+                    const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + r * nSidePixels + c;
+                    g[pixelIndex] += computeAbsorption(slice, source, pixel, aMerged, lenA, f);
                     l_gMax = fmax(l_gMax, g[pixelIndex]);
                     l_gMin = fmin(l_gMin, g[pixelIndex]);
                 }
@@ -572,40 +573,67 @@ void computeProjections(int slice, double *f, double *g, double *gMin, double *g
  * @brief Reads the environment values used to compute the voxel grid from the specified binary file.
  *
  * @param filePointer It is the file pointer to read the values from.
- * @return 0 in case of writing failure, 1 otherwise.
+ * @return EXIT_FAILURE in case of reading failure, EXIT_SUCCESS otherwise.
  */
 int readSetUP(FILE *filePointer)
 {
-    int buffer[16];
-    if (!fread(buffer, sizeof(int), 16, filePointer)) {
-        return 0;
+    unsigned short buffer0[12];
+    if (!fread(buffer0, sizeof(unsigned short), sizeof(buffer0) / sizeof(unsigned short), filePointer)) {
+        return EXIT_FAILURE;
     }
 
-    gl_pixelDim = buffer[0];
-    gl_angularTrajectory = buffer[1];
-    gl_positionsAngularDistance = buffer[2];
-    gl_objectSideLength = buffer[3];
-    gl_detectorSideLength = buffer[4];
-    gl_distanceObjectDetector = buffer[5];
-    gl_distanceObjectSource = buffer[6];
-    gl_voxelXDim = buffer[7];
-    gl_voxelYDim = buffer[8];
-    gl_voxelZDim = buffer[9];
-    gl_nVoxel[0] = buffer[10];
-    gl_nVoxel[1] = buffer[11];
-    gl_nVoxel[2] = buffer[12];
-    gl_nPlanes[0] = buffer[13];
-    gl_nPlanes[1] = buffer[14];
-    gl_nPlanes[2] = buffer[15];
+    unsigned char i = 0;
+    gl_pixelDim = buffer0[i++];
+    gl_angularTrajectory = buffer0[i++];
+    gl_positionsAngularDistance = buffer0[i++];
+    gl_voxelXDim = buffer0[i++];
+    gl_voxelYDim = buffer0[i++];
+    gl_voxelZDim = buffer0[i++];
+    gl_nVoxel[X] = buffer0[i++];
+    gl_nVoxel[Y] = buffer0[i++];
+    gl_nVoxel[Z] = buffer0[i++];
+    gl_nPlanes[X] = buffer0[i++];
+    gl_nPlanes[Y] = buffer0[i++];
+    gl_nPlanes[Z] = buffer0[i];
 
-    return 1;
+    unsigned buffer1[4];
+    if (!fread(buffer1, sizeof(unsigned), sizeof(buffer1) / sizeof(unsigned), filePointer)) {
+        return EXIT_FAILURE;
+    }
+
+    i = 0;
+    gl_objectSideLength = buffer1[i++];
+    gl_detectorSideLength = buffer1[i++];
+    gl_distanceObjectDetector = buffer1[i++];
+    gl_distanceObjectSource = buffer1[i];
+
+#ifdef PRINT_VARIABLES
+    printf("Variables READ:\n");
+    printf("- unsigned short:\n");
+    printf("    gl_pixelDim = %hu\n", gl_pixelDim);
+    printf("    gl_angularTrajectory = %hu\n", gl_angularTrajectory);
+    printf("    gl_positionsAngularDistance = %hu\n", gl_positionsAngularDistance);
+    printf("    gl_voxelXDim = %hu\n", gl_voxelXDim);
+    printf("    gl_voxelYDim = %hu\n", gl_voxelYDim);
+    printf("    gl_voxelZDim = %hu\n", gl_voxelZDim);
+    printf("    gl_nVoxel[X] = %hu\n", gl_nVoxel[X]);
+    printf("    gl_nVoxel[Y] = %hu\n", gl_nVoxel[Y]);
+    printf("    gl_nVoxel[Z] = %hu\n", gl_nVoxel[Z]);
+    printf("    gl_nPlanes[X] = %hu\n", gl_nPlanes[X]);
+    printf("    gl_nPlanes[Y] = %hu\n", gl_nPlanes[Y]);
+    printf("    gl_nPlanes[Z] = %hu\n", gl_nPlanes[Z]);
+    printf("- unsigned:\n");
+    printf("    gl_objectSideLength = %u\n", gl_objectSideLength);
+    printf("    gl_detectorSideLength = %u\n", gl_detectorSideLength);
+    printf("    gl_distanceObjectDetector = %u\n", gl_distanceObjectDetector);
+    printf("    gl_distanceObjectSource = %u\n", gl_distanceObjectSource);
+#endif
+
+    return EXIT_SUCCESS;
 }
 
 int main(int argc, char *argv[])
 {
-    FILE *inputFilePointer;
-    FILE *outputFilePointer;
-
     if (argc != 3) {
         fprintf(stderr, "Usage: %s input.dat output.pgm\n"
                         "- The first parameter is the name of the input file.\n"
@@ -613,35 +641,34 @@ int main(int argc, char *argv[])
                         argv[0]);
         return EXIT_FAILURE;
     }
-    const char *inputFileName = argv[1];
-    const char *outputFileName = argv[2];
+    const char *const inputFileName = argv[1];
+    const char *const outputFileName = argv[2];
 
-    inputFilePointer = fopen(inputFileName, "rb");
+    FILE *const inputFilePointer = fopen(inputFileName, "rb");
     if (!inputFilePointer) {
         fprintf(stderr, "Unable to open file '%s'!\n", inputFileName);
         return EXIT_FAILURE;
     }
 
-    if (!readSetUP(inputFilePointer)) {
+    if (readSetUP(inputFilePointer) == EXIT_FAILURE) {
         fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
         return EXIT_FAILURE;
     }
-
-    int nSidePixels = gl_detectorSideLength / gl_pixelDim;
+    const unsigned nSidePixels = gl_detectorSideLength / gl_pixelDim;
 
     // Number of angular positions
-    const int nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1;
+    const unsigned short nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1;
     // Array containing the coefficients of each voxel
-    double *f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * OBJ_BUFFER);
+    double *const f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * OBJ_BUFFER);
     // Array containing the computed attenuation detected in each pixel of the detector
-    double *g = (double *) calloc(nSidePixels * nSidePixels * nTheta, sizeof(double));
-    // Each thread will have its own variable to store its minimum and maximum attenuation computed
-    double gMaxValue, gMinValue;
+    double *const g = (double *) calloc(nSidePixels * nSidePixels * nTheta, sizeof(double));
+    // Minimum and maximum attenuation computed
+    double gMinValue = INFINITY, gMaxValue = -INFINITY;
 
     double totalTime = 0.0;
     // Iterates over object subsection
-    for (int slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
-        int nOfSlices;
+    for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
+        unsigned short nOfSlices;
 
         if (gl_nVoxel[Y] - slice < OBJ_BUFFER) {
             nOfSlices = gl_nVoxel[Y] - slice;
@@ -650,7 +677,7 @@ int main(int argc, char *argv[])
         }
 
         // Read voxels coefficients
-        if (!fread(f, sizeof(double), gl_nVoxel[X] * gl_nVoxel[Z] * nOfSlices, inputFilePointer)) {
+        if (!fread(f, sizeof(double), (size_t) gl_nVoxel[X] * gl_nVoxel[Z] * nOfSlices, inputFilePointer)) {
             fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
             free(f);
             free(g);
@@ -658,7 +685,7 @@ int main(int argc, char *argv[])
         }
 
         // Computes subsection projection
-        double partialTime = hpc_gettime();
+        const double partialTime = hpc_gettime();
         computeProjections(slice, f, g, &gMinValue, &gMaxValue);
         totalTime += hpc_gettime() - partialTime;
     }
@@ -667,7 +694,7 @@ int main(int argc, char *argv[])
     printf("Execution time (s) %.2f\n", totalTime);
     fflush(stdout);
 
-    outputFilePointer = fopen(outputFileName, "w");
+    FILE *const outputFilePointer = fopen(outputFileName, "w");
     if (!outputFileName) {
         fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
         free(g);
@@ -675,13 +702,13 @@ int main(int argc, char *argv[])
     }
     // Iterates over each attenuation value computed, prints a value between [0-255]
     fprintf(outputFilePointer, "P2\n%d %d\n255", nSidePixels, nSidePixels * nTheta);
-    for (double positionIndex = 0; positionIndex < nTheta; positionIndex++) {
-        double angle = -gl_angularTrajectory / 2 + positionIndex * gl_positionsAngularDistance;
+    for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+        double angle = -(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance;
         fprintf(outputFilePointer, "\n#%lf", angle);
-        for (int i = 0; i < nSidePixels; i++) {
+        for (unsigned i = 0; i < nSidePixels; i++) {
             fprintf(outputFilePointer, "\n");
-            for (int j = 0; j < nSidePixels; j++) {
-                int pixelIndex = positionIndex * nSidePixels * nSidePixels + i * nSidePixels + j;
+            for (unsigned j = 0; j < nSidePixels; j++) {
+                const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + i * nSidePixels + j;
                 int color = (g[pixelIndex] - gMinValue) * 255 / (gMaxValue - gMinValue);
                 fprintf(outputFilePointer, "%d ", color);
             }

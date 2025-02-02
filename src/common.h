@@ -43,10 +43,10 @@
 #define ANGULAR_TRAJECTORY 90 // total angular distance traveled by the source
 #define POSITIONS_ANGULAR_DISTANCE 15 // angular distance between each source position
 
-#define OBJECT_SIDE_LENGTH 100000 // side length of the object
-#define DETECTOR_SIDE_LENGTH 200000 // side length of the detector
-#define DISTANCE_OBJECT_DETECTOR 150000 // distance between the object's center and the detector
-#define DISTANCE_OBJECT_SOURCE 600000 // distance between the object's center and the source position
+#define OBJECT_SIDE_LENGTH 100000u // side length of the object
+#define DETECTOR_SIDE_LENGTH 200000u // side length of the detector
+#define DISTANCE_OBJECT_DETECTOR 150000u // distance between the object's center and the detector
+#define DISTANCE_OBJECT_SOURCE 600000u // distance between the object's center and the source position
 
 /*
  * The following constraints represent the reference value for gl_nVoxel and gl_nPlanes variables.
@@ -54,14 +54,14 @@
 #define N_VOXEL_X  (OBJECT_SIDE_LENGTH / VOXEL_X_DIM) // number of voxel the object is composed of along the X axis
 #define N_VOXEL_Y  (OBJECT_SIDE_LENGTH / VOXEL_Y_DIM) // number of voxel the object is composed of along the Y axis
 #define N_VOXEL_Z  (OBJECT_SIDE_LENGTH / VOXEL_Z_DIM) // number of voxel the object is composed of along the Z axis
-#define N_PLANES_X ((OBJECT_SIDE_LENGTH / VOXEL_X_DIM) + 1) // number of planes along the X axis
-#define N_PLANES_Y ((OBJECT_SIDE_LENGTH / VOXEL_Y_DIM) + 1) // number of planes along the Y axis
-#define N_PLANES_Z ((OBJECT_SIDE_LENGTH / VOXEL_Z_DIM) + 1) // number of planes along the Z axis
+#define N_PLANES_X (N_VOXEL_X + 1) // number of planes along the X axis
+#define N_PLANES_Y (N_VOXEL_Y + 1) // number of planes along the Y axis
+#define N_PLANES_Z (N_VOXEL_Z + 1) // number of planes along the Z axis
 
 /**
  * @brief Enumerates the cartesian axis of a cartesian 3D coordinate system.
  */
-typedef enum{
+typedef enum {
     X,
     Y,
     Z
@@ -70,7 +70,7 @@ typedef enum{
 /**
  * @brief Models a point of coordinates (x, y, z) in the cartesian 3D coordinate system.
  */
-typedef struct{
+typedef struct {
     double x;
     double y;
     double z;
@@ -79,7 +79,7 @@ typedef struct{
 /**
  * @brief Models the range of indices of the planes to consider to compute the intersections with the rays.
  */
-typedef struct{
+typedef struct {
     int minIndx;
     int maxIndx;
 } Ranges;
