@@ -33,7 +33,7 @@
 #include "common.h"
 
 /// Limits the number of voxels along the y axis computed per time
-#define OBJ_BUFFER 100
+#define OBJ_BUFFER 100u
 /// N pixels along each side of the detector
 #define N_PIXEL_ALONG_SIDE (DETECTOR_SIDE_LENGTH / PIXEL_DIM)
 // #define DEFAULT_WORK_SIZE 2352 // default work size, equals to floor(DETECTOR_SIDE_LENGTH / PIXEL_DIM)
@@ -48,24 +48,128 @@
  * In case the third value is given at launch, this will be used to compute the value of gl_objectSideLength, gl_detectorSideLength,
  * gl_distanceObjectDetector and gl_distanceObjectSource; the remaining variables will keep the value given below.
  */
-int gl_pixelDim = PIXEL_DIM;
-int gl_angularTrajectory = ANGULAR_TRAJECTORY;
-int gl_positionsAngularDistance = POSITIONS_ANGULAR_DISTANCE;
-int gl_objectSideLength = OBJECT_SIDE_LENGTH;
-int gl_detectorSideLength = DETECTOR_SIDE_LENGTH;
-int gl_distanceObjectDetector = DISTANCE_OBJECT_DETECTOR;
-int gl_distanceObjectSource = DISTANCE_OBJECT_SOURCE;
-int gl_voxelXDim = VOXEL_X_DIM;
-int gl_voxelYDim = VOXEL_Y_DIM;
-int gl_voxelZDim = VOXEL_Z_DIM;
+unsigned short gl_pixelDim = PIXEL_DIM;
+unsigned short gl_angularTrajectory = ANGULAR_TRAJECTORY;
+unsigned short gl_positionsAngularDistance = POSITIONS_ANGULAR_DISTANCE;
+unsigned short gl_voxelXDim = VOXEL_X_DIM;
+unsigned short gl_voxelYDim = VOXEL_Y_DIM;
+unsigned short gl_voxelZDim = VOXEL_Z_DIM;
+
+unsigned gl_objectSideLength = OBJECT_SIDE_LENGTH;
+unsigned gl_detectorSideLength = DETECTOR_SIDE_LENGTH;
+unsigned gl_distanceObjectDetector = DISTANCE_OBJECT_DETECTOR;
+unsigned gl_distanceObjectSource = DISTANCE_OBJECT_SOURCE;
 
 /*
  * The following arrays' value must be computed as follows:
  * gl_nVoxel[3] = {gl_objectSideLength / gl_voxelXDim, gl_objectSideLength / gl_voxelYDim, gl_objectSideLength / gl_voxelZDim};
  * gl_nPlanes[3] = {(gl_objectSideLength / gl_voxelXDim) + 1, (gl_objectSideLength / gl_voxelYDim) + 1, (gl_objectSideLength / gl_voxelZDim) + 1};
  */
-int gl_nVoxel[3] = {N_VOXEL_X, N_VOXEL_Y, N_VOXEL_Z};
-int gl_nPlanes[3] = {N_PLANES_X, N_PLANES_Y, N_PLANES_Z};
+unsigned short gl_nVoxel[3] = {N_VOXEL_X, N_VOXEL_Y, N_VOXEL_Z};
+unsigned short gl_nPlanes[3] = {N_PLANES_X, N_PLANES_Y, N_PLANES_Z};
+
+/**
+ * @brief Generates a sub-section of a solid cubic object given its side length.
+ *
+ * @param f It is the pointer to the array on which to store the sub-section.
+ * @param nOfSlices It is the number of voxel along the Y axis.
+ * @param offset It is the distance (in number of voxel) of the slices to be generated from the initial slice.
+ * @param sideLength It is the side length of the cubic object.
+ */
+void generateCubeSlice(double *f, unsigned nOfSlices, unsigned offset, unsigned sideLength)
+{
+    const long int innerToOuterDiff = gl_nVoxel[X] / 2 - sideLength / 2;
+    const long int rightSide = innerToOuterDiff + sideLength;
+
+    // Iterates over each voxel of the grid
+    // Be careful, with GCC the OpenMP collapse doesn't work if you declare the indexes as unsigned short!!
+#pragma omp parallel for collapse(3) default(none) shared(f, nOfSlices, gl_nVoxel, offset, sideLength, innerToOuterDiff, rightSide)
+    for (unsigned n = 0 ; n < nOfSlices; n++) {
+        for (unsigned i = 0; i < gl_nVoxel[Z]; i++) {
+            for (unsigned j = 0; j < gl_nVoxel[X]; j++) {
+                if (i >= innerToOuterDiff && i <= rightSide && j >= innerToOuterDiff && j <= rightSide
+                        && n + offset >= innerToOuterDiff && n + offset <= gl_nVoxel[Y] - innerToOuterDiff) {
+                    // Voxel position is inside the cubic object
+                    f[(unsigned) gl_nVoxel[Z] * i + j + (unsigned) n * gl_nVoxel[X] * gl_nVoxel[Z]] = 1.0;
+                } else {
+                    f[(unsigned) gl_nVoxel[Z] * i + j + (unsigned) n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @brief Generates a sub-section of a solid spherical object given its diameter.
+ *
+ * @param f It is the pointer to the array on which to store the sub-section.
+ * @param nOfSlices It is the number of voxel along the Y axis.
+ * @param offset It is the distance (in number of voxel) of the slices to be generated from the initial slice.
+ * @param diameter It is the diameter of the sphere.
+ */
+void generateSphereSlice(double *f, unsigned short nOfSlices, unsigned short offset, unsigned diameter)
+{
+    // Iterates over each voxel of the grid
+    // Be careful, with GCC the OpenMP collapse doesn't work if you declare the indexes as unsigned short!!
+#pragma omp parallel for collapse(3) default(none) shared(f, nOfSlices, gl_nVoxel, offset, diameter, gl_objectSideLength, gl_voxelYDim, gl_voxelXDim, gl_voxelZDim)
+    for (unsigned n = 0; n < nOfSlices; n++) {
+        for (unsigned r = 0; r < gl_nVoxel[Z]; r++) {
+            for (unsigned c = 0; c < gl_nVoxel[X]; c++) {
+                Point temp;
+                temp.y = -(double) gl_objectSideLength / 2.0 + gl_voxelYDim / 2.0 + (n + offset) * gl_voxelYDim;
+                temp.x = -(double) gl_objectSideLength / 2.0 + gl_voxelXDim / 2.0 + c * gl_voxelXDim;
+                temp.z = -(double) gl_objectSideLength / 2.0 + gl_voxelZDim / 2.0 + r * gl_voxelZDim;
+                const double distance = sqrt(pow(temp.x, 2) + pow(temp.y, 2) + pow(temp.z, 2));
+                if (distance <= diameter && c < gl_nVoxel[Z] / 2) {
+                    // Voxel position is inside the sphere object
+                    f[(unsigned) gl_nVoxel[Z] * r + c + (unsigned) n * gl_nVoxel[X] * gl_nVoxel[Z]] = 1.0;
+                } else {
+                    f[(unsigned) gl_nVoxel[Z] * r + c + (unsigned) n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @brief Generates a sub-section of a solid cubic object with an internal spherical cavity.
+ *
+ * @param f It is the pointer to the array on which to store the sub-section.
+ * @param nOfSlices It is the number of voxel along the Y axis.
+ * @param offset It is the distance (in number of voxel) of the slices to be generated from the initial slice.
+ * @param sideLength It is the side length of the cubic object.
+ */
+void generateCubeWithSphereSlice(double *f, unsigned short nOfSlices, unsigned short offset, const unsigned sideLength)
+{
+    const long int innerToOuterDiff = gl_nVoxel[X] / 2 - sideLength / 2;
+    const long int rightSide = innerToOuterDiff + sideLength;
+    const Point sphereCenter = {-(double) sideLength * gl_voxelXDim / 4.0, -(double) sideLength * gl_voxelYDim / 4.0, -(double) sideLength * gl_voxelZDim / 4.0};
+
+    // Iterates over each voxel of the grid
+    // Be careful, with GCC the OpenMP collapse doesn't work if you declare the indexes as unsigned short!!
+#pragma omp parallel for collapse(3) default(none) shared(f, nOfSlices, offset, sideLength, gl_nVoxel, innerToOuterDiff, rightSide, sphereCenter, gl_objectSideLength, gl_voxelYDim, gl_voxelXDim, gl_voxelZDim)
+    for (unsigned n = 0 ; n < nOfSlices; n++) {
+        for (unsigned i = 0; i < gl_nVoxel[Z]; i++) {
+            for (unsigned j = 0; j < gl_nVoxel[X]; j++) {
+                f[(unsigned) gl_nVoxel[Z] * i + j + (unsigned) n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
+                if (i >= innerToOuterDiff && i <= rightSide && j >= innerToOuterDiff && j <= rightSide
+                        && n + offset >= innerToOuterDiff && n + offset <= gl_nVoxel[Y] - innerToOuterDiff) {
+                    // Voxel position is inside the cubic object
+                    Point temp;
+                    temp.y = -(double) gl_objectSideLength / 2.0 + gl_voxelYDim / 2.0 + (n + offset) * gl_voxelYDim;
+                    temp.x = -(double) gl_objectSideLength / 2.0 + gl_voxelXDim / 2.0 + j * gl_voxelXDim;
+                    temp.z = -(double) gl_objectSideLength / 2.0 + gl_voxelZDim / 2.0 + i * gl_voxelZDim;
+                    const double distance = sqrt(pow(temp.x - sphereCenter.x, 2) + pow(temp.y - sphereCenter.y, 2) + pow(temp.z - sphereCenter.z, 2));
+
+                    if (distance > sideLength * gl_voxelXDim / 6.0) {
+                        // Voxel position is outside the spherical cavity
+                        f[(unsigned) gl_nVoxel[Z] * i + j + (unsigned) n * gl_nVoxel[X] * gl_nVoxel[Z]] = 1.0;
+                    }
+                }
+            }
+        }
+    }
+}
 
 static void printSizeMaxGB(const char *name, size_t size) {
     if (size > 1024) {
@@ -90,133 +194,61 @@ static void printSizeMaxGB(const char *name, size_t size) {
  * @brief Stores the environment values used to compute the voxel grid into the specified binary file.
  *
  * @param filePointer The file pointer to store the values in.
- * @return The number of bytes which the header is made up of, 0 in case an error occurs on writing.
+ * @return The number of Bytes written in output, -1 if error occurred.
  */
-unsigned long writeSetUp(FILE *filePointer)
+int writeSetUp(FILE *const filePointer)
 {
-    int setUp[] = {
+    unsigned short setUp0[] = {
         gl_pixelDim,
         gl_angularTrajectory,
         gl_positionsAngularDistance,
+        gl_voxelXDim,
+        gl_voxelYDim,
+        gl_voxelZDim,
+        gl_nVoxel[X],
+        gl_nVoxel[Y],
+        gl_nVoxel[Z],
+        gl_nPlanes[X],
+        gl_nPlanes[Y],
+        gl_nPlanes[Z]
+    };
+    if (!fwrite(setUp0, sizeof(unsigned short), sizeof(setUp0) / sizeof(unsigned short), filePointer)) {
+        return -1;
+    }
+
+    unsigned setUp1[] = {
         gl_objectSideLength,
         gl_detectorSideLength,
         gl_distanceObjectDetector,
         gl_distanceObjectSource,
-        gl_voxelXDim,
-        gl_voxelYDim,
-        gl_voxelZDim,
-        gl_nVoxel[0],
-        gl_nVoxel[1],
-        gl_nVoxel[2],
-        gl_nPlanes[0],
-        gl_nPlanes[1],
-        gl_nPlanes[2]
     };
-
-    if (!fwrite(setUp, sizeof(int), sizeof(setUp) / sizeof(int), filePointer)) {
-        return 0;
+    if (!fwrite(setUp1, sizeof(unsigned), sizeof(setUp1) / sizeof(unsigned), filePointer)) {
+        return -1;
     }
-    return sizeof(setUp);
-}
 
-/**
- * @brief Generates a sub-section of a solid cubic object given its side length.
- *
- * @param f It is the pointer to the array on which to store the sub-section.
- * @param nOfSlices It is the number of voxel along the Y axis.
- * @param offset It is the distance (in number of voxel) of the slices to be generated from the initial slice.
- * @param sideLength It is the side length of the cubic object.
- */
-void generateCubeSlice(double *f, int nOfSlices, int offset, int sideLength)
-{
-    const int innerToOuterDiff = gl_nVoxel[X] / 2 - sideLength / 2;
-    const int rightSide = innerToOuterDiff + sideLength;
+#ifdef PRINT_VARIABLES
+    printf("Variables WRITE:\n");
+    printf("- unsigned short:\n");
+    printf("    gl_pixelDim = %hu\n", gl_pixelDim);
+    printf("    gl_angularTrajectory = %hu\n", gl_angularTrajectory);
+    printf("    gl_positionsAngularDistance = %hu\n", gl_positionsAngularDistance);
+    printf("    gl_voxelXDim = %hu\n", gl_voxelXDim);
+    printf("    gl_voxelYDim = %hu\n", gl_voxelYDim);
+    printf("    gl_voxelZDim = %hu\n", gl_voxelZDim);
+    printf("    gl_nVoxel[X] = %hu\n", gl_nVoxel[X]);
+    printf("    gl_nVoxel[Y] = %hu\n", gl_nVoxel[Y]);
+    printf("    gl_nVoxel[Z] = %hu\n", gl_nVoxel[Z]);
+    printf("    gl_nPlanes[X] = %hu\n", gl_nPlanes[X]);
+    printf("    gl_nPlanes[Y] = %hu\n", gl_nPlanes[Y]);
+    printf("    gl_nPlanes[Z] = %hu\n", gl_nPlanes[Z]);
+    printf("- unsigned:\n");
+    printf("    gl_objectSideLength = %u\n", gl_objectSideLength);
+    printf("    gl_detectorSideLength = %u\n", gl_detectorSideLength);
+    printf("    gl_distanceObjectDetector = %u\n", gl_distanceObjectDetector);
+    printf("    gl_distanceObjectSource = %u\n", gl_distanceObjectSource);
+#endif
 
-    // Iterates over each voxel of the grid
-#pragma omp parallel for collapse(3) default(none) shared(f, nOfSlices, gl_nVoxel, offset, sideLength, innerToOuterDiff, rightSide)
-    for (int n = 0 ; n < nOfSlices; n++) {
-        for (int i = 0; i < gl_nVoxel[Z]; i++) {
-            for (int j = 0; j < gl_nVoxel[X]; j++) {
-                if (i >= innerToOuterDiff && i <= rightSide && j >= innerToOuterDiff && j <= rightSide
-                    && n + offset >= innerToOuterDiff && n + offset <= gl_nVoxel[Y] - innerToOuterDiff) {
-                    // Voxel position is inside the cubic object
-                    f[gl_nVoxel[Z] * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 1.0;
-                } else {
-                    f[gl_nVoxel[Z] * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
-                }
-            }
-        }
-    }
-}
-
-/**
- * @brief Generates a sub-section of a solid spherical object given its diameter.
- *
- * @param f It is the pointer to the array on which to store the sub-section.
- * @param nOfSlices It is the number of voxel along the Y axis.
- * @param offset It is the distance (in number of voxel) of the slices to be generated from the initial slice.
- * @param diameter It is the diameter of the sphere.
- */
-void generateSphereSlice(double *f, int nOfSlices, int offset, int diameter)
-{
-    // Iterates over each voxel of the grid
-#pragma omp parallel for collapse(3) default(none) shared(f, nOfSlices, gl_nVoxel, offset, diameter, gl_objectSideLength, gl_voxelYDim, gl_voxelXDim, gl_voxelZDim)
-    for (int n = 0; n < nOfSlices; n++) {
-        for (int r = 0; r < gl_nVoxel[Z]; r++) {
-            for (int c = 0; c < gl_nVoxel[X]; c++) {
-                Point temp;
-                temp.y = -(gl_objectSideLength / 2) + (gl_voxelYDim / 2) + (n + offset) * gl_voxelYDim;
-                temp.x = -(gl_objectSideLength / 2) + (gl_voxelXDim / 2) + c * gl_voxelXDim;
-                temp.z = -(gl_objectSideLength / 2) + (gl_voxelZDim / 2) + r * gl_voxelZDim;
-                const double distance = sqrt(pow(temp.x, 2) + pow(temp.y, 2) + pow(temp.z, 2));
-                if (distance <= diameter && c < gl_nVoxel[Z] / 2) {
-                    // Voxel position is inside the sphere object
-                    f[gl_nVoxel[Z] * r + c + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 1.0;
-                } else {
-                    f[gl_nVoxel[Z] * r + c + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
-                }
-            }
-        }
-    }
-}
-
-/**
- * @brief Generates a sub-section of a solid cubic object with an internal spherical cavity.
- *
- * @param f It is the pointer to the array on which to store the sub-section.
- * @param nOfSlices It is the number of voxel along the Y axis.
- * @param offset It is the distance (in number of voxel) of the slices to be generated from the initial slice.
- * @param sideLength It is the side length of the cubic object.
- */
-void generateCubeWithSphereSlice(double *f, int nOfSlices, int offset, const int sideLength)
-{
-    const int innerToOuterDiff = gl_nVoxel[X] / 2 - sideLength / 2;
-    const int rightSide = innerToOuterDiff + sideLength;
-    const Point sphereCenter = {-sideLength * gl_voxelXDim / 4, -sideLength * gl_voxelYDim / 4, -sideLength * gl_voxelZDim / 4};
-
-    // Iterates over each voxel of the grid
-#pragma omp parallel for collapse(3) default(none) shared(f, nOfSlices, offset, sideLength, gl_nVoxel, innerToOuterDiff, rightSide, sphereCenter, gl_objectSideLength, gl_voxelYDim, gl_voxelXDim, gl_voxelZDim)
-    for (int n = 0 ; n < nOfSlices; n++) {
-        for (int i = 0; i < gl_nVoxel[Z]; i++) {
-            for (int j = 0; j < gl_nVoxel[X]; j++) {
-                f[gl_nVoxel[Z] * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 0.0;
-                if ((i >= innerToOuterDiff) && (i <= rightSide) && (j >= innerToOuterDiff) && (j <= rightSide)
-                    && (n + offset >= innerToOuterDiff) && (n + offset <=  gl_nVoxel[Y] - innerToOuterDiff)) {
-                    // Voxel position is inside the cubic object
-                    Point temp;
-                    temp.y = -(gl_objectSideLength / 2) + (gl_voxelYDim / 2) + (n + offset) * gl_voxelYDim;
-                    temp.x = -(gl_objectSideLength / 2) + (gl_voxelXDim / 2) + j * gl_voxelXDim;
-                    temp.z = -(gl_objectSideLength / 2) + (gl_voxelZDim / 2) + i * gl_voxelZDim;
-                    const double distance = sqrt(pow(temp.x - sphereCenter.x, 2) + pow(temp.y - sphereCenter.y, 2) + pow(temp.z - sphereCenter.z, 2));
-
-                    if (distance > sideLength * gl_voxelXDim / 6) {
-                        // Voxel position is outside the spherical cavity
-                        f[gl_nVoxel[Z] * i + j + n * gl_nVoxel[X] * gl_nVoxel[Z]] = 1.0;
-                    }
-                }
-            }
-        }
-    }
+    return sizeof(setUp0) + sizeof(setUp1);
 }
 
 int main(int argc, char *argv[])
@@ -259,19 +291,17 @@ int main(int argc, char *argv[])
             gl_detectorSideLength = n * gl_pixelDim;
             gl_distanceObjectDetector = 1.5 * gl_objectSideLength;
             gl_distanceObjectSource = 6 * gl_objectSideLength;
+            gl_nVoxel[X] = gl_objectSideLength / gl_voxelXDim;
+            gl_nVoxel[Y] = gl_objectSideLength / gl_voxelYDim;
+            gl_nVoxel[Z] = gl_objectSideLength / gl_voxelZDim;
+            gl_nPlanes[X] = gl_nVoxel[X] + 1;
+            gl_nPlanes[Y] = gl_nVoxel[Y] + 1;
+            gl_nPlanes[Z] = gl_nVoxel[Z] + 1;
         }
     }
 
-    gl_nVoxel[X] = gl_objectSideLength / gl_voxelXDim;
-    gl_nVoxel[Y] = gl_objectSideLength / gl_voxelYDim;
-    gl_nVoxel[Z] = gl_objectSideLength / gl_voxelZDim;
-
-    gl_nPlanes[X] = (gl_objectSideLength / gl_voxelXDim) + 1;
-    gl_nPlanes[Y] = (gl_objectSideLength / gl_voxelYDim) + 1;
-    gl_nPlanes[Z] = (gl_objectSideLength / gl_voxelZDim) + 1;
-
     // Array containing the coefficients of each voxel
-    double *grid = (double *) malloc(sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * OBJ_BUFFER);
+    double *f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * OBJ_BUFFER * gl_nVoxel[Z]);
 
     FILE *filePointer = fopen(fileName, "wb");
     if (!filePointer) {
@@ -280,15 +310,15 @@ int main(int argc, char *argv[])
     }
 
     // Write the voxel grid dimensions on file
-    const unsigned long headerLength = writeSetUp(filePointer);
-    if (!headerLength) {
+    const size_t headerLength = writeSetUp(filePointer);
+    if (headerLength < 0) {
         fprintf(stderr, "Unable to write on file '%s'!\n", fileName);
         return EXIT_FAILURE;
     }
 
     // Iterates over each object subsection which size is limited along the y coordinate by OBJ_BUFFER
-    for (int slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
-        int nOfSlices;
+    for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
+        unsigned short nOfSlices;
 
         if (gl_nVoxel[Y] - slice < OBJ_BUFFER) {
             nOfSlices = gl_nVoxel[Y] - slice;
@@ -299,33 +329,33 @@ int main(int argc, char *argv[])
         // Generates object subsection
         switch (objectType) {
             case 1:
-                generateCubeWithSphereSlice(grid, nOfSlices, slice, gl_nVoxel[X]);
+                generateCubeWithSphereSlice(f, nOfSlices, slice, gl_nVoxel[X]);
                 break;
             case 2:
-                generateSphereSlice(grid, nOfSlices, slice, gl_objectSideLength / 2);
+                generateSphereSlice(f, nOfSlices, slice, gl_objectSideLength / 2);
                 break;
             default:
-                generateCubeSlice(grid, nOfSlices, slice, gl_nVoxel[X]);
+                generateCubeSlice(f, nOfSlices, slice, gl_nVoxel[X]);
                 break;
         }
 
-        if (!fwrite(grid, sizeof(double), gl_nVoxel[X] * gl_nVoxel[Z] * nOfSlices, filePointer)) {
+        if (!fwrite(f, sizeof(double), (size_t) gl_nVoxel[X] * gl_nVoxel[Z] * nOfSlices, filePointer)) {
             fprintf(stderr, "Unable to write on file '%s'!\n", fileName);
             return EXIT_FAILURE;
         }
     }
 
     printf("Output file details:\n");
-    printSizeMaxGB("\tVoxel model size:", sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * gl_nVoxel[Y]);
-    printf("\tImage type: %lu bit real\n", sizeof(double) * 8);
-    printf("\tImage width: %d pixels\n", gl_nVoxel[X]);
-    printf("\tImage height: %d pixels\n", gl_nVoxel[Z]);
-    printf("\tOffset to first image: %lu bytes\n", headerLength);
-    printf("\tNumber of images: %d\n", gl_nVoxel[Y]);
-    printf("\tGap between images: 0 bytes\n");
+    printSizeMaxGB("    Voxel model size:", sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * gl_nVoxel[Y]);
+    printf("    Image type: %lu bit real\n", sizeof(double) * 8);
+    printf("    Image width: %d pixels\n", gl_nVoxel[X]);
+    printf("    Image height: %d pixels\n", gl_nVoxel[Z]);
+    printf("    Offset to first image: %lu Bytes\n", headerLength);
+    printf("    Number of images: %d\n", gl_nVoxel[Y]);
+    printf("    Gap between images: 0 bytes\n");
 
     fclose(filePointer);
-    free(grid);
+    free(f);
 
     return EXIT_SUCCESS;
 }
