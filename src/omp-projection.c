@@ -219,34 +219,36 @@ void getAllIntersections(const double source, const double pixel, const Ranges p
 
     start = planeIndexesRanges.minIndx;
     end = planeIndexesRanges.maxIndx;
-    double plane[end - start];
-    if (axis == X) {
-        plane[0] = getXPlane(start);
-        d = gl_voxelXDim;
-        if (pixel - source < 0) {
-            plane[0] = getXPlane(end);
-            d = -gl_voxelXDim;
+    if (end > start) {
+        double plane[end - start];
+        if (axis == X) {
+            plane[0] = getXPlane(start);
+            d = gl_voxelXDim;
+            if (pixel - source < 0) {
+                plane[0] = getXPlane(end);
+                d = -gl_voxelXDim;
+            }
+        } else if (axis == Y) {
+            plane[0] = getYPlane(start);
+            d = gl_voxelYDim;
+            if (pixel - source < 0) {
+                plane[0] = getYPlane(end);
+                d = -gl_voxelYDim;
+            }
+        } else /* if (axis == Z) */ {
+            plane[0] = getZPlane(start);
+            d = gl_voxelZDim;
+            if (pixel - source < 0) {
+                plane[0] = getZPlane(end);
+                d = -gl_voxelZDim;
+            }
         }
-    } else if (axis == Y) {
-        plane[0] = getYPlane(start);
-        d = gl_voxelYDim;
-        if (pixel - source < 0) {
-            plane[0] = getYPlane(end);
-            d = -gl_voxelYDim;
-        }
-    } else /* if (axis == Z) */ {
-        plane[0] = getZPlane(start);
-        d = gl_voxelZDim;
-        if (pixel - source < 0) {
-            plane[0] = getZPlane(end);
-            d = -gl_voxelZDim;
-        }
-    }
 
-    for (int i = 1; i < end - start; i++) {
-        plane[i] = plane[i - 1] + d;
+        for (int i = 1; i < end - start; i++) {
+            plane[i] = plane[i - 1] + d;
+        }
+        getIntersection(source, pixel, plane, end - start, a);
     }
-    getIntersection(source, pixel, plane, end - start, a);
 }
 
 /**
