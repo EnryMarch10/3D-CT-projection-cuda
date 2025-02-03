@@ -43,19 +43,19 @@ NVCFLAGS += -Xcompiler "-Wall -Werror" -Wno-deprecated-gpu-targets
 
 ifeq ($(DEBUG),all)
 	CFLAGS += -DDEBUG -DPRINT_VARIABLES
-	NVCFLAGS += -lineinfo $(MACROS)
+	NVCFLAGS += -lineinfo -DDEBUG -DPRINT_VARIABLES
 else ifeq ($(DEBUG),yes)
 	CFLAGS += -DDEBUG
-	NVCFLAGS += -lineinfo $(MACROS)
+	NVCFLAGS += -lineinfo -DDEBUG
 else
 # The following macro optimize the final code:
 # -DNDEBUG - avoids for example assertions checks
 # -DNO_CUDA_CHECK_ERROR - avoids hpc.h checks on cuda kernel errors during execution
-	MACROS += -DNDEBUG
-	NVCFLAGS += $(MACROS) -DNO_CUDA_CHECK_ERROR
+	CFLAGS += -DNDEBUG
+	NVCFLAGS += -DNO_CUDA_CHECK_ERROR -DNDEBUG
 endif
 
-all: $(TARGETS) $(EXE_INPUT)
+all: $(EXE_INPUT) $(TARGETS)
 
 $(EXE_INPUT): $(TARGET_INPUT)
 $(TARGET_INPUT): CFLAGS += -fopenmp
@@ -110,9 +110,7 @@ clean:
 
 ### DATA ###
 
-ifndef WORK_SIZE
-    SUFFIX_SIZE=default
-else
+ifdef WORK_SIZE
     SUFFIX_SIZE=$(WORK_SIZE)
 endif
 
@@ -218,42 +216,41 @@ help:
 	@echo "Available targets:"
 	@echo
 	@echo " General:"
-	@echo "        help    prints this message"
-	@echo "       purge    brutally removes build/*, input/* and output/*"
-	@echo "                with all contents"
+	@echo "          help  Prints this message"
+	@echo "         purge  Brutally removes $(DIR_BUILD)/*, $(DIR_INPUT)/* and $(DIR_OUTPUT)/*, with all contents"
 	@echo
 	@echo " Code:"
 	@echo
-	@echo "         all    compile everything (default)"
-	@echo "    inputgen    compile input generator program"
-#	@echo "      serial    compile serial program"
-	@echo "         omp    compile parallel OpenMP program"
-	@echo "        cuda    compile CUDA program,"
-	@echo "                add DEBUG=yes if youu want to debug"
-	@echo "       clean    cleanup generated executables"
+	@echo "           all  Compile everything (default)"
+	@echo "      inputgen  Compile input generator program"
+#	@echo "        serial  Compile serial program"
+	@echo "           omp  Compile OpenMP program"
+	@echo "          cuda  Compile CUDA program"
+	@echo "         clean  Cleanup generated executables"
 	@echo
 	@echo " Data:"
 	@echo
-	@echo "      inputs    generate all input files, you can change the dimensions,"
-	@echo "                by default the variable WORK_SIZE is set to 2352"
-	@echo "     outputs    generate all output files"
-	@echo "                use OpenMP executable anmd then CUDA executable"
-	@echo "                for inputs WORK_SIZE can be specified"
-	@echo "      images    generate all output files in .png format"
-	@echo "                use OpenMP executable anmd then CUDA executable"
-	@echo "                for inputs WORK_SIZE can be specified"
-	@echo " omp_outputs    generate all output files"
-	@echo "                use OpenMP executable"
-	@echo "                for inputs WORK_SIZE can be specified"
-	@echo "  omp_images    generate all output files in .png format"
-	@echo "                use OpenMP executable"
-	@echo "                for inputs WORK_SIZE can be specified"
-	@echo "cuda_outputs    generate all output files"
-	@echo "                use CUDA executable"
-	@echo "                for inputs WORK_SIZE can be specified"
-	@echo " cuda_images    generate all output files in .png format"
-	@echo "                use CUDA executable"
-	@echo "                for inputs WORK_SIZE can be specified"
+	@echo "        inputs  Generate all input files inside $(DIR_INPUT)/*.dat,"
+	@echo "                you can change the dimensions with the variable WORK_SIZE"
+	@echo "       outputs  Generate all output files:"
+	@echo "                puts OpenMP outputs in $(DIR_OUTPUT_OMP)/*.pgm,"
+	@echo "                places CUDA outputs in $(DIR_OUTPUT_CUDA)/*.pgm"
+	@echo "        images  Generate all output files and converts them in .png format:"
+	@echo "                places outputs in OpenMP and CUDA outputs folders"
+	@echo "   omp_outputs  Generate OpenMP output files inside $(DIR_OUTPUT_OMP)/*.pgm"
+	@echo "    omp_images  Generate OpenMP output images in $(DIR_OUTPUT_OMP)/*.png"
+	@echo "  cuda_outputs  Generate CUDA output files inside $(DIR_OUTPUT_CUDA)/*.pgm"
+	@echo "   cuda_images  Generate CUDA output images in $(DIR_OUTPUT_CUDA)/*.png"
+	@echo
+	@echo " Variables:"
+	@echo
+	@echo "     WORK_SIZE  Specifies the inputs dimensions, by default it is set to 2352,"
+	@echo "                it can be specfied in each Data target"
+	@echo "         DEBUG  Can be set to:"
+	@echo "                 - \"yes\" allows essential debug messages, enbles CUDA kernels error checking,"
+	@echo "                         and line info to test also with CUDA compute-sanitizer tool"
+	@echo "                 - \"all\" allows all debug messages, enbles CUDA kernels error checking,"
+	@echo "                         and line info to test also with CUDA compute-sanitizer tool"
 	@echo
 
 purge:
