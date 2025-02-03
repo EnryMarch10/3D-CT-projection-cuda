@@ -48,7 +48,7 @@
 // Inputs configuration limits
 // 1024^3 (voxels cube size) * 8 (double size in Bytes) = 8 GiB
 // max file size if the voxels are the same for each axis, and if the doubles are 8 Bytes
-#define MAX_PLANES 1024u
+#define MAX_PLANES 1300u
 #define MAX_PLANES_x2 (MAX_PLANES * 2)
 #define MAX_PLANES_x3 (MAX_PLANES * 3)
 // CUDA devices typically have 64 KB of constant memory
@@ -551,7 +551,7 @@ __device__ __forceinline__ double atomicMaxDouble(double *const addr, const doub
  * @param isFirst Tells if `g` array is uninitialized or it is not, this function initializes it if necessary.
  * @return __global__ Indicates that this is a CUDA kernel function, so it is executed on the device (GPU) and not the host (CPU).
  */
-__global__ void kernel_computeProjections(const unsigned short slice, const unsigned short nTheta, const unsigned nSidePixels, const double *const f, double *const g, const char isFirst) {
+__global__ void computeProjections(const unsigned short slice, const unsigned short nTheta, const unsigned nSidePixels, const double *const f, double *const g, const char isFirst) {
     __shared__ double l_gMins[BLKDIM];
     __shared__ double l_gMaxs[BLKDIM];
     const unsigned l_index = threadIdx.x + threadIdx.y * blockDim.x;
@@ -743,7 +743,7 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, c
     size_t freeMem, totalMem;
     cudaMemGetInfo(&freeMem, &totalMem);
     // At least 1 GB of estimated free global memory are necessary for the kernel execution in a 8 GB RAM GPU
-    freeMem -= totalMem / 8;
+    freeMem -= (totalMem * 2 / 8);
     unsigned voxelsY = gl_nVoxel[Y];
     size_t size = sizeof(double) * gl_nVoxel[X] * voxelsY * gl_nVoxel[Z];
     while (size > freeMem) {
@@ -781,9 +781,10 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, c
  * @param f It is an array that contains the coefficients of attenuation of the voxels contained in the sub-section.
  * @param sizeF It is the size of the `f`.
  * @param nTheta It is the number of angular positions.
+ * @param nSidePixels It is the number of pixels per size of the detector.
  * @param isFirst Tells if `g` array is uninitialized or it is not, this function tells to initialize it if necessary.
  */
-void computeProjections(const unsigned short slice, double *f, const size_t sizeF, const unsigned short nTheta, const unsigned nSidePixels, const char isFirst)
+void getProjections(const unsigned short slice, double *f, const size_t sizeF, const unsigned short nTheta, const unsigned nSidePixels, const char isFirst)
 {
 #ifdef DEBUG
     static unsigned short it = 0;
@@ -792,7 +793,7 @@ void computeProjections(const unsigned short slice, double *f, const size_t size
     cudaSafeCall(cudaMemcpy(d_f, f, sizeF, cudaMemcpyHostToDevice));
     static dim3 block(BLKDIM_STEP, BLKDIM_STEP);
     static dim3 grid((nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP, (nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP);
-    kernel_computeProjections<<<grid, block>>>(slice, nTheta, nSidePixels, d_f, d_g, isFirst);
+    computeProjections<<<grid, block>>>(slice, nTheta, nSidePixels, d_f, d_g, isFirst);
     cudaCheckError();
 }
 
@@ -859,15 +860,18 @@ int readSetUP(FILE *const filePointer)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s input.dat output.pgm\n"
-                        "- The first parameter is the name of the input file.\n"
-                        "- The second parameter is the name of a binary file to store the output at.\n",
+    if (argc < 2 || argc > 3) {
+        fprintf(stderr, "Usage: %s INPUT [OUTPUT]\n"
+                        "- INPUT: The first parameter is the name of the input file.\n"
+                        "- [OUTPUT]: The second parameter is the name of a binary file to store the output at.\n",
                         argv[0]);
         return EXIT_FAILURE;
     }
     const char *const inputFileName = argv[1];
-    const char *const outputFileName = argv[2];
+    const char *outputFileName = NULL;
+    if (argc > 2) {
+        outputFileName = argv[2];
+    }
 
     FILE *const inputFilePointer = fopen(inputFileName, "rb");
     if (!inputFilePointer) {
@@ -884,6 +888,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     // Number of angular positions
+    double partialTime = hpc_gettime();
     const unsigned short nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1;
     if (nTheta > MAX_TABLES_SIZE) {
         fprintf(stderr, "Number of positions required %u is too large, max %lu!\n", nTheta, MAX_TABLES_SIZE);
@@ -898,8 +903,8 @@ int main(int argc, char *argv[])
     initEnvironment(&sizeF, sizeG, nTheta, nSidePixels, &gMinValue, &gMaxValue);
     // Array containing the coefficients of each voxel
     double *const f = (double *) malloc(sizeF);
+    double totalTime = hpc_gettime() - partialTime;
 
-    double totalTime = 0.0;
     // Iterates over object subsections
     for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
         unsigned short nOfSlices;
@@ -919,39 +924,42 @@ int main(int argc, char *argv[])
         }
 
         // Computes subsection projection
-        const double partialTime = hpc_gettime();
-        computeProjections(slice, f, sizeF, nTheta, nSidePixels, !slice);
+        partialTime = hpc_gettime();
+        getProjections(slice, f, sizeF, nTheta, nSidePixels, !slice);
         totalTime += hpc_gettime() - partialTime;
     }
     fclose(inputFilePointer);
+    partialTime = hpc_gettime();
     free(f);
     // Array containing the computed attenuation detected in each pixel of the detector
     double *const g = (double *) malloc(sizeG);
     termEnvironment(g, sizeG, &gMinValue, &gMaxValue);
+    totalTime += hpc_gettime() - partialTime;
     printf("Execution time (s) %.2f\n", totalTime);
-    fflush(stdout);
 
-    FILE *const outputFilePointer = fopen(outputFileName, "w");
-    if (!outputFileName) {
-        fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
-        free(g);
-        return EXIT_FAILURE;
-    }
-    // Iterates over each attenuation value computed, prints a value between [0-255]
-    fprintf(outputFilePointer, "P2\n%d %d\n255", nSidePixels, nSidePixels * nTheta);
-    for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
-        const double angle = -(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance;
-        fprintf(outputFilePointer, "\n#%lf", angle);
-        for (unsigned i = 0; i < nSidePixels; i++) {
-            fprintf(outputFilePointer, "\n");
-            for (unsigned j = 0; j < nSidePixels; j++) {
-                const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + i * nSidePixels + j;
-                const int color = (g[pixelIndex] - gMinValue) * 255 / (gMaxValue - gMinValue);
-                fprintf(outputFilePointer, "%d ", color);
+    if (outputFileName != NULL) {
+        FILE *const outputFilePointer = fopen(outputFileName, "w");
+        if (!outputFileName) {
+            fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
+            free(g);
+            return EXIT_FAILURE;
+        }
+        // Iterates over each attenuation value computed, prints a value between [0-255]
+        fprintf(outputFilePointer, "P2\n%d %d\n255", nSidePixels, nSidePixels * nTheta);
+        for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+            const double angle = -(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance;
+            fprintf(outputFilePointer, "\n#%lf", angle);
+            for (unsigned i = 0; i < nSidePixels; i++) {
+                fprintf(outputFilePointer, "\n");
+                for (unsigned j = 0; j < nSidePixels; j++) {
+                    const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + i * nSidePixels + j;
+                    const int color = (g[pixelIndex] - gMinValue) * 255 / (gMaxValue - gMinValue);
+                    fprintf(outputFilePointer, "%d ", color);
+                }
             }
         }
+        fclose(outputFilePointer);
     }
-    fclose(outputFilePointer);
     free(g);
 
     return EXIT_SUCCESS;

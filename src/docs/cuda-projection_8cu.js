@@ -1,0 +1,28 @@
+var cuda_projection_8cu =
+[
+    [ "atomicMaxDouble", "cuda-projection_8cu.html#a3fd79c0584c62772fe1d567661aa0027", null ],
+    [ "atomicMinDouble", "cuda-projection_8cu.html#af64aeee4fe94fa937cbce91f5d34890d", null ],
+    [ "computeAbsorption", "cuda-projection_8cu.html#a86c152fa93089970e65e0aa8288f2cd4", null ],
+    [ "computeProjections", "cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3", null ],
+    [ "getAllIntersections", "cuda-projection_8cu.html#a50f01ebb23a5a11e0415848289a4671a", null ],
+    [ "getAMax", "cuda-projection_8cu.html#a0b492e4d9766ca0aecb27a2309cedd82", null ],
+    [ "getAMin", "cuda-projection_8cu.html#ab564f003c08f9d99df3a58154f713d86", null ],
+    [ "getIntersection", "cuda-projection_8cu.html#a365207302d4241079acaa1e4a4fe436a", null ],
+    [ "getPixel", "cuda-projection_8cu.html#ad75bada33863f5db8c25c0558f63139a", null ],
+    [ "getProjections", "cuda-projection_8cu.html#aebedb605358f481b671b8ea31f29e8b5", null ],
+    [ "getRangeOfIndex", "cuda-projection_8cu.html#ab2563934c69e461c3a8ba90e0ab118e2", null ],
+    [ "getSidesXPlanes", "cuda-projection_8cu.html#a9679628dbb6a5a86eef0ed7113779866", null ],
+    [ "getSidesYPlanes", "cuda-projection_8cu.html#a9e6685e4908ebe3f8b31594802077550", null ],
+    [ "getSidesZPlanes", "cuda-projection_8cu.html#a9ab6bf86dca446ff347d134f29fcd4ff", null ],
+    [ "getSource", "cuda-projection_8cu.html#aed6bba963f1f5414e1b45d465a3e81bf", null ],
+    [ "getXPlane", "cuda-projection_8cu.html#aa71204182baf78f56be2c28c0e885d97", null ],
+    [ "getYPlane", "cuda-projection_8cu.html#a9c4b397a7a49b711b4454349dbdde4ec", null ],
+    [ "getZPlane", "cuda-projection_8cu.html#a95748e2db982494ed58f55796f63767f", null ],
+    [ "initEnvironment", "cuda-projection_8cu.html#a080b810c20595610b6e65e1a577a2f01", null ],
+    [ "initTables", "cuda-projection_8cu.html#a404414c4a397f8882bd70fe49d8d321e", null ],
+    [ "merge", "cuda-projection_8cu.html#a50349fb3c229827224d1ecba795bc47c", null ],
+    [ "merge3", "cuda-projection_8cu.html#ab99297fbf84a168273c1ad59722db520", null ],
+    [ "readSetUP", "cuda-projection_8cu.html#aac37ce9bdf73aae0cd2ab69003c63255", null ],
+    [ "termEnvironment", "cuda-projection_8cu.html#a4dbd29fc2ed485e58eb945b410478772", null ],
+    [ "termEnvironment", "cuda-projection_8cu.html#a0b80778b697c0fb9bfa75d2ca3634034", null ]
+];
