@@ -1,0 +1,26 @@
+var omp_projection_8c =
+[
+    [ "computeAbsorption", "omp-projection_8c.html#ae3cde07607db3e42464648645ab82a5d", null ],
+    [ "computeProjections", "omp-projection_8c.html#a91c1483b31c2632b85f0f2d08e4be10a", null ],
+    [ "getAllIntersections", "omp-projection_8c.html#a5f51f5f74280e59e6dabea0ab4c2763b", null ],
+    [ "getAMax", "omp-projection_8c.html#a285a0e4db4eb6abb181dd66dde16967d", null ],
+    [ "getAMin", "omp-projection_8c.html#ab2c8fbc0bba7b91a3b9ffc8967ace715", null ],
+    [ "getIntersection", "omp-projection_8c.html#a149a948293e53a037a1765c09ff71913", null ],
+    [ "getPixel", "omp-projection_8c.html#a317aa107523bef48ac57d23d5efb84b0", null ],
+    [ "getRangeOfIndex", "omp-projection_8c.html#a92b78df62ad30990062a3e28546383ff", null ],
+    [ "getSidesXPlanes", "omp-projection_8c.html#a73161354b820cd053340e3c34ce89deb", null ],
+    [ "getSidesYPlanes", "omp-projection_8c.html#ab15a86e6f3f3dea877a3b26c27057cad", null ],
+    [ "getSidesZPlanes", "omp-projection_8c.html#a3505bc3d55ded9158d98b4571924fc7b", null ],
+    [ "getSource", "omp-projection_8c.html#a35b227d2c53e8ecd95c97ccdea905846", null ],
+    [ "getXPlane", "omp-projection_8c.html#a62994646d9adde2ff95ca4428a069d9b", null ],
+    [ "getYPlane", "omp-projection_8c.html#aefc902c2cb6a15330e6fe28c9d2787c4", null ],
+    [ "getZPlane", "omp-projection_8c.html#a5543176b9f6cb0cf343a5ac1222f105c", null ],
+    [ "initEnvironment", "omp-projection_8c.html#ad58db6a8edea29ce6a98ac12873a90aa", null ],
+    [ "initTables", "omp-projection_8c.html#a404414c4a397f8882bd70fe49d8d321e", null ],
+    [ "merge", "omp-projection_8c.html#af9298b6d30c4c2dd6463bbb435a18863", null ],
+    [ "merge3", "omp-projection_8c.html#a8cf884d6fd46566644a22199397575d1", null ],
+    [ "min", "omp-projection_8c.html#abd8bbcfabb3ddef2ccaafb9928a37b95", null ],
+    [ "min3", "omp-projection_8c.html#a242710ffc6c186821800ab581fc06174", null ],
+    [ "readSetUP", "omp-projection_8c.html#a094543d6ca60bd3a7c9904f3e5c5d0e5", null ],
+    [ "termEnvironment", "omp-projection_8c.html#a0b80778b697c0fb9bfa75d2ca3634034", null ]
+];

@@ -4,6 +4,10 @@ This folder contains the source code of the project.
 
 ## Structure
 
+### Documentation
+
+The doxygen documentation of the code can be found inside the `docs` folder.
+
 ### Makefile
 
 The `make` command is very useful to compile the programs in this directory.

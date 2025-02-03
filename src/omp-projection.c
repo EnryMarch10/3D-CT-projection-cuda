@@ -59,6 +59,8 @@ unsigned gl_detectorSideLength;
 unsigned gl_distanceObjectDetector;
 unsigned gl_distanceObjectSource;
 
+double *gl_sinTable, *gl_cosTable;
+
 /**
  * @brief Initializes `sin` and `cos` tables, with default values for a certain length.
  *
@@ -473,27 +475,20 @@ double computeAbsorption(const unsigned short slice, const Point source, const P
  * @param g It is the resulting array that contains the value of the computed projection attenuation for each pixel.
  * @param gMin It is the minimum projection attenuation computed.
  * @param gMax It is the maximum projection attenuation computed.
+ * @param nTheta It is the number of angular positions.
+ * @param nSidePixels It is the number of pixels per size of the detector.
  */
-void computeProjections(const unsigned short slice, double *f, double *g, double *gMin, double *gMax)
+void computeProjections(const unsigned short slice, double *f, double *g, double *gMin, double *gMax, const unsigned short nTheta, const unsigned nSidePixels)
 {
-    const unsigned short nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1; // Number of angular positions
-    const unsigned nSidePixels = gl_detectorSideLength / gl_pixelDim;
-
     double l_gMin = INFINITY;
     double l_gMax = -INFINITY;
 
-    double *sinTable;
-    double *cosTable;
-    sinTable = (double *) malloc(sizeof(double) * nTheta);
-    cosTable = (double *) malloc(sizeof(double) * nTheta);
-    initTables(sinTable, cosTable, nTheta);
-
     // Iterates over each source
     for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
-        const Point source = getSource(sinTable, cosTable, positionIndex);
+        const Point source = getSource(gl_sinTable, gl_cosTable, positionIndex);
 
         // Iterates over each pixel of the detector
-#pragma omp parallel for collapse(2) schedule(dynamic) default(none) shared(sinTable, cosTable, nSidePixels, positionIndex, source, slice, f, g, nTheta, gl_nVoxel, gl_nPlanes) reduction(min:l_gMin) reduction(max:l_gMax)
+#pragma omp parallel for collapse(2) schedule(dynamic) default(none) shared(gl_sinTable, gl_cosTable, nSidePixels, positionIndex, source, slice, f, g, nTheta, gl_nVoxel, gl_nPlanes) reduction(min:l_gMin) reduction(max:l_gMax)
         for (unsigned r = 0; r < nSidePixels; r++) {
             for (unsigned c = 0; c < nSidePixels; c++) {
                 double a[3][2];
@@ -503,7 +498,7 @@ void computeProjections(const unsigned short slice, double *f, double *g, double
                 double aZ[gl_nPlanes[Z]];
 
                 // Gets the pixel's center cartesian coordinates
-                const Point pixel = getPixel(sinTable, cosTable, r, c, positionIndex);
+                const Point pixel = getPixel(gl_sinTable, gl_cosTable, r, c, positionIndex);
 
                 // Computes Min-Max parametric values
                 double aMin, aMax;
@@ -563,10 +558,27 @@ void computeProjections(const unsigned short slice, double *f, double *g, double
             }
         }
     }
-    free(sinTable);
-    free(cosTable);
     *gMax = l_gMax;
     *gMin = l_gMin;
+}
+
+/**
+ * @brief Releases allocated resources of the OpenMP environment.
+ */
+void termEnvironment(void) {
+    free(gl_sinTable);
+    free(gl_cosTable);
+}
+
+/**
+ * @brief Allocates resources necessary for the OpenMP environment.
+ *
+ * @param nTheta It is the number of angular positions.
+ */
+void initEnvironment(const unsigned short nTheta) {
+    gl_sinTable = (double *) malloc(sizeof(double) * nTheta);
+    gl_cosTable = (double *) malloc(sizeof(double) * nTheta);
+    initTables(gl_sinTable, gl_cosTable, nTheta);
 }
 
 /**
@@ -634,15 +646,18 @@ int readSetUP(FILE *filePointer)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s input.dat output.pgm\n"
-                        "- The first parameter is the name of the input file.\n"
-                        "- The second parameter is the name of a binary file to store the output at.\n",
+    if (argc < 2 || argc > 3) {
+        fprintf(stderr, "Usage: %s INPUT [OUTPUT]\n"
+                        "- INPUT: The first parameter is the name of the input file.\n"
+                        "- [OUTPUT]: The second parameter is the name of a binary file to store the output at.\n",
                         argv[0]);
         return EXIT_FAILURE;
     }
     const char *const inputFileName = argv[1];
-    const char *const outputFileName = argv[2];
+    const char *outputFileName = NULL;
+    if (argc > 2) {
+        outputFileName = argv[2];
+    }
 
     FILE *const inputFilePointer = fopen(inputFileName, "rb");
     if (!inputFilePointer) {
@@ -654,18 +669,20 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
         return EXIT_FAILURE;
     }
-    const unsigned nSidePixels = gl_detectorSideLength / gl_pixelDim;
-
+    double partialTime = hpc_gettime();
     // Number of angular positions
     const unsigned short nTheta = gl_angularTrajectory / gl_positionsAngularDistance + 1;
+    const unsigned nSidePixels = gl_detectorSideLength / gl_pixelDim;
+    initEnvironment(nTheta);
     // Array containing the coefficients of each voxel
     double *const f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * OBJ_BUFFER);
     // Array containing the computed attenuation detected in each pixel of the detector
     double *const g = (double *) calloc(nSidePixels * nSidePixels * nTheta, sizeof(double));
+    // double *const g = (double *) malloc(sizeof(double) * nSidePixels * nSidePixels * nTheta);
     // Minimum and maximum attenuation computed
     double gMinValue = INFINITY, gMaxValue = -INFINITY;
+    double totalTime = hpc_gettime() - partialTime;
 
-    double totalTime = 0.0;
     // Iterates over object subsection
     for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
         unsigned short nOfSlices;
@@ -685,36 +702,40 @@ int main(int argc, char *argv[])
         }
 
         // Computes subsection projection
-        const double partialTime = hpc_gettime();
-        computeProjections(slice, f, g, &gMinValue, &gMaxValue);
+        partialTime = hpc_gettime();
+        computeProjections(slice, f, g, &gMinValue, &gMaxValue, nTheta, nSidePixels);
         totalTime += hpc_gettime() - partialTime;
     }
     fclose(inputFilePointer);
+    partialTime = hpc_gettime();
     free(f);
+    termEnvironment();
+    totalTime += hpc_gettime() - partialTime;
     printf("Execution time (s) %.2f\n", totalTime);
-    fflush(stdout);
 
-    FILE *const outputFilePointer = fopen(outputFileName, "w");
-    if (!outputFileName) {
-        fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
-        free(g);
-        return EXIT_FAILURE;
-    }
-    // Iterates over each attenuation value computed, prints a value between [0-255]
-    fprintf(outputFilePointer, "P2\n%d %d\n255", nSidePixels, nSidePixels * nTheta);
-    for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
-        double angle = -(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance;
-        fprintf(outputFilePointer, "\n#%lf", angle);
-        for (unsigned i = 0; i < nSidePixels; i++) {
-            fprintf(outputFilePointer, "\n");
-            for (unsigned j = 0; j < nSidePixels; j++) {
-                const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + i * nSidePixels + j;
-                int color = (g[pixelIndex] - gMinValue) * 255 / (gMaxValue - gMinValue);
-                fprintf(outputFilePointer, "%d ", color);
+    if (outputFileName != NULL) {
+        FILE *const outputFilePointer = fopen(outputFileName, "w");
+        if (!outputFileName) {
+            fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
+            free(g);
+            return EXIT_FAILURE;
+        }
+        // Iterates over each attenuation value computed, prints a value between [0-255]
+        fprintf(outputFilePointer, "P2\n%d %d\n255", nSidePixels, nSidePixels * nTheta);
+        for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+            double angle = -(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance;
+            fprintf(outputFilePointer, "\n#%lf", angle);
+            for (unsigned i = 0; i < nSidePixels; i++) {
+                fprintf(outputFilePointer, "\n");
+                for (unsigned j = 0; j < nSidePixels; j++) {
+                    const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + i * nSidePixels + j;
+                    int color = (g[pixelIndex] - gMinValue) * 255 / (gMaxValue - gMinValue);
+                    fprintf(outputFilePointer, "%d ", color);
+                }
             }
         }
+        fclose(outputFilePointer);
     }
-    fclose(outputFilePointer);
     free(g);
 
     return EXIT_SUCCESS;

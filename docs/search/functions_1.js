@@ -1,5 +1,0 @@
-var searchData=
-[
-  ['computeabsorption_0',['computeabsorption',['../cuda-projection_8cu.html#a86c152fa93089970e65e0aa8288f2cd4',1,'computeAbsorption(const unsigned short slice, const Point source, const Point pixel, const double *const a, const unsigned short lenA, const double *const f):&#160;cuda-projection.cu'],['../omp-projection_8c.html#ae3cde07607db3e42464648645ab82a5d',1,'computeAbsorption(const unsigned short slice, const Point source, const Point pixel, const double *const a, const unsigned short lenA, const double *const f):&#160;omp-projection.c']]],
-  ['computeprojections_1',['computeprojections',['../cuda-projection_8cu.html#a235318b3920b56b84febedeeba57fb53',1,'computeProjections(const unsigned short slice, double *f, const size_t sizeF, const unsigned short nTheta, const unsigned nSidePixels, const char isFirst):&#160;cuda-projection.cu'],['../omp-projection_8c.html#ac6ca802d142626f60cc4757021a81b3c',1,'computeProjections(const unsigned short slice, double *f, double *g, double *gMin, double *gMax):&#160;omp-projection.c']]]
-];
