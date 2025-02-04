@@ -43,7 +43,7 @@
 #include "hpc.h"
 #include "common.h"
 
-#define OBJ_BUFFER 100u
+unsigned short OBJ_BUFFER = 100;
 
 unsigned short gl_pixelDim;
 unsigned short gl_angularTrajectory;
@@ -646,10 +646,11 @@ int readSetUP(FILE *filePointer)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2 || argc > 3) {
-        fprintf(stderr, "Usage: %s INPUT [OUTPUT]\n"
+    if (argc < 2 || argc > 4) {
+        fprintf(stderr, "Usage: %s INPUT [OUTPUT] [Y_PLANES]\n"
                         "- INPUT: The first parameter is the name of the input file.\n"
-                        "- [OUTPUT]: The second parameter is the name of a binary file to store the output at.\n",
+                        "- [OUTPUT]: The second parameter is the name of a binary file to store the output at.\n"
+                        "- [Y_PLANES]: The third parameter is the maximum number of planes considered in the Y axis for each iteration.\n",
                         argv[0]);
         return EXIT_FAILURE;
     }
@@ -664,6 +665,10 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Unable to open file '%s'!\n", inputFileName);
         return EXIT_FAILURE;
     }
+    if (argc > 3) {
+        OBJ_BUFFER = atoi(argv[3]);
+        assert(OBJ_BUFFER > 0);
+    }
 
     if (readSetUP(inputFilePointer) == EXIT_FAILURE) {
         fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
@@ -675,7 +680,7 @@ int main(int argc, char *argv[])
     const unsigned nSidePixels = gl_detectorSideLength / gl_pixelDim;
     initEnvironment(nTheta);
     // Array containing the coefficients of each voxel
-    double *const f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * gl_nVoxel[Z] * OBJ_BUFFER);
+    double *const f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * OBJ_BUFFER * gl_nVoxel[Z]);
     // Array containing the computed attenuation detected in each pixel of the detector
     double *const g = (double *) calloc(nSidePixels * nSidePixels * nTheta, sizeof(double));
     // double *const g = (double *) malloc(sizeof(double) * nSidePixels * nSidePixels * nTheta);
@@ -701,6 +706,10 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
 
+#ifdef PRINT
+        static unsigned short it = 0;
+        printf("IT %u of size %hu\n", ++it, nOfSlices);
+#endif
         // Computes subsection projection
         partialTime = hpc_gettime();
         computeProjections(slice, f, g, &gMinValue, &gMaxValue, nTheta, nSidePixels);

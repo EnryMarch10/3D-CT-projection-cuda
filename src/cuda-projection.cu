@@ -84,7 +84,7 @@ __device__ double d_gMax;
 
 /************************************************* HOST *************************************************/
 
-unsigned short OBJ_BUFFER;
+unsigned short OBJ_BUFFER = 0;
 
 unsigned short gl_pixelDim;
 unsigned short gl_angularTrajectory;
@@ -496,8 +496,8 @@ __device__ double computeAbsorption(const unsigned short slice, const Point sour
             const unsigned short y = min((int) ((source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / d_voxelYDim), min(d_nVoxel[Y] - 1, d_OBJ_BUFFER - 1));
             const unsigned short z = min((int) ((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / d_voxelZDim), d_nVoxel[Z] - 1);
 
-            // In a 3D matrix it would be: f[x][z * gl_nVoxel[Z]][y * gl_nVoxel[X] * gl_nVoxel[Z]]
-            g += f[x + (unsigned) z * gl_nVoxel[Z] + (unsigned) y * gl_nVoxel[X] * gl_nVoxel[Z]] * segments;
+            // In a 3D matrix it would be: f[x][z * d_nVoxel[Z]][y * d_nVoxel[X] * d_nVoxel[Z]]
+            g += f[x + (unsigned) z * d_nVoxel[Z] + (unsigned) y * d_nVoxel[X] * d_nVoxel[Z]] * segments;
         }
     }
     return g;
@@ -741,30 +741,34 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, c
 
     cudaSafeCall(cudaMalloc((void **) &d_g, sizeG));
 
-    size_t freeMem, totalMem;
-    cudaMemGetInfo(&freeMem, &totalMem);
-    // At least 1 GB of estimated free global memory are necessary for the kernel execution in a 8 GB RAM GPU
-    freeMem -= (totalMem * 2 / 8);
-    unsigned voxelsY = gl_nVoxel[Y];
-    size_t size = sizeof(double) * gl_nVoxel[X] * voxelsY * gl_nVoxel[Z];
-    while (size > freeMem) {
-        // 5 / 8 is around 5 GB if considering an 8 GB input size
-        voxelsY = voxelsY * 5 / 8;
-        if (voxelsY <= 0) {
-            fprintf(stderr, "The voxels Y size is too small respect to the other sizes:\n"
-                            "- N voxels X: %u.\n"
-                            "- N voxels Y: %u.\n"
-                            "- N voxels Z: %u.\n"
-                            "Total size reduced to the minimum possible is %lu Bytes!\n"
-                            "This is too much for this GPU with %lu Bytes of usable global memory (of %lu Bytes total)!\n",
-                            gl_nVoxel[X], gl_nVoxel[Y], gl_nVoxel[Z], size, freeMem, totalMem);
-            termEnvironment();
-            exit(EXIT_FAILURE);
+    if (!OBJ_BUFFER) {
+        size_t freeMem, totalMem;
+        cudaMemGetInfo(&freeMem, &totalMem);
+        // At least 1 GB of estimated free global memory are necessary for the kernel execution in a 8 GB RAM GPU
+        freeMem -= (totalMem * 2 / 8);
+        unsigned voxelsY = gl_nVoxel[Y];
+        size_t size = sizeof(double) * gl_nVoxel[X] * voxelsY * gl_nVoxel[Z];
+        while (size > freeMem) {
+            // 5 / 8 is around 5 GB if considering an 8 GB input size
+            voxelsY = voxelsY * 5 / 8;
+            if (voxelsY <= 0) {
+                fprintf(stderr, "The voxels Y size is too small respect to the other sizes:\n"
+                                "- N voxels X: %u.\n"
+                                "- N voxels Y: %u.\n"
+                                "- N voxels Z: %u.\n"
+                                "Total size reduced to the minimum possible is %lu Bytes!\n"
+                                "This is too much for this GPU with %lu Bytes of usable global memory (of %lu Bytes total)!\n",
+                                gl_nVoxel[X], gl_nVoxel[Y], gl_nVoxel[Z], size, freeMem, totalMem);
+                termEnvironment();
+                exit(EXIT_FAILURE);
+            }
+            size = sizeof(double) * gl_nVoxel[X] * voxelsY * gl_nVoxel[Z];
         }
-        size = sizeof(double) * gl_nVoxel[X] * voxelsY * gl_nVoxel[Z];
+        OBJ_BUFFER = voxelsY;
+        *sizeF = size;
+    } else {
+        *sizeF = sizeof(double) * gl_nVoxel[X] * OBJ_BUFFER * gl_nVoxel[Z];
     }
-    OBJ_BUFFER = voxelsY;
-    *sizeF = size;
 
     cudaSafeCall(cudaMalloc((void **) &d_f, *sizeF));
     cudaSafeCall(cudaMemcpyToSymbol(d_OBJ_BUFFER, &OBJ_BUFFER, sizeof(d_OBJ_BUFFER)));
@@ -788,15 +792,13 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, c
 void getProjections(const unsigned short slice, double *f, const size_t sizeF, const unsigned short nTheta, const unsigned nSidePixels, const char isFirst)
 {
 #ifdef PRINT
-    static unsigned short it = 0;
-    printf("IT %u\n", ++it);
-    printf("Copying f...\n");
+    printf("%.4lf> Copying f...\n", hpc_gettime());
 #endif
     cudaSafeCall(cudaMemcpy(d_f, f, sizeF, cudaMemcpyHostToDevice));
     static dim3 block(BLKDIM_STEP, BLKDIM_STEP);
     static dim3 grid((nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP, (nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP);
 #ifdef PRINT
-    printf("Executing %u kernel...\n", it);
+    printf("%.4lf> Executing kernel...\n", hpc_gettime());
 #endif
     computeProjections<<<grid, block>>>(slice, nTheta, nSidePixels, d_f, d_g, isFirst);
     cudaCheckError();
@@ -865,10 +867,11 @@ int readSetUP(FILE *const filePointer)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2 || argc > 3) {
-        fprintf(stderr, "Usage: %s INPUT [OUTPUT]\n"
+    if (argc < 2 || argc > 4) {
+        fprintf(stderr, "Usage: %s INPUT [OUTPUT] [Y_PLANES]\n"
                         "- INPUT: The first parameter is the name of the input file.\n"
-                        "- [OUTPUT]: The second parameter is the name of a binary file to store the output at.\n",
+                        "- [OUTPUT]: The second parameter is the name of a binary file to store the output at.\n"
+                        "- [Y_PLANES]: The third parameter is the maximum number of planes considered in the Y axis for each iteration.\n",
                         argv[0]);
         return EXIT_FAILURE;
     }
@@ -876,6 +879,10 @@ int main(int argc, char *argv[])
     const char *outputFileName = NULL;
     if (argc > 2) {
         outputFileName = argv[2];
+    }
+    if (argc > 3) {
+        OBJ_BUFFER = atoi(argv[3]);
+        assert(OBJ_BUFFER > 0);
     }
 
     FILE *const inputFilePointer = fopen(inputFileName, "rb");
@@ -922,7 +929,7 @@ int main(int argc, char *argv[])
 
         // Read voxels coefficients
 #ifdef PRINT
-        printf("Reading f...\n");
+        printf("%.4lf> Reading f...\n", hpc_gettime());
 #endif
         if (!fread(f, sizeof(double), (size_t) gl_nVoxel[X] * nOfSlices * gl_nVoxel[Z], inputFilePointer)) {
             fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
@@ -931,6 +938,10 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
 
+#ifdef PRINT
+        static unsigned short it = 0;
+        printf("%.4lf> IT %u of size %hu\n", hpc_gettime(), ++it, nOfSlices);
+#endif
         // Computes subsection projection
         partialTime = hpc_gettime();
         getProjections(slice, f, sizeF, nTheta, nSidePixels, !slice);
