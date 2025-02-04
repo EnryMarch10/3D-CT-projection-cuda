@@ -40,7 +40,7 @@ shopt -s nullglob
 
 for SOURCE in cuda-*.cu; do
   if [[ $SOURCE != *-test.cu ]]; then
-    echo "# $0> Testing $SOURCE at `date "+%Y-%m-%d %I:%M:%S %p"`"
+    echo "$0> # Testing $SOURCE at `date "+%Y-%m-%d %I:%M:%S %p"`"
     NAME="$( basename -s .cu "$SOURCE" )"
 
     RESULT="$DIR_RESULTS/tput-$NAME-$INPUT_MAX_DIM.txt"
