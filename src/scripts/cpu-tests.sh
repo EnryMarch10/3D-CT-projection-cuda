@@ -40,7 +40,7 @@ shopt -s nullglob
 
 for SOURCE in omp-*.c; do
   if [[ $SOURCE != *-test.c ]]; then
-    echo "# $0> Testing $SOURCE at `date "+%Y-%m-%d %I:%M:%S %p"`"
+    echo "$0> # Testing $SOURCE at `date "+%Y-%m-%d %I:%M:%S %p"`"
     NAME="$( basename -s .c "$SOURCE" )"
 
     RESULT="$DIR_RESULTS/tput-$NAME-$INPUT_MAX_DIM.txt"
