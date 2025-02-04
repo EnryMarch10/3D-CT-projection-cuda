@@ -50,6 +50,7 @@ var NAVTREEINDEX0 =
 "index.html#makefile":[0,0,1],
 "index.html#nvidia-gpu-siddons-projection":[0,0,4],
 "index.html#structure":[0,0],
+"index.html#throughput-scripts-for-testing":[0,0,5],
 "inputgen_8c.html":[2,0,3],
 "inputgen_8c.html#a28e9af725dfe6fdf44b8d2fc2661d8e6":[2,0,3,1],
 "inputgen_8c.html#a5359d31359d7433b9c05348fd13a5945":[2,0,3,0],

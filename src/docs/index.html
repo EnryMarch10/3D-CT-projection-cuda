@@ -158,6 +158,21 @@ NVIDIA GPU Siddon's Projection</h2>
 <blockquote class="doxtable">
 <p>&zwj;[!TIP] Compile with: <code>make cuda</code>. To compile CUDA sources in DEBUG mode run: <code>make cuda DEBUG=yes</code>. </p>
 </blockquote>
+<h2><a class="anchor" id="throughput-scripts-for-testing"></a>
+Throughput Scripts for Testing</h2>
+<p>The file <code>start-tests.sh</code> runs a script in background that executes CPU and then GPU throughput tests.</p>
+<p>This script is designed to run independently of the terminal, making it suitable for execution on a remote server.</p>
+<p>The folder used by the script are:</p><ul>
+<li><code>build</code> contains miscellaneous files obtained from the source code.<ul>
+<li><code>obj</code> contains the compiled source code.</li>
+<li><code>bin</code> contains the executables, <code>obj/*</code> linked version.</li>
+</ul>
+</li>
+<li><code>inputs</code> contains generated input <code>.dat</code> files.</li>
+<li><code>outputs</code> contains output <code>.pgm</code> files and possibly their <code>.png</code> format.</li>
+<li><code>results</code> contains <code>.txt</code> files with the resulting wall clock times of the executed programs.</li>
+<li><code>logs</code> contains <code>output.txt</code> and <code>error.txt</code> log files reporting standard output and error of the scripts. </li>
+</ul>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 </div><!-- doc-content -->

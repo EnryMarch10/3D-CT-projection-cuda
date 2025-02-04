@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['s_20projection_0',['s projection',['../index.html#cpu-siddons-projection',1,'CPU Siddon&apos;s Projection'],['../index.html#nvidia-gpu-siddons-projection',1,'NVIDIA GPU Siddon&apos;s Projection']]],
-  ['siddon_20s_20projection_1',['siddon s projection',['../index.html#cpu-siddons-projection',1,'CPU Siddon&apos;s Projection'],['../index.html#nvidia-gpu-siddons-projection',1,'NVIDIA GPU Siddon&apos;s Projection']]],
-  ['structure_2',['Structure',['../index.html#structure',1,'']]]
+  ['ranges_0',['Ranges',['../structRanges.html',1,'']]],
+  ['readsetup_1',['readsetup',['../cuda-projection_8cu.html#aac37ce9bdf73aae0cd2ab69003c63255',1,'readSetUP(FILE *const filePointer):&#160;cuda-projection.cu'],['../omp-projection_8c.html#a094543d6ca60bd3a7c9904f3e5c5d0e5',1,'readSetUP(FILE *filePointer):&#160;omp-projection.c']]]
 ];

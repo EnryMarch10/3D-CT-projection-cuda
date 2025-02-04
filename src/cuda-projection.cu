@@ -492,11 +492,12 @@ __device__ double computeAbsorption(const unsigned short slice, const Point sour
         for (unsigned short i = 0; i < lenA - 1; i++) {
             const double segments = d12 * (a[i + 1] - a[i]);
             const double aMid = (a[i + 1] + a[i]) / 2;
-            const unsigned short xRow = min((int) ((source.x + aMid * (pixel.x - source.x) - getXPlane(0)) / d_voxelXDim), d_nVoxel[X] - 1);
-            const unsigned short yRow = min((int) ((source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / d_voxelYDim), min(d_nVoxel[Y] - 1, d_OBJ_BUFFER - 1));
-            const unsigned short zRow = min((int) ((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / d_voxelZDim), d_nVoxel[Z] - 1);
+            const unsigned short x = min((int) ((source.x + aMid * (pixel.x - source.x) - getXPlane(0)) / d_voxelXDim), d_nVoxel[X] - 1);
+            const unsigned short y = min((int) ((source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / d_voxelYDim), min(d_nVoxel[Y] - 1, d_OBJ_BUFFER - 1));
+            const unsigned short z = min((int) ((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / d_voxelZDim), d_nVoxel[Z] - 1);
 
-            g += f[(unsigned) yRow * d_nVoxel[X] * d_nVoxel[Z] + (unsigned) zRow * d_nVoxel[Z] + xRow] * segments;
+            // In a 3D matrix it would be: f[x][z * gl_nVoxel[Z]][y * gl_nVoxel[X] * gl_nVoxel[Z]]
+            g += f[x + (unsigned) z * gl_nVoxel[Z] + (unsigned) y * gl_nVoxel[X] * gl_nVoxel[Z]] * segments;
         }
     }
     return g;
