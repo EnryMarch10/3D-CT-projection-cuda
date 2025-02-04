@@ -102,3 +102,18 @@ Where:
 > [!TIP]
 > Compile with: `make cuda`.
 > To compile CUDA sources in DEBUG mode run: `make cuda DEBUG=yes`.
+
+### Throughput Scripts for Testing
+
+The file `start-tests.sh` runs a script in background that executes CPU and then GPU throughput tests.
+
+This script is designed to run independently of the terminal, making it suitable for execution on a remote server.
+
+The folder used by the script are:
+- `build` contains miscellaneous files obtained from the source code.
+  - `obj` contains the compiled source code.
+  - `bin` contains the executables, `obj/*` linked version.
+- `inputs` contains generated input `.dat` files.
+- `outputs` contains output `.pgm` files and possibly their `.png` format.
+- `results` contains `.txt` files with the resulting wall clock times of the executed programs.
+- `logs` contains `output.txt` and `error.txt` log files reporting standard output and error of the scripts.

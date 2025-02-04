@@ -49,8 +49,8 @@ for SOURCE in omp-*.c; do
     echo "SOURCE: $SOURCE" >> "$RESULT"
     echo >> "$RESULT"
     mkdir -p ./inputs
-    mkdir -p "./outputs/tput/$NAME"
-    INPUT_MAX_DIM="$INPUT_MAX_DIM" PROG_INPUT=./build/bin/inputgen DIR_INPUT=./inputs DIR_OUTPUT="./outputs/tput/$NAME" "$(dirname "$0")/demo-tput-openmp.sh" "./build/bin/$NAME" "$N_REPS" >> "$DIR_RESULTS/tput-$NAME-$INPUT_MAX_DIM.txt"
+    mkdir -p "./outputs/tput-$NAME"
+    INPUT_MAX_DIM="$INPUT_MAX_DIM" PROG_INPUT=./build/bin/inputgen DIR_INPUT=./inputs DIR_OUTPUT="./outputs/tput-$NAME" "$(dirname "$0")/demo-tput-openmp.sh" "./build/bin/$NAME" "$N_REPS" >> "$DIR_RESULTS/tput-$NAME-$INPUT_MAX_DIM.txt"
   fi
 done
 
