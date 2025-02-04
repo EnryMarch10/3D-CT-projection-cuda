@@ -42,17 +42,21 @@ NVCC := nvcc
 NVCFLAGS += -Xcompiler "-Wall -Werror" -Wno-deprecated-gpu-targets
 
 ifeq ($(DEBUG),all)
-	CFLAGS += -DDEBUG -DPRINT_VARIABLES
-	NVCFLAGS += -lineinfo -DDEBUG -DPRINT_VARIABLES
+	CFLAGS += -DPRINT -DDEBUG -DPRINT_VARIABLES
+	NVCFLAGS += -DPRINT -DDEBUG -DPRINT_VARIABLES -lineinfo
 else ifeq ($(DEBUG),yes)
-	CFLAGS += -DDEBUG
-	NVCFLAGS += -lineinfo -DDEBUG
+	CFLAGS += -DPRINT -DDEBUG
+	NVCFLAGS += -DPRINT -DDEBUG -lineinfo
 else
+	ifeq ($(DEBUG),simple)
+		CFLAGS += -DPRINT
+		NVCFLAGS += -DPRINT
+	endif
 # The following macro optimize the final code:
 # -DNDEBUG - avoids for example assertions checks
 # -DNO_CUDA_CHECK_ERROR - avoids hpc.h checks on cuda kernel errors during execution
 	CFLAGS += -DNDEBUG
-	NVCFLAGS += -DNO_CUDA_CHECK_ERROR -DNDEBUG
+	NVCFLAGS += -DNDEBUG -DNO_CUDA_CHECK_ERROR
 endif
 
 all: $(EXE_INPUT) $(TARGETS)
@@ -118,13 +122,13 @@ endif
 
 DIR_INPUT := inputs
 
+CUBE := Cube
 CUBE_WITH_SPHERICAL_HOLE := CubeWithSphericalHole
 HALF_SPHERE := HalfSphere
-CUBE := Cube
 
+CUBE_WITH_SUFFIX := $(CUBE)$(SUFFIX_SIZE)
 CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX := $(CUBE_WITH_SPHERICAL_HOLE)$(SUFFIX_SIZE)
 HALF_SPHERE_WITH_SUFFIX := $(HALF_SPHERE)$(SUFFIX_SIZE)
-CUBE_WITH_SUFFIX := $(CUBE)$(SUFFIX_SIZE)
 
 SHAPES := $(CUBE_WITH_SUFFIX) $(CUBE_WITH_SPHERICAL_HOLE_WITH_SUFFIX) $(HALF_SPHERE_WITH_SUFFIX)
 
@@ -245,12 +249,13 @@ help:
 	@echo " Variables:"
 	@echo
 	@echo "     WORK_SIZE  Specifies the inputs dimensions, by default it is set to 2352,"
-	@echo "                it can be specfied in each Data target"
+	@echo "                it can be specified in each Data target"
 	@echo "         DEBUG  Can be set to:"
-	@echo "                 - \"yes\" allows essential debug messages, enbles CUDA kernels error checking,"
-	@echo "                         and line info to test also with CUDA compute-sanitizer tool"
-	@echo "                 - \"all\" allows all debug messages, enbles CUDA kernels error checking,"
-	@echo "                         and line info to test also with CUDA compute-sanitizer tool"
+	@echo "                 - \"all\"    allows all debug messages, enables CUDA kernels error checking,"
+	@echo "                            and line info to test also with CUDA compute-sanitizer tool"
+	@echo "                 - \"yes\"    allows essential debug messages, enables CUDA kernels error checking,"
+	@echo "                            and line info to test also with CUDA compute-sanitizer tool"
+	@echo "                 - \"simple\" allows essential debug messages"
 	@echo
 
 purge:
