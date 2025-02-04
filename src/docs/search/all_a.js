@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['point_0',['Point',['../structPoint.html',1,'']]],
-  ['projection_1',['projection',['../index.html#cpu-siddons-projection',1,'CPU Siddon&apos;s Projection'],['../index.html#nvidia-gpu-siddons-projection',1,'NVIDIA GPU Siddon&apos;s Projection']]]
+  ['obj_5fbuffer_0',['OBJ_BUFFER',['../inputgen_8c.html#a28e9af725dfe6fdf44b8d2fc2661d8e6',1,'inputgen.c']]],
+  ['omp_2dprojection_2ec_1',['omp-projection.c',['../omp-projection_8c.html',1,'']]]
 ];

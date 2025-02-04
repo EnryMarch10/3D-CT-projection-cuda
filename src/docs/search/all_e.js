@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['writesetup_0',['writeSetUp',['../inputgen_8c.html#aa5fe73c44fdadf6a04d0a639fa963775',1,'inputgen.c']]]
+  ['termenvironment_0',['termenvironment',['../cuda-projection_8cu.html#a0b80778b697c0fb9bfa75d2ca3634034',1,'termEnvironment(void):&#160;cuda-projection.cu'],['../cuda-projection_8cu.html#a4dbd29fc2ed485e58eb945b410478772',1,'termEnvironment(double *g, size_t sizeG, double *gMin, double *gMax):&#160;cuda-projection.cu'],['../omp-projection_8c.html#a0b80778b697c0fb9bfa75d2ca3634034',1,'termEnvironment(void):&#160;omp-projection.c']]],
+  ['testing_1',['Throughput Scripts for Testing',['../index.html#throughput-scripts-for-testing',1,'']]],
+  ['throughput_20scripts_20for_20testing_2',['Throughput Scripts for Testing',['../index.html#throughput-scripts-for-testing',1,'']]]
 ];

@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['makefile_0',['Makefile',['../index.html#makefile',1,'']]],
-  ['merge_1',['merge',['../cuda-projection_8cu.html#a50349fb3c229827224d1ecba795bc47c',1,'merge(const double *const a, const double *const b, const unsigned short lenA, const unsigned short lenB, double *const c):&#160;cuda-projection.cu'],['../omp-projection_8c.html#af9298b6d30c4c2dd6463bbb435a18863',1,'merge(const double *const a, const double *const b, const unsigned short lenA, const unsigned short lenB, double *const c):&#160;omp-projection.c']]],
-  ['merge3_2',['merge3',['../cuda-projection_8cu.html#ab99297fbf84a168273c1ad59722db520',1,'merge3(const double *const a, const double *const b, const double *const c, const unsigned short lenA, const unsigned short lenB, const unsigned short lenC, double *const merged):&#160;cuda-projection.cu'],['../omp-projection_8c.html#a8cf884d6fd46566644a22199397575d1',1,'merge3(const double *const a, const double *const b, const double *const c, const unsigned short lenA, const unsigned short lenB, const unsigned short lenC, double *const merged):&#160;omp-projection.c']]],
-  ['min_3',['min',['../omp-projection_8c.html#abd8bbcfabb3ddef2ccaafb9928a37b95',1,'omp-projection.c']]],
-  ['min3_4',['min3',['../omp-projection_8c.html#a242710ffc6c186821800ab581fc06174',1,'omp-projection.c']]]
+  ['initenvironment_0',['initenvironment',['../cuda-projection_8cu.html#a080b810c20595610b6e65e1a577a2f01',1,'initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, const unsigned nSidePixels, double *gMin, double *gMax):&#160;cuda-projection.cu'],['../omp-projection_8c.html#ad58db6a8edea29ce6a98ac12873a90aa',1,'initEnvironment(const unsigned short nTheta):&#160;omp-projection.c']]],
+  ['inittables_1',['inittables',['../cuda-projection_8cu.html#a404414c4a397f8882bd70fe49d8d321e',1,'initTables(double *const sinTable, double *const cosTable, const unsigned short length):&#160;cuda-projection.cu'],['../omp-projection_8c.html#a404414c4a397f8882bd70fe49d8d321e',1,'initTables(double *const sinTable, double *const cosTable, const unsigned short length):&#160;omp-projection.c']]],
+  ['input_20generation_2',['Input Generation',['../index.html#input-generation',1,'']]],
+  ['inputgen_2ec_3',['inputgen.c',['../inputgen_8c.html',1,'']]]
 ];
