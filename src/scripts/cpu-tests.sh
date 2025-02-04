@@ -15,6 +15,16 @@ if [ $# -gt 1 ]; then
   exit 1
 fi
 
+if [ -z "$INPUT_MAX_DIM" ]; then
+  echo "$0> The variable 'INPUT_MAX_DIM' is unset." >&2
+  exit 1
+fi
+
+if [[ ! "$INPUT_MAX_DIM" =~ ^-?[0-9]+$ ]]; then
+  echo "$0> The variable 'INPUT_MAX_DIM' should be a valid integer" >&2
+  exit 1
+fi
+
 N_REPS=10
 
 if [ $# -eq 1 ]; then
@@ -33,13 +43,14 @@ for SOURCE in omp-*.c; do
     echo "# $0> Testing $SOURCE at `date "+%Y-%m-%d %I:%M:%S %p"`"
     NAME="$( basename -s .c "$SOURCE" )"
 
-    echo -n "TIME: " > "$DIR_RESULTS/tput-$NAME.txt"
-    date "+%Y-%m-%d %I:%M:%S %p" >> "$DIR_RESULTS/tput-$NAME.txt"
-    echo "SOURCE: $SOURCE" >> "$DIR_RESULTS/tput-$NAME.txt"
-    echo >> "$DIR_RESULTS/tput-$NAME.txt"
+    RESULT="$DIR_RESULTS/tput-$NAME-$INPUT_MAX_DIM.txt"
+    echo -n "TIME: " > "$RESULT"
+    date "+%Y-%m-%d %I:%M:%S %p" >> "$RESULT"
+    echo "SOURCE: $SOURCE" >> "$RESULT"
+    echo >> "$RESULT"
     mkdir -p ./inputs
     mkdir -p "./outputs/tput/$NAME"
-    INPUT_MAX_DIM=1500 PROG_INPUT=./build/bin/inputgen DIR_INPUT=./inputs DIR_OUTPUT="./outputs/tput/$NAME" "$(dirname "$0")/demo-tput-openmp.sh" "./build/bin/$NAME" "$N_REPS" >> "$DIR_RESULTS/tput-$NAME.txt"
+    INPUT_MAX_DIM="$INPUT_MAX_DIM" PROG_INPUT=./build/bin/inputgen DIR_INPUT=./inputs DIR_OUTPUT="./outputs/tput/$NAME" "$(dirname "$0")/demo-tput-openmp.sh" "./build/bin/$NAME" "$N_REPS" >> "$DIR_RESULTS/tput-$NAME-$INPUT_MAX_DIM.txt"
   fi
 done
 
