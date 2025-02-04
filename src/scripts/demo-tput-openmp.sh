@@ -56,8 +56,9 @@ if [ ! -f "$PROG" ]; then
   exit 1
 fi
 
+readonly STEP_SIZE=100
 readonly CORES=`cat /proc/cpuinfo | grep processor | wc -l`
-readonly N0="$( echo "$INPUT_MAX_DIM - $CORES * 100" | bc -l -q | cut -d. -f1 )"
+readonly N0="$( echo "$INPUT_MAX_DIM - $CORES * $STEP_SIZE" | bc -l -q | cut -d. -f1 )"
 
 echo -n "p"
 for n in `seq $N_REPS`; do
@@ -67,7 +68,7 @@ echo
 
 for figure in Cube CubeWithSphericalHole HalfSphere; do
   for p in `seq $CORES`; do
-    PROB_SIZE=`echo "$N0 + $p * 100" | bc -l -q | cut -d. -f1`
+    PROB_SIZE=`echo "$N0 + $p * $STEP_SIZE" | bc -l -q | cut -d. -f1`
     INPUT="${DIR_INPUT}/${figure}${PROB_SIZE}.dat"
     if [ ! -e "$INPUT" ]; then
       "$PROG_INPUT" "$INPUT" "$figure" "$PROB_SIZE" > /dev/null

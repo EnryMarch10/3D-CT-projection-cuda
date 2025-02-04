@@ -31,11 +31,13 @@ fi
 RESULTS_CPU=./results/cpu
 RESULTS_GPU=./results/gpu
 
+INPUT_MAX_DIM=2000
+
 mkdir -p "$RESULTS_CPU"
 mkdir -p "$RESULTS_GPU"
 echo "$0> ### Start CPU tests at `date "+%Y-%m-%d %I:%M:%S %p"` ###"
 echo "Working..."
-DIR_RESULTS="$RESULTS_CPU" "$(dirname "$0")/cpu-tests.sh"
+DIR_RESULTS="$RESULTS_CPU" INPUT_MAX_DIM="$INPUT_MAX_DIM" "$(dirname "$0")/cpu-tests.sh"
 if [ $? -ne 0 ]; then
   echo "$0> ### CPU tests failed! Aborting script ###" >&2
   exit 1
@@ -43,7 +45,7 @@ fi
 echo "$0> ### Ended CPU tests at `date "+%Y-%m-%d %I:%M:%S %p"` ###"
 echo "$0> ### Start GPU tests at `date "+%Y-%m-%d %I:%M:%S %p"` ###"
 echo "Working..."
-DIR_RESULTS="$RESULTS_GPU" "$(dirname "$0")/gpu-tests.sh"
+DIR_RESULTS="$RESULTS_GPU" INPUT_MAX_DIM="$INPUT_MAX_DIM" "$(dirname "$0")/gpu-tests.sh"
 if [ $? -ne 0 ]; then
   echo "$0> ### GPU tests failed! Aborting script ###" >&2
   exit 1
