@@ -786,13 +786,17 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, c
  */
 void getProjections(const unsigned short slice, double *f, const size_t sizeF, const unsigned short nTheta, const unsigned nSidePixels, const char isFirst)
 {
-#ifdef DEBUG
+#ifdef PRINT
     static unsigned short it = 0;
-    printf("IT %u...\n", ++it);
+    printf("IT %u\n", ++it);
+    printf("Copying f...\n");
 #endif
     cudaSafeCall(cudaMemcpy(d_f, f, sizeF, cudaMemcpyHostToDevice));
     static dim3 block(BLKDIM_STEP, BLKDIM_STEP);
     static dim3 grid((nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP, (nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP);
+#ifdef PRINT
+    printf("Executing %u kernel...\n", it);
+#endif
     computeProjections<<<grid, block>>>(slice, nTheta, nSidePixels, d_f, d_g, isFirst);
     cudaCheckError();
 }
@@ -916,6 +920,9 @@ int main(int argc, char *argv[])
         }
 
         // Read voxels coefficients
+#ifdef PRINT
+        printf("Reading f...\n");
+#endif
         if (!fread(f, sizeof(double), (size_t) gl_nVoxel[X] * nOfSlices * gl_nVoxel[Z], inputFilePointer)) {
             fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
             free(f);
