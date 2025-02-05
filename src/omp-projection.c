@@ -457,11 +457,12 @@ double computeAbsorption(const unsigned short slice, const Point source, const P
         for (unsigned short i = 0; i < lenA - 1; i++) {
             const double segments = d12 * (a[i + 1] - a[i]);
             const double aMid = (a[i + 1] + a[i]) / 2;
-            const unsigned short xRow = min((source.x + aMid * (pixel.x - source.x) - getXPlane(0)) / gl_voxelXDim, gl_nVoxel[X] - 1);
-            const unsigned short yRow = min3((source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / gl_voxelYDim, gl_nVoxel[Y] - 1, OBJ_BUFFER - 1);
-            const unsigned short zRow = min((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / gl_voxelZDim, gl_nVoxel[Z] - 1);
+            const unsigned short x = min((source.x + aMid * (pixel.x - source.x) - getXPlane(0)) / gl_voxelXDim, gl_nVoxel[X] - 1);
+            const unsigned short y = min3((source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / gl_voxelYDim, gl_nVoxel[Y] - 1, OBJ_BUFFER - 1);
+            const unsigned short z = min((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / gl_voxelZDim, gl_nVoxel[Z] - 1);
 
-            g += f[(unsigned) yRow * gl_nVoxel[X] * gl_nVoxel[Z] + (unsigned) zRow * gl_nVoxel[Z] + xRow] * segments;
+            // In a 3D matrix it would be: f[x][z * d_nVoxel[Z]][y * d_nVoxel[X] * d_nVoxel[Z]]
+            g += f[x + (unsigned) z*gl_nVoxel[Z] + (unsigned) y*gl_nVoxel[X]*gl_nVoxel[Z]] * segments;
         }
     }
     return g;
