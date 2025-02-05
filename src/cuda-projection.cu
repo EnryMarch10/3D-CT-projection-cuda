@@ -497,7 +497,7 @@ __device__ double computeAbsorption(const unsigned short slice, const Point sour
             const unsigned short z = min((int) ((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / d_voxelZDim), d_nVoxel[Z] - 1);
 
             // In a 3D matrix it would be: f[x][z * d_nVoxel[Z]][y * d_nVoxel[X] * d_nVoxel[Z]]
-            g += f[x + (unsigned) z * d_nVoxel[Z] + (unsigned) y * d_nVoxel[X] * d_nVoxel[Z]] * segments;
+            g += f[x + (unsigned) z*d_nVoxel[Z] + (unsigned) y*d_nVoxel[X]*d_nVoxel[Z]] * segments;
         }
     }
     return g;
