@@ -4,7 +4,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 \usepackage{times} % Selected font
-\usepackage{xcolor} % Colors
+\usepackage[table, svgnames]{xcolor} % Colors
 \usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
 \usepackage{float} % For anchor options
 \usepackage{graphicx} % Images
@@ -23,6 +23,59 @@
 \setlist[itemize]{topsep=0pt, partopsep=0pt, parsep=0pt}
 \usepackage{tikz} % To draw graphs
 \usetikzlibrary{3d} % For 3D graphs
+
+\usepackage{listings} % To use listings
+% \usepackage{inconsolata} % Use Inconsolata
+\renewcommand{\lstlistingname}{Listato} % Configurazione italiana del listato
+
+\definecolor{C_comment_green}{rgb}{0.0, 0.5, 0.0}
+\definecolor{C_types_blue}{RGB}{30, 130, 210}
+\definecolor{C_user_types_green}{RGB}{50, 222, 156}
+\definecolor{C_directives_purple}{RGB}{140, 10, 133}
+\definecolor{C_function_amber}{RGB}{200, 180, 20}
+
+\lstdefinelanguage{CStyle}{
+  morekeywords={ % Types and macros
+    unsigned,
+    N_VOXEL_X, N_VOXEL_Y, N_VOXEL_Z
+  },
+  morekeywords=[2]{ % Directives
+    for, if, else, return
+  },
+  morekeywords=[3]{ % Functions
+    min, max
+  },
+  morekeywords=[4]{ % User types
+  Point, Ranges
+  },
+  sensitive=true,
+  morecomment=[l]//,
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[b]',
+  commentstyle=\color{C_comment_green},
+  keywordstyle=\color{C_types_blue}\bfseries,
+  keywordstyle=[2]\color{C_directives_purple}\bfseries,
+  keywordstyle=[3]\color{C_function_amber}\bfseries,
+  keywordstyle=[4]\color{C_user_types_green}\bfseries,
+  stringstyle=\color{red},
+  identifierstyle=\color{darkgray},
+}
+
+\lstset{
+  basicstyle=\ttfamily\small,           % Set font type
+  keywordstyle=\color{blue}\bfseries,   % Set keyword color to blue and bold
+  stringstyle=\color{red},              % Set string color to red
+  commentstyle=\color{C_comment_green}, % Set comment color to gray and italic
+  breaklines=true,                      % Enable line breaking
+  frame=single,                         % Add a frame around the code
+  numbers=left,                         % Add line numbers on the left
+  numberstyle=\tiny\color{gray},        % Style for line numbers
+  backgroundcolor=\color{lightgray!20}, % Background color
+  captionpos=b,                         % Caption position at the bottom
+  showstringspaces=false,               % Don't show spaces in strings
+  % literate={*}{{\raisebox{0.3ex}{*}}}1, % Scale * character
+}
 
 \begin{document}
 
@@ -260,9 +313,9 @@ Considerando quanto già visto nel modello matematico, nel nostro caso l'algorit
 Questi dati devono essere determinati per poter procedere con la computazione.
 
 L'algoritmo svolge una computazione equivalente a quella descritta nell'\autoref{eq:law_lambert-beer_discrete}:
-\begin{equation*}
+\begin{equation} \label{eq:law_lambert-beer_Siddon}
   d = \sum_i \sum_j \sum_k l(i, j, k) \rho(i, j, k)
-\end{equation*}
+\end{equation}
 dove i parametri \(i\), \(j\) e \(k\) individuano un singolo voxel nello spazio tridimensionale.
 In particolare, considerando una specifica configurazione di \((i, j, k)\), \(l\) rappresenta la lunghezza sottesa in quel
 voxel (equivalente di \(M\)) mentre \(\rho\) rappresenta la densità del voxel (equivalente di \(f\)).
@@ -339,12 +392,12 @@ I punti chiave dell'algoritmo, nella determinazione della matrice \(M\), possono
         determinando così la matrice \(M\).
 \end{itemize}
 
-\subsection{Il vettore \(f\)}
+\subsection{Il vettore \(f\)} \label{chap:vector_f}
 
 Il vettore \(f\) rappresenta il coefficiente di attenuazione assunto nella regione interna al volume sotteso da ciascun voxel.
 Presenta dunque un numero di elementi pari al numero di voxel in cui è suddiviso l'oggetto.
 
-Le tre diverse configurazioni, fornite da \cite{Colletta2024}, sono state qui riutilizzate:
+Le tre diverse configurazioni utilizzate sono:
 \begin{itemize}
   \item Un \textbf{cubo}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi all'interno della
         regione cubica sono posti ad 1, altrimenti a 0.
@@ -752,6 +805,64 @@ piano e una componente della retta come di seguito:
 
 dove sono stati indicati i sistemi utilizzati nel caso in cui il piano sia parallelo al piano \(yz\) (primo sistema), al piano
 \(xz\) (secondo sistema) o al piano \(xy\) (terzo sistema).
+
+\chapter{Descrizione del progetto}
+
+Il progetto include diverse implementazioni, tra cui un programma per la generazione dei file di input, uno per il calcolo della
+proiezione basato sull'algoritmo di Siddon con OpenMP ed una versione sviluppata con CUDA.
+
+Le prime due soluzioni sono state ottenute rielaborando il lavoro di \cite{Colletta2024}, mentre l'implementazione CUDA
+costituisce il fulcro di questo progetto.
+
+\section{Generazione input}
+
+L'implementazione proposta genera le configurazioni del vettore \(f\) già discusse nella \autoref{chap:vector_f}.
+Queste configurazioni vengono scritte su file.
+La strategia adottata per la scrittura è descritta di seguito.
+
+\begin{lstlisting}[language=CStyle, caption={Codice C per inizializzazione di \(f\) per un cubo.}, label={lst:vector_f_config}]
+  unsigned Nx = N_VOXEL_X, Nz = N_VOXEL_Z, pNy = k;
+  // Dove k <= N_VOXEL_Y
+  for (unsigned y = 0; y < pNy; y++) {
+    for (unsigned z = 0; z < Nz; z++) {
+      for (unsigned x = 0; x < Nx; x++) {
+        f[x + z*Nz + y*Nx*Nz] = 1.0;
+      }
+    }
+  }
+\end{lstlisting}
+
+Per comprendere l'indicizzazione è utile considerare che l'elemento nell'array 1D \(f[x + z N_z + y N_x N_z]\), è equivalente a
+quello nella matrice 3D \(\rho[x][z][y]\), in cui \(x\), \(z\) ed \(y\)  sono fissati, rivedi l'\autoref{eq:law_lambert-beer_Siddon}.
+
+La caratteristica fondamentale di questa soluzione è che l'inizializzazione mostrata, di fatto, ``srotola'' la matrice
+\(\rho\) in un array \(f\), in cui la coordinata \(y\) è indipendente rispetto alle altre.
+In questo senso le \(x\) e poi le \(z\) sono scritte più velocemente rispetto alla \(y\), quindi dipendono da essa.
+In altre parole, la \(y\), nel codice al \autoref{lst:vector_f_config}, è l'unico contatore non annidato, di conseguenza quello
+che non dipende dagli altri.
+
+Si osserva però che la specifica mappatura degli elementi scelta non è l'unica possibile, si sarebbero per esempio potute
+scambiare le varie coordinate tra di loro, invertendone i ruoli, e perciò le relative dipendenze.
+
+Il \autoref{lst:vector_f_config} rappresenta in realtà un'iterazione della scrittura su file.
+Infatti \lstinline{pNy} non è assegnato a \lstinline{N_VOXELS_Y}, ma a \lstinline{k}.
+Quindi l'array \(f\), limitato nelle dimensioni da \lstinline{pNy}, rappresenta una partizione verticale dell'oggetto cubico di
+interesse e non l'array completo così come considerato nel modello matematico, rivedi la \autoref{fig:CT_reference_plane}.
+Tale partizione avrà numero di voxel sull'asse delle \(y\) pari a \lstinline{k}, dove \lstinline{k <= N_VOXELS_Y}.
+
+In questo modo, anche la lettura dell'input può essere fatta per partizioni sul numero totale di voxel nell'asse delle \(y\),
+cioè \lstinline{N_VOXELS_Y}.
+È essenziale riconoscere che tali partizioni possono assumere dimensioni arbitrarie, senza vincoli reciproci e, in particolare,
+senza necessità di conoscere quella scelta per la scrittura.
+
+Questa strategia di scrittura è essenziale per gestire input di grandi dimensioni.
+In particolare, nel caso di computazione su CPU, è fondamentale considerare la quantità di memoria RAM disponibile sulla scheda
+madre (aspetto che approfondiremo con OpenMP).
+Nel caso di computazione su GPU, invece, vanno prese in considerazione sia la memoria RAM della scheda madre sia quella
+disponibile sulla GPU (aspetto che esamineremo con CUDA).
+Ad esempio, supponiamo di dover analizzare una partizione di lunghezza \lstinline{OBJ_BUFFER}, con la condizione
+\lstinline{OBJ_BUFFER <= N_VOXELS_Y}.
+In questo caso, per quella partizione verranno letti solo \lstinline{N_VOXEL_X *  OBJ_BUFFER * N_VOXEL_Z} valori.
 
 \appendix
 
