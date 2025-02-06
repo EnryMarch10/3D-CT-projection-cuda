@@ -650,7 +650,7 @@ int main(int argc, char *argv[])
     if (argc < 2 || argc > 4) {
         fprintf(stderr, "Usage: %s INPUT [OUTPUT] [Y_PLANES]\n"
                         "- INPUT: The first parameter is the name of the input file.\n"
-                        "- [OUTPUT]: The second parameter is the name of a binary file to store the output at.\n"
+                        "- [OUTPUT]: The second parameter is the name of a .pgm file to store the output at.\n"
                         "- [Y_PLANES]: The third parameter is the maximum number of planes considered in the Y axis for each iteration.\n",
                         argv[0]);
         return EXIT_FAILURE;
