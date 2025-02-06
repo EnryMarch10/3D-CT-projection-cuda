@@ -6,6 +6,8 @@
 \usepackage{times} % Selected font
 \usepackage[table, svgnames]{xcolor} % Colors
 \usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
+\usepackage{url} % To put URLs
+\usepackage{xurl} % Avoids URLs to overfull \hbox
 \usepackage{float} % For anchor options
 \usepackage{graphicx} % Images
 \graphicspath{{img/}}
@@ -808,11 +810,114 @@ dove sono stati indicati i sistemi utilizzati nel caso in cui il piano sia paral
 
 \chapter{Descrizione del progetto}
 
-Il progetto include diverse implementazioni, tra cui un programma per la generazione dei file di input, uno per il calcolo della
-proiezione basato sull'algoritmo di Siddon con OpenMP ed una versione sviluppata con CUDA.
+Il progetto include diverse implementazioni scritte in C, tra cui un programma per la generazione dei file di input, uno per il
+calcolo della proiezione basato sull'algoritmo di Siddon con OpenMP ed una versione sviluppata con CUDA.
 
 Le prime due soluzioni sono state ottenute rielaborando il lavoro di \cite{Colletta2024}, mentre l'implementazione CUDA
 costituisce il fulcro di questo progetto.
+
+Di seguito verrà riportata una breve introduzione alle tecniche di parallelizzazione utilizzate, a cui seguirà la descrizione
+delle implementazioni sviluppate.
+
+\section{Parallelizzazione}
+
+L'ottimizzazione di un algoritmo seriale è un processo estremamente ampio e variegato, che coinvolge molteplici strategie a
+seconda del contesto applicativo, delle caratteristiche hardware e degli obiettivi di prestazione.
+In generale, l'ottimizzazione può riguardare la riduzione della complessità computazionale, una migliore gestione della memoria,
+l'uso di strutture dati efficienti o l'impiego di tecniche avanzate per minimizzare i tempi di esecuzione.
+
+Tuttavia, quando si passa a implementazioni ottimizzate per architetture specifiche come CPU e GPU, emergono strategie di
+ottimizzazione mirate, che sfruttano le peculiarità di ciascun tipo di hardware.
+
+Nel seguito, ci concentreremo sulle tecniche di parallelizzazione adottate nelle implementazioni su CPU e GPU selezionate,
+analizzando le metodologie impiegate per massimizzare le prestazioni in ciascun caso.
+
+\subsection{CPU}
+
+La CPU (Central Processing Unit) è il componente principale di un computer responsabile dell'esecuzione delle istruzioni di un
+programma.
+È spesso definita il ``cervello'' del sistema, in quanto gestisce i calcoli, l'elaborazione dei dati e il controllo delle
+operazioni.
+
+Le CPU moderne, per motivi principalmente legati al risparmio energetico, dispongono di più core e supportano il multi-threading,
+consentendo l'esecuzione parallela di più attività.
+
+\subsubsection{OpenMP}
+
+OpenMP\footnote{Per maggiori informazioni vedi \url{https://www.openmp.org/}.} (Open Multi-Processing) è un'API (Application
+Programming Interface) che supporta la programmazione parallela su architetture multi core con memoria condivisa.
+Fornisce un insieme di direttive per il compilatore, librerie runtime e variabili d'ambiente che permettono di scrivere programmi
+paralleli.
+In questo progetto è stato utilizzato il linguaggio C.
+
+OpenMP rientra nella categoria \textbf{MIMD} (Multiple Instruction, Multiple Data) secondo la tassonomia di Flynn, vedi
+\cite{Flynn1966}.
+In realtà, sfruttando il modello ``fork-join'', dove un processo principale genera più processi eseguendo la stessa operazione su
+dati diversi, il parallelismo può implicitamente assumere alcune caratteristiche SIMD (Single Instruction, Multiple Data).
+
+Caratteristiche principali di OpenMP:
+\begin{itemize}
+  \item Parallelismo a memoria condivisa: I processi condividono lo stesso spazio di indirizzamento.
+  \item Programmazione basata su direttive: Le sezioni di codice parallelo sono specificate tramite pragma.
+  \item Scalabilità: Adatta il numero di processi in base al numero di core disponibili.
+  \item Facilità di utilizzo: Non richiede riscrittura completa del codice, ma solo l'aggiunta di annotazioni.
+  \item Sincronizzazione e gestione del carico: Include meccanismi per bilanciare il carico tra i processi ed evitare race
+        conditions.
+\end{itemize}
+
+\subsection{GPU}
+
+La GPU (Graphics Processing Unit) è un processore specializzato progettato per eseguire calcoli in parallelo su grandi quantità di
+dati.
+Originariamente sviluppata per il rendering grafico.
+Conseguentemente alla domanda del mercato, la GPU si è oggi ampiamente evoluta in un processore generale, che quindi può svolgere
+molti diversi tipi di carichi di lavoro al di là del solo rendering grafico.
+Utilizzata in settori come intelligenza artificiale, elaborazione di immagini, deep learning e simulazioni scientifiche, grazie
+alla sua capacità di eseguire migliaia di operazioni simultaneamente.
+Le GPU moderne, sebbene operino in generale a frequenze più basse delle CPU, sono molto più veloci di esse nell'eseguire i compiti
+in cui sono specializzate.
+
+\subsubsection{CUDA}
+
+CUDA\footnote{Per maggiori informazioni vedi \url{https://docs.nvidia.com/cuda/}.} (Compute Unified Device Architecture) è una
+piattaforma di calcolo parallelo e un modello di programmazione sviluppato da NVIDIA che consente di sfruttare le GPU NVIDIA per
+l'elaborazione generale, GPGPU (General-Purpose computing on Graphics Processing Units).
+In questo progetto è stato utilizzato il linguaggio `CUDA-C' (C con estensioni NVIDIA).
+
+A livello CUDA, per lavorare in modo efficiente, si astrae dal funzionamento hardware, considerando un parallelismo di tipo
+\textbf{SIMT} (Single Instruction, Multiple Thread), vedi \cite{NVIDIA2008}, che è un'estensione del concetto SIMD (Single
+Instruction, Multiple Data) della tassonomia di Flynn, vedi \cite{Flynn1966}.
+
+In particolare l'hardware delle GPU prevede esecuzione:
+\begin{itemize}
+  \item SIMT: a livello di Warp (unità di schedulazione)
+        \begin{itemize}
+          \item Le GPU eseguono gruppi di Thread chiamati Warp (tipicamente 32 Thread) che eseguono la stessa istruzione
+                simultaneamente, ma su dati diversi. Questo è il comportamento tipico del paradigma SIMD.
+          \item Tuttavia, a differenza di un vero SIMD (dove tutti i dati sono rigidamente legati alla stessa istruzione), i
+                Thread in un warp possono, anche se inefficiente, divergere (ad esempio, con istruzioni condizionali), motivo per
+                cui il modello è chiamato SIMT.
+        \end{itemize}
+  \item MIMD: a livello di multiprocessore
+        \begin{itemize}
+          \item Ogni Streaming Multiprocessor (SM) della GPU può eseguire più warps indipendenti, ognuno con istruzioni diverse.
+          \item Questo significa che, considerando l'intera GPU, essa opera in modo MIMD, poiché più SM possono eseguire
+                istruzioni diverse su set di dati diversi.
+        \end{itemize}
+\end{itemize}
+
+Il meccanismo di computazione in unità, i Warp, implica che siano le computazioni SIMT che permettono le prestazioni migliori.
+Questo perché le divergenze, istruzioni condizionali nel codice, portano alla serializzazione dell'esecuzione in Thread relativi
+ad un singolo Warp.
+
+Caratteristiche principali di CUDA:
+\begin{itemize}
+  \item Parallelismo massivo: Permette di eseguire migliaia di Thread in parallelo sulla GPU. Adatto a risolvere problemi del
+        tipo `Embarrassingly Parallel', quindi in cui la computazione può essere decomposta in task indipendenti, con poche
+        divergenze e che richiedono poca comunicazione l'uno con l'altro.
+  \item Memoria gerarchica: Struttura di memoria ottimizzata per alte prestazioni (memoria globale, condivisa, registri).
+  \item Elevata efficienza: Permette di accelerare calcoli scientifici, AI, machine learning, rendering, simulazioni fisiche, ecc.
+\end{itemize}
 
 \section{Generazione input}
 
@@ -849,6 +954,7 @@ Infatti \lstinline{pNy} non è assegnato a \lstinline{N_VOXELS_Y}, ma a \lstinli
 Quindi l'array \(f\), limitato nelle dimensioni da \lstinline{pNy}, rappresenta una partizione verticale dell'oggetto cubico di
 interesse e non l'array completo così come considerato nel modello matematico, rivedi la \autoref{fig:CT_reference_plane}.
 Tale partizione avrà numero di voxel sull'asse delle \(y\) pari a \lstinline{k}, dove \lstinline{k <= N_VOXELS_Y}.
+Nella soluzione proposta oltretutto la singola iterazione presentata viene parallelizzata sfruttando OpenMP.
 
 In questo modo, anche la lettura dell'input può essere fatta per partizioni sul numero totale di voxel nell'asse delle \(y\),
 cioè \lstinline{N_VOXELS_Y}.
@@ -863,6 +969,14 @@ disponibile sulla GPU (aspetto che esamineremo con CUDA).
 Ad esempio, supponiamo di dover analizzare una partizione di lunghezza \lstinline{OBJ_BUFFER}, con la condizione
 \lstinline{OBJ_BUFFER <= N_VOXELS_Y}.
 In questo caso, per quella partizione verranno letti solo \lstinline{N_VOXEL_X *  OBJ_BUFFER * N_VOXEL_Z} valori.
+
+% \section{Proiezione CPU}
+
+% L'implementazione proposta sfrutta il parallelismo OpenMP.
+
+% \section{Proiezione GPU NVIDIA}
+
+% L'implementazione proposta sfrutta il parallelismo CUDA.
 
 \appendix
 
