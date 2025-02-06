@@ -73,13 +73,14 @@ The source file `omp-projection.c` contains an OpenMP parallel implementation of
 Usage:
 
 ```shell
-./build/bin/omp-projection INPUT OUTPUT
+./build/bin/omp-projection INPUT [OUTPUT] [Y_PLANES]
 ```
 
 Where:
 - `INPUT`: is the input file name of the 3D object, for example `input/cube.dat`.
-- `OUTPUT`: is the output file name of the 2D projections, for example if compiled in normal mode it could be `output/cube.pgm`,
-  if compiled in binary mode it could be `output/cube.dat`.
+- `[OUTPUT]`: is the output file name of the 2D projections, for example if compiled in normal mode it could be `output/Cube.pgm`,
+  `/dev/null` can be used if you want to specify the y planes without creating an output file, for testing purposes.
+- `[Y_PLANES]`: is the y axis slice size considered in the computation, that can be specified a priori, the default value is 100.
 
 > [!TIP]
 > Compile with: `make omp`.
@@ -91,13 +92,15 @@ The source file `cuda-projection.cu` contains an CUDA parallel implementation of
 Usage:
 
 ```shell
-./build/bin/cuda-projection INPUT OUTPUT
+./build/bin/cuda-projection INPUT [OUTPUT] [Y_PLANES]
 ```
 
 Where:
-- `INPUT`: is the input file name of the 3D object, for example `input/cube.dat`.
-- `OUTPUT`: is the output file name of the 2D projections, for example if compiled in normal mode it could be `output/cube.pgm`,
-  if compiled in binary mode it could be `output/cube.dat`.
+- `INPUT`: is the input file name of the 3D object, for example `input/Cube.dat`.
+- `[OUTPUT]`: is the output file name of the 2D projections, for example if compiled in normal mode it could be `output/Cube.pgm`,
+  `/dev/null` can be used if you want to specify the y planes without creating an output file, for testing purposes.
+- `[Y_PLANES]`: is the y axis slice size considered in the computation, that can be specified a priori, the default value is
+  dynamically calculated depending on the GPU's available RAM.
 
 > [!TIP]
 > Compile with: `make cuda`.
