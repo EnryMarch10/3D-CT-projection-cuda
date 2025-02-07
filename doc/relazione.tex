@@ -25,6 +25,7 @@
 \setlist[itemize]{topsep=0pt, partopsep=0pt, parsep=0pt}
 \usepackage{tikz} % To draw graphs
 \usetikzlibrary{3d} % For 3D graphs
+\usepackage[figure]{hypcap} % Ensures that references go to the figure, not the caption
 
 \usepackage{listings} % To use listings
 % \usepackage{inconsolata} % Use Inconsolata
@@ -240,15 +241,15 @@ Per ciascun voxel il coefficiente di attenuazione è un valore approssimato cost
 
 L'\autoref{eq:law_lambert-beer} nel caso discreto, per calcolare una singola proiezione, diventa:
 \begin{equation} \label{eq:law_lambert-beer_discrete}
-  g_i = \sum_{j=0}^N M_{i, j} f_j \quad \forall i \in 1, \dots, n_p
+  g_i = \sum_{j=0}^N M_{i, j} f_j \quad \forall i \in 1, \dots, N_p
 \end{equation}
 
 Dove:
 \begin{itemize}
-  \item \(i\) è l'\(i\)-esimo raggio, degli \(n_p\) considerati per quella proiezione.
+  \item \(i\) è l'\(i\)-esimo raggio, degli \(N_p\) considerati per quella proiezione.
   \item \(j\) è il \(j\)-esimo voxel, degli \(N\) totali che approssimano il corpo.
   \item \(g_i\) è l'attenuazione subita dall'\(i\)-esimo raggio.
-  \item \(M_{i,j}\) è una matrice di \(n_p \times N\) elementi che per ogni raggio \(i\) definisce la lunghezza della porzione
+  \item \(M_{i,j}\) è una matrice di \(N_p \times N\) elementi che per ogni raggio \(i\) definisce la lunghezza della porzione
         sottesa al volume di ciascun voxel \(j\).
   \item \(f_j\) è il valore del coefficiente di attenuazione assunto nel volume interno al \(j\)-esimo voxel.
 \end{itemize}
@@ -403,11 +404,11 @@ Le tre diverse configurazioni utilizzate sono:
 \begin{itemize}
   \item Un \textbf{cubo}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi all'interno della
         regione cubica sono posti ad 1, altrimenti a 0.
-  \item Una \textbf{semi-sfera}: stabilita la lunghezza del raggio della semisfera che si intende rappresentare, gli elementi
-        all'interno della regione semisferica sono posti ad 1, altrimenti a 0.
   \item Un \textbf{cubo con cavità sferica}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi
         all'interno della regione cubica, ad eccezione di quelli la cui distanza da un punto stabilito all'interno dell'oggetto
         sia inferiore ad un raggio stabilito, sono posti ad 1, altrimenti a 0.
+  \item Una \textbf{semi-sfera}: stabilita la lunghezza del raggio della semisfera che si intende rappresentare, gli elementi
+        all'interno della regione semisferica sono posti ad 1, altrimenti a 0.
 \end{itemize}
 
 \section{Considerazioni geometriche}
@@ -557,7 +558,7 @@ distanza \(d_r\) dal centro del corpo in esame.
 L'approccio usato per relazionare i raggi con il rilevatore è detto \textit{ray-driven}.
 Per ciascun unità del rilevatore si considera l'esistenza di un unico raggio passante, diretto dalla sorgente al centro del
 pixel stesso.
-Secondo questo approccio, il numero \(n_p\) di raggi usati per il calcolo della proiezione coincide con il numero di pixel del
+Secondo questo approccio, il numero \(N_p\) di raggi usati per il calcolo della proiezione coincide con il numero di pixel del
 rilevatore.
 
 Il rilevatore è sempre ortogonale all'asse che congiunge la sorgente con il centro del corpo.
@@ -970,13 +971,44 @@ Ad esempio, supponiamo di dover analizzare una partizione di lunghezza \lstinlin
 \lstinline{OBJ_BUFFER <= N_VOXELS_Y}.
 In questo caso, per quella partizione verranno letti solo \lstinline{N_VOXEL_X *  OBJ_BUFFER * N_VOXEL_Z} valori.
 
-% \section{Proiezione CPU}
+\section{Calcolo proiezioni}
 
-% L'implementazione proposta sfrutta il parallelismo OpenMP.
+L'algoritmo di calcolo delle proiezioni implementato segue quanto già discusso nell'introduzione:
+\begin{enumerate}
+  \item il vettore \(f\) dei coefficienti di attenuazione viene letto da file come input del programma;
+  \item si calcola il prossimo punto sorgente da analizzare, nel caso in cui siano finiti l'algoritmo termina;
+  \item si calcola il prossimo pixel del rilevatore (in realtà il punto centrale), nel caso in cui siano finiti si ritorna al
+        punto 2;
+  \item per procedere si calcolano i valori parametrici di intersezione del raggio individuato dalla sorgente e dal pixel del
+        rilevatore con il primo e l'ultimo piano di ogni dimensione, per verificare che il raggio attraversi l'oggetto, in caso
+        contrario si ritorna al punto 3.
+  \item a questo punto si calcolano i valori parametrici dei piani estremi (il primo e l'ultimo) che devono essere considerati per
+        calcolare il sottoinsieme delle intersezioni con il raggio che risultano dentro la griglia dei voxel, rivedi la
+        \autoref{fig:CT_Siddon_grid_to_planes}.
+  \item poi si calcolano i valori parametrici delle intersezioni tra il raggio ed i piani considerati.
+  \item si calcola la lunghezza del prossimo segmento sotteso ai voxel (valore di \(M\)), nel caso in cui siano finiti si ritorna
+        al punto 3;
+  \item ora si calcola l'indice del voxel che sottende il segmento;
+  \item al pixel del rilevatore (pixel corrente di \(g\)) viene infine sommata l'attenuazione del voxel corrispondente,
+        moltiplicata per la lunghezza del segmento considerato, si ritorna quindi al punto 7.
+\end{enumerate}
 
-% \section{Proiezione GPU NVIDIA}
+In \autoref{fig:flowchart} presentato il diagramma di flusso relativo.
 
-% L'implementazione proposta sfrutta il parallelismo CUDA.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{flowchart}
+  \caption{Diagramma di flusso del calcolo delle proiezioni.}
+  \label{fig:flowchart}
+\end{figure}
+
+% \subsection{Implementazione OpenMP}
+
+% L'implementazione per CPU proposta sfrutta il parallelismo OpenMP.
+
+% \subsection{Implementazione CUDA}
+
+% L'implementazione per GPU NVIDIA proposta sfrutta il parallelismo CUDA.
 
 \appendix
 
