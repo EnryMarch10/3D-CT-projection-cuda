@@ -185,7 +185,7 @@ __device__ double getAMax(double a[3][2], const char isParallel)
  *
  * @param a It is the array containing the parametric value of the intersection between the ray and the object's side along each axis.
  * @param isParallel It is a value corresponding to the axis to which the array is orthogonal, -1 otherwise.
- * @return The minimum parametric value a, representing the last intersection between ray and object.
+ * @return The minimum parametric value a, representing the first intersection between ray and object.
  * @return __device__ Indicates that this is a CUDA function that can be called from a kernel.
  */
 __device__ double getAMin(double a[3][2], const char isParallel)
@@ -247,7 +247,7 @@ __device__ void getAllIntersections(const double source, const double pixel, con
 
     start = planeIndexesRanges.minIndx;
     end = planeIndexesRanges.maxIndx;
-    if (end > start) {
+    if (end > start) { // Avoids management of invalid array
         assert(end - start <= MAX_PLANES);
         double plane[MAX_PLANES];
         if (axis == X) {
@@ -485,19 +485,22 @@ __device__ void getSidesZPlanes(double *const planes)
  */
 __device__ double computeAbsorption(const unsigned short slice, const Point source, const Point pixel, const double *const a, const unsigned short lenA, const double *const f)
 {
-    const double d12 = sqrt(pow(pixel.x - source.x, 2) + pow(pixel.y - source.y, 2) + pow(pixel.z - source.z, 2));
     double g = 0.0;
 
-    if (lenA > 0) {
+    if (lenA > 0) { // Avoids overflow on unsigned value
+        const double deltaX = pixel.x - source.x;
+        const double deltaY = pixel.y - source.y;
+        const double deltaZ = pixel.z - source.z;
+        const double d12 = sqrt(pow(deltaX, 2) + pow(deltaY, 2) + pow(deltaZ, 2));
         for (unsigned short i = 0; i < lenA - 1; i++) {
-            const double segments = d12 * (a[i + 1] - a[i]);
             const double aMid = (a[i + 1] + a[i]) / 2;
-            const unsigned short x = min((int) ((source.x + aMid * (pixel.x - source.x) - getXPlane(0)) / d_voxelXDim), d_nVoxel[X] - 1);
-            const unsigned short y = min((int) ((source.y + aMid * (pixel.y - source.y) - getYPlane(slice)) / d_voxelYDim), min(d_nVoxel[Y] - 1, d_OBJ_BUFFER - 1));
-            const unsigned short z = min((int) ((source.z + aMid * (pixel.z - source.z) - getZPlane(0)) / d_voxelZDim), d_nVoxel[Z] - 1);
+            const unsigned short x = min((int) ((source.x + aMid * deltaX - getXPlane(0)) / d_voxelXDim), d_nVoxel[X] - 1);
+            const unsigned short y = min((int) ((source.y + aMid * deltaY - getYPlane(slice)) / d_voxelYDim), min(d_nVoxel[Y] - 1, d_OBJ_BUFFER - 1));
+            const unsigned short z = min((int) ((source.z + aMid * deltaZ - getZPlane(0)) / d_voxelZDim), d_nVoxel[Z] - 1);
 
-            // In a 3D matrix it would be: f[x][z * d_nVoxel[Z]][y * d_nVoxel[X] * d_nVoxel[Z]]
-            g += f[x + (unsigned) z*d_nVoxel[Z] + (unsigned) y*d_nVoxel[X]*d_nVoxel[Z]] * segments;
+            // In a 3D matrix it would be: f[x][z][y]
+            // d12 * (a[i + 1] - a[i] = segment length
+            g += f[x + (unsigned) z*d_nVoxel[Z] + (unsigned) y*d_nVoxel[X]*d_nVoxel[Z]] * d12 * (a[i + 1] - a[i]);
         }
     }
     return g;
