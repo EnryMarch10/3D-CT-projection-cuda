@@ -138,10 +138,11 @@ Input Generation</h2>
 CPU Siddon's Projection</h2>
 <p>The source file <code><a class="el" href="omp-projection_8c.html" title="An OpenMP implementation of the Siddon&#39;s projection algorithm.">omp-projection.c</a></code> contains an OpenMP parallel implementation of the Siddon's projection algorithm.</p>
 <p>Usage:</p>
-<div class="fragment"><div class="line">./build/bin/omp-projection INPUT OUTPUT</div>
+<div class="fragment"><div class="line">./build/bin/omp-projection INPUT [OUTPUT] [Y_PLANES]</div>
 </div><!-- fragment --><p>Where:</p><ul>
 <li><code>INPUT</code>: is the input file name of the 3D object, for example <code>input/cube.dat</code>.</li>
-<li><code>OUTPUT</code>: is the output file name of the 2D projections, for example if compiled in normal mode it could be <code>output/cube.pgm</code>, if compiled in binary mode it could be <code>output/cube.dat</code>.</li>
+<li><code>[OUTPUT]</code>: is the output file name of the 2D projections, for example if compiled in normal mode it could be <code>output/Cube.pgm</code>, <code>/dev/null</code> can be used if you want to specify the y planes without creating an output file, for testing purposes.</li>
+<li><code>[Y_PLANES]</code>: is the y axis slice size considered in the computation, that can be specified a priori, the default value is 100.</li>
 </ul>
 <blockquote class="doxtable">
 <p>&zwj;[!TIP] Compile with: <code>make omp</code>. </p>
@@ -150,10 +151,11 @@ CPU Siddon's Projection</h2>
 NVIDIA GPU Siddon's Projection</h2>
 <p>The source file <code><a class="el" href="cuda-projection_8cu.html" title="A CUDA implementation of the Siddon&#39;s projection algorithm.">cuda-projection.cu</a></code> contains an CUDA parallel implementation of the Siddon's projection algorithm.</p>
 <p>Usage:</p>
-<div class="fragment"><div class="line">./build/bin/cuda-projection INPUT OUTPUT</div>
+<div class="fragment"><div class="line">./build/bin/cuda-projection INPUT [OUTPUT] [Y_PLANES]</div>
 </div><!-- fragment --><p>Where:</p><ul>
-<li><code>INPUT</code>: is the input file name of the 3D object, for example <code>input/cube.dat</code>.</li>
-<li><code>OUTPUT</code>: is the output file name of the 2D projections, for example if compiled in normal mode it could be <code>output/cube.pgm</code>, if compiled in binary mode it could be <code>output/cube.dat</code>.</li>
+<li><code>INPUT</code>: is the input file name of the 3D object, for example <code>input/Cube.dat</code>.</li>
+<li><code>[OUTPUT]</code>: is the output file name of the 2D projections, for example if compiled in normal mode it could be <code>output/Cube.pgm</code>, <code>/dev/null</code> can be used if you want to specify the y planes without creating an output file, for testing purposes.</li>
+<li><code>[Y_PLANES]</code>: is the y axis slice size considered in the computation, that can be specified a priori, the default value is dynamically calculated depending on the GPU's available RAM.</li>
 </ul>
 <blockquote class="doxtable">
 <p>&zwj;[!TIP] Compile with: <code>make cuda</code>. To compile CUDA sources in DEBUG mode run: <code>make cuda DEBUG=yes</code>. </p>
