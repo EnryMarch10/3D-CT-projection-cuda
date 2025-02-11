@@ -88,15 +88,15 @@ $(DIR_BIN)/%: $(DIR_OBJ)/%.o
 	@mkdir -p $(DIR_BIN)
 	$(CC) $(LFLAGS) $^ -o $@ $(LDLIBS)
 
-$(DIR_OBJ)/%.o: %.c hpc.h
+$(DIR_OBJ)/%.o: %.c common.h hpc.h
 	@mkdir -p $(DIR_OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # CUDA
 
-$(DIR_BIN)/%: %.cu
+$(DIR_BIN)/%: %.cu common.h hpc.h
 	@mkdir -p $(DIR_BIN)
-	$(NVCC) $(NVCFLAGS) $^ -o $@
+	$(NVCC) $(NVCFLAGS) $< -o $@
 
 # INPUT
 
@@ -104,9 +104,9 @@ $(DIR_BIN)/$(EXE_INPUT): $(DIR_OBJ)/$(EXE_INPUT).o
 	@mkdir -p $(DIR_BIN)
 	$(CC) $(LFLAGS) $^ -o $@ $(LDLIBS)
 
-$(DIR_OBJ)/$(EXE_INPUT).o: $(EXE_INPUT).c
+$(DIR_OBJ)/$(EXE_INPUT).o: $(EXE_INPUT).c common.h
 	@mkdir -p $(DIR_OBJ)
-	$(CC) $(CFLAGS) -c $^ -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	-\rm -f $(addprefix $(DIR_OBJ)/, $(addsuffix .o, $(EXE))) $(addprefix $(DIR_BIN)/, $(EXE))

@@ -17,6 +17,7 @@ var omp_projection_8c =
     [ "getZPlane", "omp-projection_8c.html#a5543176b9f6cb0cf343a5ac1222f105c", null ],
     [ "initEnvironment", "omp-projection_8c.html#ad58db6a8edea29ce6a98ac12873a90aa", null ],
     [ "initTables", "omp-projection_8c.html#a404414c4a397f8882bd70fe49d8d321e", null ],
+    [ "max", "omp-projection_8c.html#af082905f7eac6d03e92015146bbc1925", null ],
     [ "merge", "omp-projection_8c.html#af9298b6d30c4c2dd6463bbb435a18863", null ],
     [ "merge3", "omp-projection_8c.html#a8cf884d6fd46566644a22199397575d1", null ],
     [ "min", "omp-projection_8c.html#abd8bbcfabb3ddef2ccaafb9928a37b95", null ],

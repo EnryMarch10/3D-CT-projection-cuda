@@ -43,7 +43,7 @@
 #include "hpc.h"
 #include "common.h"
 
-unsigned short OBJ_BUFFER = 100;
+unsigned short yVoxels = 100;
 
 unsigned short gl_pixelDim;
 unsigned short gl_angularTrajectory;
@@ -86,6 +86,18 @@ void initTables(double *const sinTable, double *const cosTable, const unsigned s
 int min(int a, int b)
 {
     return a < b ? a : b;
+}
+
+/**
+ * @brief Computes the maximum value between `a` and `b`.
+ *
+ * @param a The first value.
+ * @param b The second value.
+ * @return The maximum between `a` and `b`.
+ */
+int max(int a, int b)
+{
+    return a > b ? a : b;
 }
 
 /**
@@ -422,7 +434,7 @@ void getSidesXPlanes(double *const planes)
 void getSidesYPlanes(double *const planes, const unsigned short slice)
 {
     planes[0] = getYPlane(slice);
-    planes[1] = getYPlane(min(gl_nPlanes[Y] - 1, OBJ_BUFFER + slice));
+    planes[1] = getYPlane(min(gl_nPlanes[Y] - 1, yVoxels + slice));
 }
 
 /**
@@ -460,7 +472,7 @@ double computeAbsorption(const unsigned short slice, const Point source, const P
         for (unsigned short i = 0; i < lenA - 1; i++) {
             const double aMid = (a[i + 1] + a[i]) / 2;
             const unsigned short x = min((source.x + aMid * deltaX - getXPlane(0)) / gl_voxelXDim, gl_nVoxel[X] - 1);
-            const unsigned short y = min3((source.y + aMid * deltaY - getYPlane(slice)) / gl_voxelYDim, gl_nVoxel[Y] - 1, OBJ_BUFFER - 1);
+            const unsigned short y = min3((source.y + aMid * deltaY - getYPlane(slice)) / gl_voxelYDim, gl_nVoxel[Y] - 1, yVoxels - 1);
             const unsigned short z = min((source.z + aMid * deltaZ - getZPlane(0)) / gl_voxelZDim, gl_nVoxel[Z] - 1);
 
             // In a 3D matrix it would be: f[x][z][y]
@@ -496,10 +508,6 @@ void computeProjections(const unsigned short slice, double *f, double *g, double
         for (unsigned r = 0; r < nSidePixels; r++) {
             for (unsigned c = 0; c < nSidePixels; c++) {
                 double a[3][2];
-                double aMerged[gl_nPlanes[X] + gl_nPlanes[Y] + gl_nPlanes[Z]];
-                double aX[gl_nPlanes[X]];
-                double aY[gl_nPlanes[Y]];
-                double aZ[gl_nPlanes[Z]];
 
                 // Gets the pixel's center cartesian coordinates
                 const Point pixel = getPixel(gl_sinTable, gl_cosTable, r, c, positionIndex);
@@ -532,25 +540,20 @@ void computeProjections(const unsigned short slice, double *f, double *g, double
                     indices[Z] = getRangeOfIndex(source.z, pixel.z, isParallel, aMin, aMax, Z);
 
                     // Computes lengths of the arrays containing parametric value of the intersection with each set of parallel planes
-                    int lenX = indices[X].maxIndx - indices[X].minIndx;
-                    int lenY = indices[Y].maxIndx - indices[Y].minIndx;
-                    int lenZ = indices[Z].maxIndx - indices[Z].minIndx;
-                    if (lenX < 0) {
-                        lenX = 0;
-                    }
-                    if (lenY < 0) {
-                        lenY = 0;
-                    }
-                    if (lenZ < 0) {
-                        lenZ = 0;
-                    }
+                    const unsigned short lenX = max(0, indices[X].maxIndx - indices[X].minIndx);
+                    const unsigned short lenY = max(0, indices[Y].maxIndx - indices[Y].minIndx);
+                    const unsigned short lenZ = max(0, indices[Z].maxIndx - indices[Z].minIndx);
 
                     // Computes ray-planes intersection Nx + Ny + Nz
+                    double aX[gl_nPlanes[X]];
+                    double aY[gl_nPlanes[Y]];
+                    double aZ[gl_nPlanes[Z]];
                     getAllIntersections(source.x, pixel.x, indices[X], aX, X);
                     getAllIntersections(source.y, pixel.y, indices[Y], aY, Y);
                     getAllIntersections(source.z, pixel.z, indices[Z], aZ, Z);
 
                     // Computes segments Nx + Ny + Nz
+                    double aMerged[gl_nPlanes[X] + gl_nPlanes[Y] + gl_nPlanes[Z]];
                     const unsigned short lenA = merge3(aX, aY, aZ, lenX, lenY, lenZ, aMerged);
 
                     // Associates each segment to the respective voxel Nx + Ny + Nz
@@ -651,10 +654,10 @@ int readSetUP(FILE *filePointer)
 int main(int argc, char *argv[])
 {
     if (argc < 2 || argc > 4) {
-        fprintf(stderr, "Usage: %s INPUT [OUTPUT] [Y_PLANES]\n"
+        fprintf(stderr, "Usage: %s INPUT [OUTPUT] [Y_MAX_VOXELS]\n"
                         "- INPUT: The first parameter is the name of the input file.\n"
                         "- [OUTPUT]: The second parameter is the name of a .pgm file to store the output at.\n"
-                        "- [Y_PLANES]: The third parameter is the maximum number of planes considered in the Y axis for each iteration.\n",
+                        "- [Y_MAX_VOXELS]: The third parameter is the maximum number of voxels considered in the Y axis for each iteration.\n",
                         argv[0]);
         return EXIT_FAILURE;
     }
@@ -669,14 +672,16 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Unable to open file '%s'!\n", inputFileName);
         return EXIT_FAILURE;
     }
-    if (argc > 3) {
-        OBJ_BUFFER = atoi(argv[3]);
-        assert(OBJ_BUFFER > 0);
-    }
 
     if (readSetUP(inputFilePointer) == EXIT_FAILURE) {
         fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
         return EXIT_FAILURE;
+    }
+    if (argc > 3) {
+        const int yMaxVoxels = atoi(argv[3]);
+        yVoxels = min(gl_nVoxel[Y], max(yMaxVoxels, 1));
+    } else {
+        yVoxels = min(gl_nVoxel[Y], yVoxels);
     }
     double partialTime = hpc_gettime();
     // Number of angular positions
@@ -684,7 +689,7 @@ int main(int argc, char *argv[])
     const unsigned nSidePixels = gl_detectorSideLength / gl_pixelDim;
     initEnvironment(nTheta);
     // Array containing the coefficients of each voxel
-    double *const f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * OBJ_BUFFER * gl_nVoxel[Z]);
+    double *const f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * yVoxels * gl_nVoxel[Z]);
     // Array containing the computed attenuation detected in each pixel of the detector
     double *const g = (double *) calloc(nSidePixels * nSidePixels * nTheta, sizeof(double));
     // double *const g = (double *) malloc(sizeof(double) * nSidePixels * nSidePixels * nTheta);
@@ -693,17 +698,17 @@ int main(int argc, char *argv[])
     double totalTime = hpc_gettime() - partialTime;
 
     // Iterates over object subsection
-    for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
+    for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += yVoxels) {
         unsigned short nOfSlices;
 
-        if (gl_nVoxel[Y] - slice < OBJ_BUFFER) {
+        if (gl_nVoxel[Y] - slice < yVoxels) {
             nOfSlices = gl_nVoxel[Y] - slice;
         } else {
-            nOfSlices = OBJ_BUFFER;
+            nOfSlices = yVoxels;
         }
 
         // Read voxels coefficients
-        if (!fread(f, sizeof(double), (size_t) gl_nVoxel[X] * gl_nVoxel[Z] * nOfSlices, inputFilePointer)) {
+        if (!fread(f, sizeof(double), (size_t) gl_nVoxel[X] * nOfSlices * gl_nVoxel[Z], inputFilePointer)) {
             fprintf(stderr, "Unable to read from file '%s'!\n", inputFileName);
             free(f);
             free(g);

@@ -77,14 +77,14 @@ __constant__ unsigned short d_nPlanes[3];
 __constant__ double d_gl_sinTable[MAX_TABLES_SIZE];
 __constant__ double d_gl_cosTable[MAX_TABLES_SIZE];
 
-__device__ unsigned short d_OBJ_BUFFER;
+__device__ unsigned short d_yVoxels;
 
 __device__ double d_gMin;
 __device__ double d_gMax;
 
 /************************************************* HOST *************************************************/
 
-unsigned short OBJ_BUFFER = 0;
+unsigned short yVoxels = 0;
 
 unsigned short gl_pixelDim;
 unsigned short gl_angularTrajectory;
@@ -455,7 +455,7 @@ __device__ void getSidesXPlanes(double *const planes)
 __device__ void getSidesYPlanes(double *const planes, const unsigned short slice)
 {
     planes[0] = getYPlane(slice);
-    planes[1] = getYPlane(min(d_nPlanes[Y] - 1, d_OBJ_BUFFER + slice));
+    planes[1] = getYPlane(min(d_nPlanes[Y] - 1, d_yVoxels + slice));
 }
 
 /**
@@ -495,7 +495,7 @@ __device__ double computeAbsorption(const unsigned short slice, const Point sour
         for (unsigned short i = 0; i < lenA - 1; i++) {
             const double aMid = (a[i + 1] + a[i]) / 2;
             const unsigned short x = min((int) ((source.x + aMid * deltaX - getXPlane(0)) / d_voxelXDim), d_nVoxel[X] - 1);
-            const unsigned short y = min((int) ((source.y + aMid * deltaY - getYPlane(slice)) / d_voxelYDim), min(d_nVoxel[Y] - 1, d_OBJ_BUFFER - 1));
+            const unsigned short y = min((int) ((source.y + aMid * deltaY - getYPlane(slice)) / d_voxelYDim), min(d_nVoxel[Y] - 1, d_yVoxels - 1));
             const unsigned short z = min((int) ((source.z + aMid * deltaZ - getZPlane(0)) / d_voxelZDim), d_nVoxel[Z] - 1);
 
             // In a 3D matrix it would be: f[x][z][y]
@@ -566,14 +566,12 @@ __global__ void computeProjections(const unsigned short slice, const unsigned sh
 
     if (r < nSidePixels && c < nSidePixels) {
         double a[3][2];
-        assert(d_nPlanes[X] + d_nPlanes[Y] + d_nPlanes[Z] <= MAX_PLANES_x3);
-        assert(d_nPlanes[X] <= MAX_PLANES);
-        assert(d_nPlanes[Y] <= MAX_PLANES);
-        assert(d_nPlanes[Z] <= MAX_PLANES);
-        double aMerged[MAX_PLANES_x3];
-        double aX[MAX_PLANES];
-        double aY[MAX_PLANES];
-        double aZ[MAX_PLANES];
+
+        if (isFirst) {
+            for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+                g[positionIndex * nSidePixels * nSidePixels + r * nSidePixels + c] = 0.0;
+            }
+        }
         // Iterates over each source
         for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
             const Point source = getSource(d_gl_sinTable, d_gl_cosTable, positionIndex);
@@ -601,10 +599,6 @@ __global__ void computeProjections(const unsigned short slice, const unsigned sh
             aMin = getAMin(a, isParallel);
             aMax = getAMax(a, isParallel);
 
-            const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + r * nSidePixels + c;
-            if (isFirst) {
-                g[pixelIndex] = 0.0;
-            }
             if (aMin < aMax) {
                 // Computes Min-Max plane indexes
                 Ranges indices[3];
@@ -618,14 +612,19 @@ __global__ void computeProjections(const unsigned short slice, const unsigned sh
                 const unsigned short lenZ = max(0, indices[Z].maxIndx - indices[Z].minIndx);
 
                 // Computes ray-planes intersection Nx + Ny + Nz
+                double aX[MAX_PLANES];
+                double aY[MAX_PLANES];
+                double aZ[MAX_PLANES];
                 getAllIntersections(source.x, pixel.x, indices[X], aX, X);
                 getAllIntersections(source.y, pixel.y, indices[Y], aY, Y);
                 getAllIntersections(source.z, pixel.z, indices[Z], aZ, Z);
 
                 // Computes segments Nx + Ny + Nz
+                double aMerged[MAX_PLANES_x3];
                 const unsigned short lenA = merge3(aX, aY, aZ, lenX, lenY, lenZ, aMerged);
 
                 // Associates each segment to the respective voxel Nx + Ny + Nz
+                const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + r * nSidePixels + c;
                 g[pixelIndex] += computeAbsorption(slice, source, pixel, aMerged, lenA, f);
                 l_gMins[l_index] = fmin(l_gMins[l_index], g[pixelIndex]);
                 l_gMaxs[l_index] = fmax(l_gMaxs[l_index], g[pixelIndex]);
@@ -744,7 +743,7 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, c
 
     cudaSafeCall(cudaMalloc((void **) &d_g, sizeG));
 
-    if (!OBJ_BUFFER) {
+    if (!yVoxels) {
         size_t freeMem, totalMem;
         cudaMemGetInfo(&freeMem, &totalMem);
         // At least 1 GB of estimated free global memory are necessary for the kernel execution in a 8 GB RAM GPU
@@ -767,14 +766,14 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, c
             }
             size = sizeof(double) * gl_nVoxel[X] * voxelsY * gl_nVoxel[Z];
         }
-        OBJ_BUFFER = voxelsY;
+        yVoxels = voxelsY;
         *sizeF = size;
     } else {
-        *sizeF = sizeof(double) * gl_nVoxel[X] * OBJ_BUFFER * gl_nVoxel[Z];
+        *sizeF = sizeof(double) * gl_nVoxel[X] * yVoxels * gl_nVoxel[Z];
     }
 
     cudaSafeCall(cudaMalloc((void **) &d_f, *sizeF));
-    cudaSafeCall(cudaMemcpyToSymbol(d_OBJ_BUFFER, &OBJ_BUFFER, sizeof(d_OBJ_BUFFER)));
+    cudaSafeCall(cudaMemcpyToSymbol(d_yVoxels, &yVoxels, sizeof(d_yVoxels)));
 #ifdef DEBUG
     printSizeMaxGB("f", *sizeF, "GLOBAL");
     printSizeMaxGB("g", sizeG, "GLOBAL");
@@ -871,10 +870,10 @@ int readSetUP(FILE *const filePointer)
 int main(int argc, char *argv[])
 {
     if (argc < 2 || argc > 4) {
-        fprintf(stderr, "Usage: %s INPUT [OUTPUT] [Y_PLANES]\n"
+        fprintf(stderr, "Usage: %s INPUT [OUTPUT] [Y_MAX_VOXELS]\n"
                         "- INPUT: The first parameter is the name of the input file.\n"
                         "- [OUTPUT]: The second parameter is the name of a .pgm file to store the output at.\n"
-                        "- [Y_PLANES]: The third parameter is the maximum number of planes considered in the Y axis for each iteration.\n",
+                        "- [Y_MAX_VOXELS]: The third parameter is the maximum number of voxels considered in the Y axis for each iteration.\n",
                         argv[0]);
         return EXIT_FAILURE;
     }
@@ -882,10 +881,6 @@ int main(int argc, char *argv[])
     const char *outputFileName = NULL;
     if (argc > 2) {
         outputFileName = argv[2];
-    }
-    if (argc > 3) {
-        OBJ_BUFFER = atoi(argv[3]);
-        assert(OBJ_BUFFER > 0);
     }
 
     FILE *const inputFilePointer = fopen(inputFileName, "rb");
@@ -901,6 +896,10 @@ int main(int argc, char *argv[])
     if (gl_nPlanes[X] > MAX_PLANES || gl_nPlanes[Y] > MAX_PLANES || gl_nPlanes[Z] > MAX_PLANES) {
         fprintf(stderr, "The maximum number of planes per axis is %u planes!\n", MAX_PLANES);
         return EXIT_FAILURE;
+    }
+    if (argc > 3) {
+        const int yMaxVoxels = atoi(argv[3]);
+        yVoxels = min(gl_nVoxel[Y], max(yVoxels, 1));
     }
     // Number of angular positions
     double partialTime = hpc_gettime();
@@ -921,13 +920,13 @@ int main(int argc, char *argv[])
     double totalTime = hpc_gettime() - partialTime;
 
     // Iterates over object subsections
-    for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
+    for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += yVoxels) {
         unsigned short nOfSlices;
 
-        if (gl_nVoxel[Y] - slice < OBJ_BUFFER) {
+        if (gl_nVoxel[Y] - slice < yVoxels) {
             nOfSlices = gl_nVoxel[Y] - slice;
         } else {
-            nOfSlices = OBJ_BUFFER;
+            nOfSlices = yVoxels;
         }
 
         // Read voxels coefficients
