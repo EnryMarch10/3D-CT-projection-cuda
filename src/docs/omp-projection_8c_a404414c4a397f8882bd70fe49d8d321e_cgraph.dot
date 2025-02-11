@@ -70,9 +70,12 @@ digraph "initTables"
   Node18 [id="Node000018",label="getSource",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#a35b227d2c53e8ecd95c97ccdea905846",tooltip="Retrieves the cartesian coordinates of the source."];
   Node18 -> Node2 [id="edge46_Node000018_Node000002",color="steelblue1",style="solid",tooltip=" "];
   Node2 -> Node19 [id="edge47_Node000002_Node000019",color="steelblue1",style="solid",tooltip=" "];
-  Node19 [id="Node000019",label="merge3",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#a8cf884d6fd46566644a22199397575d1",tooltip="Merges three sorted arrays into one single sorted array."];
+  Node19 [id="Node000019",label="max",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#af082905f7eac6d03e92015146bbc1925",tooltip="Computes the maximum value between a and b."];
   Node19 -> Node2 [id="edge48_Node000019_Node000002",color="steelblue1",style="solid",tooltip=" "];
-  Node19 -> Node20 [id="edge49_Node000019_Node000020",color="steelblue1",style="solid",tooltip=" "];
-  Node20 [id="Node000020",label="merge",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#af9298b6d30c4c2dd6463bbb435a18863",tooltip="Merges two sorted arrays into one single sorted array."];
+  Node2 -> Node20 [id="edge49_Node000002_Node000020",color="steelblue1",style="solid",tooltip=" "];
+  Node20 [id="Node000020",label="merge3",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#a8cf884d6fd46566644a22199397575d1",tooltip="Merges three sorted arrays into one single sorted array."];
   Node20 -> Node2 [id="edge50_Node000020_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node20 -> Node21 [id="edge51_Node000020_Node000021",color="steelblue1",style="solid",tooltip=" "];
+  Node21 [id="Node000021",label="merge",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$omp-projection_8c.html#af9298b6d30c4c2dd6463bbb435a18863",tooltip="Merges two sorted arrays into one single sorted array."];
+  Node21 -> Node2 [id="edge52_Node000021_Node000002",color="steelblue1",style="solid",tooltip=" "];
 }

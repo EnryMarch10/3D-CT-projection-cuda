@@ -63,7 +63,7 @@
 #include "common.h"
 
 /// Limits the number of voxels along the y axis computed per time
-#define OBJ_BUFFER 100u
+#define Y_VOXELS 100
 /// N pixels along each side of the detector
 #define N_PIXEL_ALONG_SIDE (DETECTOR_SIDE_LENGTH / PIXEL_DIM)
 // #define DEFAULT_WORK_SIZE 2352 // default work size, equals to floor(DETECTOR_SIDE_LENGTH / PIXEL_DIM)
@@ -131,39 +131,6 @@ void generateCubeSlice(double *f, unsigned nOfSlices, unsigned offset, unsigned 
 }
 
 /**
- * @brief Generates a sub-section of a solid spherical object given its diameter.
- *
- * @param f It is the pointer to the array on which to store the sub-section.
- * @param nOfSlices It is the number of voxel along the Y axis.
- * @param offset It is the distance (in number of voxel) of the slices to be generated from the initial slice.
- * @param diameter It is the diameter of the sphere.
- */
-void generateSphereSlice(double *f, unsigned short nOfSlices, unsigned short offset, unsigned diameter)
-{
-    // Iterates over each voxel of the grid
-    // Be careful, with GCC the OpenMP collapse doesn't work if you declare the indexes as unsigned short!!
-#pragma omp parallel for collapse(3) default(none) shared(f, nOfSlices, gl_nVoxel, offset, diameter, gl_objectSideLength, gl_voxelYDim, gl_voxelXDim, gl_voxelZDim)
-    for (unsigned y = 0; y < nOfSlices; y++) {
-        for (unsigned z = 0; z < gl_nVoxel[Z]; z++) {
-            for (unsigned x = 0; x < gl_nVoxel[X]; x++) {
-                Point temp;
-                temp.y = -(double) gl_objectSideLength / 2.0 + gl_voxelYDim / 2.0 + (y + offset) * gl_voxelYDim;
-                temp.x = -(double) gl_objectSideLength / 2.0 + gl_voxelXDim / 2.0 + x * gl_voxelXDim;
-                temp.z = -(double) gl_objectSideLength / 2.0 + gl_voxelZDim / 2.0 + z * gl_voxelZDim;
-                const double distance = sqrt(pow(temp.x, 2) + pow(temp.y, 2) + pow(temp.z, 2));
-                if (distance <= diameter && x < gl_nVoxel[Z] / 2) {
-                    // Voxel position is inside the sphere object
-                    // In a 3D matrix it would be: f[x][z][y]
-                    f[x + (unsigned) z*gl_nVoxel[Z] + (unsigned) y*gl_nVoxel[X]*gl_nVoxel[Z]] = 1.0;
-                } else {
-                    f[x + (unsigned) z*gl_nVoxel[Z] + (unsigned) y*gl_nVoxel[X]*gl_nVoxel[Z]] = 0.0;
-                }
-            }
-        }
-    }
-}
-
-/**
  * @brief Generates a sub-section of a solid cubic object with an internal spherical cavity.
  *
  * @param f It is the pointer to the array on which to store the sub-section.
@@ -198,6 +165,39 @@ void generateCubeWithSphereSlice(double *f, unsigned short nOfSlices, unsigned s
                         // In a 3D matrix it would be: f[x][z][y]
                         f[x + (unsigned) z*gl_nVoxel[Z] + (unsigned) y*gl_nVoxel[X]*gl_nVoxel[Z]] = 1.0;
                     }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @brief Generates a sub-section of a solid spherical object given its diameter.
+ *
+ * @param f It is the pointer to the array on which to store the sub-section.
+ * @param nOfSlices It is the number of voxel along the Y axis.
+ * @param offset It is the distance (in number of voxel) of the slices to be generated from the initial slice.
+ * @param diameter It is the diameter of the sphere.
+ */
+void generateSphereSlice(double *f, unsigned short nOfSlices, unsigned short offset, unsigned diameter)
+{
+    // Iterates over each voxel of the grid
+    // Be careful, with GCC the OpenMP collapse doesn't work if you declare the indexes as unsigned short!!
+#pragma omp parallel for collapse(3) default(none) shared(f, nOfSlices, gl_nVoxel, offset, diameter, gl_objectSideLength, gl_voxelYDim, gl_voxelXDim, gl_voxelZDim)
+    for (unsigned y = 0; y < nOfSlices; y++) {
+        for (unsigned z = 0; z < gl_nVoxel[Z]; z++) {
+            for (unsigned x = 0; x < gl_nVoxel[X]; x++) {
+                Point temp;
+                temp.y = -(double) gl_objectSideLength / 2.0 + gl_voxelYDim / 2.0 + (y + offset) * gl_voxelYDim;
+                temp.x = -(double) gl_objectSideLength / 2.0 + gl_voxelXDim / 2.0 + x * gl_voxelXDim;
+                temp.z = -(double) gl_objectSideLength / 2.0 + gl_voxelZDim / 2.0 + z * gl_voxelZDim;
+                const double distance = sqrt(pow(temp.x, 2) + pow(temp.y, 2) + pow(temp.z, 2));
+                if (distance <= diameter && x < gl_nVoxel[Z] / 2) {
+                    // Voxel position is inside the sphere object
+                    // In a 3D matrix it would be: f[x][z][y]
+                    f[x + (unsigned) z*gl_nVoxel[Z] + (unsigned) y*gl_nVoxel[X]*gl_nVoxel[Z]] = 1.0;
+                } else {
+                    f[x + (unsigned) z*gl_nVoxel[Z] + (unsigned) y*gl_nVoxel[X]*gl_nVoxel[Z]] = 0.0;
                 }
             }
         }
@@ -334,7 +334,7 @@ int main(int argc, char *argv[])
     }
 
     // Array containing the coefficients of each voxel
-    double *f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * OBJ_BUFFER * gl_nVoxel[Z]);
+    double *f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * Y_VOXELS * gl_nVoxel[Z]);
 
     FILE *filePointer = fopen(fileName, "wb");
     if (!filePointer) {
@@ -349,14 +349,14 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    // Iterates over each object subsection which size is limited along the y coordinate by OBJ_BUFFER
-    for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += OBJ_BUFFER) {
+    // Iterates over each object subsection which size is limited along the y coordinate by Y_VOXELS
+    for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += Y_VOXELS) {
         unsigned short nOfSlices;
 
-        if (gl_nVoxel[Y] - slice < OBJ_BUFFER) {
+        if (gl_nVoxel[Y] - slice < Y_VOXELS) {
             nOfSlices = gl_nVoxel[Y] - slice;
         } else {
-            nOfSlices = OBJ_BUFFER;
+            nOfSlices = Y_VOXELS;
         }
 
         // Generates object subsection
