@@ -2,10 +2,9 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[italian]{babel}
+\usepackage[italian, shorthands=off]{babel} % Without shorthands=off, there is interference with hyperref package for footnotes
 \usepackage{times} % Selected font
 \usepackage[table, svgnames]{xcolor} % Colors
-\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
 \usepackage{url} % To put URLs
 \usepackage{xurl} % Avoids URLs to overfull \hbox
 \usepackage{float} % For anchor options
@@ -19,37 +18,57 @@
 \usepackage[backend=biber, style=alphabetic, sorting=ydnt]{biblatex} % To include bibliography
 \addbibresource{riferimenti.bib}
 \usepackage{amsmath} % Necessary for \text{} command inside maths notations
-\setlength{\parskip}{0.5em} % Set global paragraph spacing
-\setlength{\parindent}{0pt} % No paragraph indentation
+\usepackage{parskip} % Avoids paragraph indentation and puts spacing instead, better than the following two
+% \setlength{\parskip}{0.5em} % Set global paragraph spacing
+% \setlength{\parindent}{0pt} % No paragraph indentation
 \usepackage{enumitem} % To avoid interline between bullets and text before them
 \setlist[itemize]{topsep=0pt, partopsep=0pt, parsep=0pt}
 \usepackage{tikz} % To draw graphs
 \usetikzlibrary{3d} % For 3D graphs
-\usepackage[figure]{hypcap} % Ensures that references go to the figure, not the caption
-
 \usepackage{listings} % To use listings
 % \usepackage{inconsolata} % Use Inconsolata
 \renewcommand{\lstlistingname}{Listato} % Configurazione italiana del listato
 
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue, pdfborder={0 0 0}, hyperfootnotes=true]{hyperref}
+\usepackage[figure]{hypcap} % Ensures that references go to the figure, not the caption. You must include hyperref first
+
 \definecolor{C_comment_green}{rgb}{0.0, 0.5, 0.0}
-\definecolor{C_types_blue}{RGB}{30, 130, 210}
+\definecolor{C_types_blue}{RGB}{30, 60, 240}
+\definecolor{C_macro_blue}{RGB}{30, 105, 235}
+\definecolor{C_enum_blue}{RGB}{30, 130, 210}
 \definecolor{C_user_types_green}{RGB}{50, 222, 156}
 \definecolor{C_directives_purple}{RGB}{140, 10, 133}
 \definecolor{C_function_amber}{RGB}{200, 180, 20}
 
 \lstdefinelanguage{CStyle}{
-  morekeywords={ % Types and macros
-    unsigned,
-    N_VOXEL_X, N_VOXEL_Y, N_VOXEL_Z
+  morekeywords={ % Keywords
+    static, const,
+    void,
+    double, unsigned, short,
+    sizeof,
+    __global__
   },
   morekeywords=[2]{ % Directives
-    for, if, else, return
+    for, if, else, return, do, while,
+    pragma, omp, parallel, collapse, schedule, dynamic, default, none
   },
   morekeywords=[3]{ % Functions
-    min, max
+    computeProjections, asyncComputeProjections,
+    initEnvironment, termEnvironment,
+    printf, fprintf, fread, getSource, getPixel,
+    malloc, calloc, free,
+    cudaMemGetInfo, cudaMemcpy,
+    exit
   },
   morekeywords=[4]{ % User types
-  Point, Ranges
+    Point, Ranges, size_t,
+    dim3
+  },
+  morekeywords=[5]{ % Macros
+    N_VOXEL_X, N_VOXEL_Y, N_VOXEL_Z, EXIT_FAILURE, BLKDIM_STEP
+  },
+  morekeywords=[6]{ % Enums
+    X, Y, Z, cudaMemcpyHostToDevice
   },
   sensitive=true,
   morecomment=[l]//,
@@ -61,6 +80,8 @@
   keywordstyle=[2]\color{C_directives_purple}\bfseries,
   keywordstyle=[3]\color{C_function_amber}\bfseries,
   keywordstyle=[4]\color{C_user_types_green}\bfseries,
+  keywordstyle=[5]\color{C_macro_blue}\bfseries,
+  keywordstyle=[6]\color{C_enum_blue}\bfseries,
   stringstyle=\color{red},
   identifierstyle=\color{darkgray},
 }
@@ -181,7 +202,7 @@ Gli obiettivi di questo lavoro sono:
 \newpage
 \pagenumbering{arabic}
 
-\chapter{Introduzione}
+\chapter{Introduzione} \label{chap:intro}
 
 Una proiezione è una matrice i cui valori rappresentano l'attenuazione dei raggi X che attraversano il corpo oggetto di studio.
 Considerando un'immagine generata a partire dalla matrice proiezione, i colori rappresentano graficamente i vari livelli di
@@ -323,7 +344,7 @@ dove i parametri \(i\), \(j\) e \(k\) individuano un singolo voxel nello spazio 
 In particolare, considerando una specifica configurazione di \((i, j, k)\), \(l\) rappresenta la lunghezza sottesa in quel
 voxel (equivalente di \(M\)) mentre \(\rho\) rappresenta la densità del voxel (equivalente di \(f\)).
 
-\subsection{La matrice \(M\)}
+\subsection{La matrice \texorpdfstring{\(M\)}{M}}
 
 \begin{figure}[H]
   \centering
@@ -395,7 +416,7 @@ I punti chiave dell'algoritmo, nella determinazione della matrice \(M\), possono
         determinando così la matrice \(M\).
 \end{itemize}
 
-\subsection{Il vettore \(f\)} \label{chap:vector_f}
+\subsection{Il vettore \texorpdfstring{\(f\)}{f}} \label{chap:vector_f}
 
 Il vettore \(f\) rappresenta il coefficiente di attenuazione assunto nella regione interna al volume sotteso da ciascun voxel.
 Presenta dunque un numero di elementi pari al numero di voxel in cui è suddiviso l'oggetto.
@@ -480,7 +501,7 @@ vengono a dirigersi, ruotano in un'orbita circolare in modo da scansionare il co
 
 Quando la sorgente ruota in un senso nelle specifiche posizioni dell'orbita, il rilevatore ruota coerentemente nel senso opposto.
 
-\subsection{Le sorgenti}
+\subsection{Le sorgenti} \label{subsec:sources}
 
 La sorgente è approssimata ad un punto, che indica la posizione a partire dalla quale sono diretti i raggi.
 Le posizioni considerate sono più di una e sono distribuite, nell'implementazione trattata, lungo una traiettoria circolare
@@ -550,7 +571,7 @@ L'equazione degli altri piani a partire dal primo si determina nel seguente modo
 dove \(N_x\), \(N_y\) e \(N_z\) sono il numero di voxel lungo gli assi \(x\), \(y\) e \(z\), mentre \(d_x\), \(d_y\) e \(d_z\)
 sono a loro volta le dimensioni di un singolo voxel lungo i tre assi cartesiani.
 
-\subsection{I rilevatori}
+\subsection{I rilevatori} \label{subsec:pixels}
 
 Nel caso tridimensionale, il rilevatore può essere visto come una matrice di unità di misura, ossia i pixel, posizionata a una
 distanza \(d_r\) dal centro del corpo in esame.
@@ -648,7 +669,8 @@ ottiene:
     \end{tikzpicture}
   }
   \caption{\label{fig:CT_polar_coordinates} Vista goniometrica di un raggio diretto dalla prima sorgente verso il centro del pixel
-           centrale nella matrice che rappresenta il rilevatore.}
+           centrale nel rilevatore. Gli angoli corrispondono esattamente a quelli nell'esempio quando la matrice che costituisce
+           il rilevatore ha un numero di pixel per lato dispari.}
 \end{figure}
 
 Osservando \autoref{fig:CT_polar_coordinates}, dalle formule trigonometriche per i triangoli rettangoli:
@@ -827,7 +849,7 @@ seconda del contesto applicativo, delle caratteristiche hardware e degli obietti
 In generale, l'ottimizzazione può riguardare la riduzione della complessità computazionale, una migliore gestione della memoria,
 l'uso di strutture dati efficienti o l'impiego di tecniche avanzate per minimizzare i tempi di esecuzione.
 
-Tuttavia, quando si passa a implementazioni ottimizzate per architetture specifiche come CPU e GPU, emergono strategie di
+Tuttavia, quando si passa ad implementazioni ottimizzate per architetture specifiche come CPU e GPU, emergono strategie di
 ottimizzazione mirate, che sfruttano le peculiarità di ciascun tipo di hardware.
 
 Nel seguito, ci concentreremo sulle tecniche di parallelizzazione adottate nelle implementazioni su CPU e GPU selezionate,
@@ -889,27 +911,27 @@ A livello CUDA, per lavorare in modo efficiente, si astrae dal funzionamento har
 \textbf{SIMT} (Single Instruction, Multiple Thread), vedi \cite{NVIDIA2008}, che è un'estensione del concetto SIMD (Single
 Instruction, Multiple Data) della tassonomia di Flynn, vedi \cite{Flynn1966}.
 
-In particolare l'hardware delle GPU prevede esecuzione:
+In realtà l'hardware delle GPU prevede esecuzione:
 \begin{itemize}
   \item SIMT: a livello di Warp (unità di schedulazione)
         \begin{itemize}
           \item Le GPU eseguono gruppi di Thread chiamati Warp (tipicamente 32 Thread) che eseguono la stessa istruzione
                 simultaneamente, ma su dati diversi. Questo è il comportamento tipico del paradigma SIMD.
           \item Tuttavia, a differenza di un vero SIMD (dove tutti i dati sono rigidamente legati alla stessa istruzione), i
-                Thread in un warp possono, anche se inefficiente, divergere (ad esempio, con istruzioni condizionali), motivo per
+                Thread in un Warp possono, anche se inefficiente, divergere (ad esempio, con istruzioni condizionali), motivo per
                 cui il modello è chiamato SIMT.
         \end{itemize}
   \item MIMD: a livello di multiprocessore
         \begin{itemize}
-          \item Ogni Streaming Multiprocessor (SM) della GPU può eseguire più warps indipendenti, ognuno con istruzioni diverse.
+          \item Ogni Streaming Multiprocessor (SM) della GPU può eseguire più Warp indipendenti, ognuno con istruzioni diverse.
           \item Questo significa che, considerando l'intera GPU, essa opera in modo MIMD, poiché più SM possono eseguire
                 istruzioni diverse su set di dati diversi.
         \end{itemize}
 \end{itemize}
 
-Il meccanismo di computazione in unità, i Warp, implica che siano le computazioni SIMT che permettono le prestazioni migliori.
-Questo perché le divergenze, istruzioni condizionali nel codice, portano alla serializzazione dell'esecuzione in Thread relativi
-ad un singolo Warp.
+Il meccanismo di computazione basato sulle unità Warp implica che le computazioni SIMT offrano le migliori prestazioni.
+Questo perché le divergenze, ovvero le istruzioni condizionali nel codice, causano la serializzazione dell'esecuzione dei Thread
+all'interno di un singolo Warp.
 
 Caratteristiche principali di CUDA:
 \begin{itemize}
@@ -927,16 +949,18 @@ Queste configurazioni vengono scritte su file.
 La strategia adottata per la scrittura è descritta di seguito.
 
 \begin{lstlisting}[language=CStyle, caption={Codice C per inizializzazione di \(f\) per un cubo.}, label={lst:vector_f_config}]
-  unsigned Nx = N_VOXEL_X, Nz = N_VOXEL_Z, pNy = k;
-  // Dove k <= N_VOXEL_Y
-  for (unsigned y = 0; y < pNy; y++) {
-    for (unsigned z = 0; z < Nz; z++) {
-      for (unsigned x = 0; x < Nx; x++) {
-        f[x + z*Nz + y*Nx*Nz] = 1.0;
-      }
+unsigned Nx = N_VOXEL_X, Nz = N_VOXEL_Z, pNy = k;
+// Dove k <= N_VOXEL_Y
+for (unsigned y = 0; y < pNy; y++) {
+  for (unsigned z = 0; z < Nz; z++) {
+    for (unsigned x = 0; x < Nx; x++) {
+      f[x + z*Nz + y*Nx*Nz] = 1.0;
     }
   }
+}
 \end{lstlisting}
+
+Il \autoref{lst:vector_f_config} mostra l'inizializzazione semplificata di \(f\) per un oggetto cubico denso.
 
 Per comprendere l'indicizzazione è utile considerare che l'elemento nell'array 1D \(f[x + z N_z + y N_x N_z]\), è equivalente a
 quello nella matrice 3D \(\rho[x][z][y]\), in cui \(x\), \(z\) ed \(y\)  sono fissati, rivedi l'\autoref{eq:law_lambert-beer_Siddon}.
@@ -950,30 +974,32 @@ che non dipende dagli altri.
 Si osserva però che la specifica mappatura degli elementi scelta non è l'unica possibile, si sarebbero per esempio potute
 scambiare le varie coordinate tra di loro, invertendone i ruoli, e perciò le relative dipendenze.
 
-Il \autoref{lst:vector_f_config} rappresenta in realtà un'iterazione della scrittura su file.
+Il \autoref{lst:vector_f_config} rappresenta in realtà un'iterazione dell'inizializzazione di \(f\).
 Infatti \lstinline{pNy} non è assegnato a \lstinline{N_VOXELS_Y}, ma a \lstinline{k}.
 Quindi l'array \(f\), limitato nelle dimensioni da \lstinline{pNy}, rappresenta una partizione verticale dell'oggetto cubico di
 interesse e non l'array completo così come considerato nel modello matematico, rivedi la \autoref{fig:CT_reference_plane}.
-Tale partizione avrà numero di voxel sull'asse delle \(y\) pari a \lstinline{k}, dove \lstinline{k <= N_VOXELS_Y}.
-Nella soluzione proposta oltretutto la singola iterazione presentata viene parallelizzata sfruttando OpenMP.
+Tale partizione avrà numero di voxel sull'asse \(y\) pari a \lstinline{k}, dove \lstinline{k <= N_VOXELS_Y}.
+Nella soluzione proposta oltretutto la singola iterazione, simile a quella presentata, viene parallelizzata sfruttando OpenMP.
 
-In questo modo, anche la lettura dell'input può essere fatta per partizioni sul numero totale di voxel nell'asse delle \(y\),
+In questo modo, anche la lettura dell'input può essere fatta per partizioni sul numero totale di voxel nell'asse \(y\),
 cioè \lstinline{N_VOXELS_Y}.
 È essenziale riconoscere che tali partizioni possono assumere dimensioni arbitrarie, senza vincoli reciproci e, in particolare,
 senza necessità di conoscere quella scelta per la scrittura.
 
 Questa strategia di scrittura è essenziale per gestire input di grandi dimensioni.
-In particolare, nel caso di computazione su CPU, è fondamentale considerare la quantità di memoria RAM disponibile sulla scheda
-madre (aspetto che approfondiremo con OpenMP).
-Nel caso di computazione su GPU, invece, vanno prese in considerazione sia la memoria RAM della scheda madre sia quella
-disponibile sulla GPU (aspetto che esamineremo con CUDA).
-Ad esempio, supponiamo di dover analizzare una partizione di lunghezza \lstinline{OBJ_BUFFER}, con la condizione
-\lstinline{OBJ_BUFFER <= N_VOXELS_Y}.
-In questo caso, per quella partizione verranno letti solo \lstinline{N_VOXEL_X *  OBJ_BUFFER * N_VOXEL_Z} valori.
+In particolare, nella computazione su CPU, è fondamentale considerare la quantità di memoria RAM disponibile sulla scheda madre,
+un fattore rilevante nella parallelizzazione con OpenMP.
+Nella computazione su GPU, invece, bisogna tenere conto sia della memoria RAM della scheda madre sia di quella disponibile sulla
+GPU, aspetto cruciale quando si parallelizza con CUDA.
+Ad esempio, supponiamo di dover analizzare una partizione di lunghezza \lstinline{yVoxels}, con la condizione
+\lstinline{yVoxels <= N_VOXELS_Y}.
+In questo caso, per quella partizione verranno letti solo \lstinline{N_VOXEL_X *  yVoxels * N_VOXEL_Z} valori, il che, per input
+di grandi dimensioni, può comportare un notevole risparmio di RAM.
 
 \section{Calcolo proiezioni}
 
-L'algoritmo di calcolo delle proiezioni implementato segue quanto già discusso nell'introduzione:
+L'algoritmo per il calcolo delle proiezioni implementato si basa su quanto discusso nel \autoref{chap:intro}, in particolare tieni
+a mente l'\autoref{eq:law_lambert-beer_discrete}. I passi dell'algoritmo sono i seguenti:
 \begin{enumerate}
   \item il vettore \(f\) dei coefficienti di attenuazione viene letto da file come input del programma;
   \item si calcola il prossimo punto sorgente da analizzare, nel caso in cui siano finiti l'algoritmo termina;
@@ -993,8 +1019,6 @@ L'algoritmo di calcolo delle proiezioni implementato segue quanto già discusso 
         moltiplicata per la lunghezza del segmento considerato, si ritorna quindi al punto 7.
 \end{enumerate}
 
-In \autoref{fig:flowchart} presentato il diagramma di flusso relativo.
-
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{flowchart}
@@ -1002,13 +1026,255 @@ In \autoref{fig:flowchart} presentato il diagramma di flusso relativo.
   \label{fig:flowchart}
 \end{figure}
 
-% \subsection{Implementazione OpenMP}
+In \autoref{fig:flowchart} è presentato il diagramma di flusso relativo ai punti 1-9 dell'algoritmo di calcolo delle proiezioni.
 
-% L'implementazione per CPU proposta sfrutta il parallelismo OpenMP.
+\subsection{Implementazione generale}
 
-% \subsection{Implementazione CUDA}
+\subsubsection{1. Lettura input}
 
-% L'implementazione per GPU NVIDIA proposta sfrutta il parallelismo CUDA.
+\begin{lstlisting}[language=CStyle, caption={Codice C per la lettura di \(f\).}, label={lst:vector_f_read}]
+double *const f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * yVoxels * gl_nVoxel[Z]);
+...
+for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += yVoxels) {
+  unsigned short nOfSlices;
+  if (gl_nVoxel[Y] - slice < yVoxels) {
+    nOfSlices = gl_nVoxel[Y] - slice;
+  } else {
+    nOfSlices = yVoxels;
+  }
+  fread(f, sizeof(double), (size_t) gl_nVoxel[X] * nOfSlices * gl_nVoxel[Z], inputFilePointer);
+  ...
+  computeProjections(...);
+}
+\end{lstlisting}
+
+Il \autoref{lst:vector_f_read} mostra la gestione dell'array \(f\), che può costituire l'intero insieme di voxel o un suo
+sottoinsieme.
+La lettura dei dati viene quindi fatta considerando \lstinline{nOfSlices} voxel alla volta sull'asse \(y\), dove
+\lstinline{yVoxels} è il numero di voxel considerati in una singola iterazione sull'asse \(y\).
+Nella funzione \lstinline{computeProjections} sono sviluppati tutti i calcoli necessari per ottenere le proiezione.
+Tutti i passi descritti successivamente sono svolti all'interno di tale funzione.
+
+\subsubsection{2. Individuazione della prossima sorgente}
+
+\begin{lstlisting}[language=CStyle, caption={Codice C per l'individuazione di un punto sorgente.}, label={lst:S_point}]
+for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+  const Point source = getSource(gl_sinTable, gl_cosTable, positionIndex);
+  ... // Calcolo di ogni pixel del rilevatore
+}
+\end{lstlisting}
+
+Il \autoref{lst:S_point} mostra come avviene il calcolo di ogni punto sorgente in base all'angolo di rotazione.
+Il calcolo di ogni punto sorgente è ripetuto per ogni partizione considerata.
+I dettagli della funzione \lstinline{getSource} non sono mostrati, il calcolo è lo stesso già presentato nella
+\autoref{subsec:sources}.
+
+\subsubsection{3. Individuazione del prossimo pixel del rilevatore}
+
+\begin{lstlisting}[language=CStyle, caption={Codice C per l'individuazione di un pixel del rilevatore.}, label={lst:D_point}]
+... // Per ogni sorgente
+for (unsigned r = 0; r < nSidePixels; r++) {
+  for (unsigned c = 0; c < nSidePixels; c++) {
+    ...
+    const Point pixel = getPixel(gl_sinTable, gl_cosTable, r, c, positionIndex);
+    ... // Calcolo dell'assorbimento per il pixel considerato
+  }
+}
+\end{lstlisting}
+
+Il \autoref{lst:D_point} mostra come avviene il calcolo di ogni punto centrale di un pixel del rilevatore in base all'angolo di
+rotazione.
+I dettagli della funzione \lstinline{getPixel} non sono mostrati, il calcolo è lo stesso già presentato nella
+\autoref{subsec:pixels}.
+
+\subsubsection{4-9. Computazioni successive}
+
+Le computazioni seguenti sono eseguite facendo riferimento all'algoritmo di Siddon \cite{Siddon1984}.
+
+\subsection{Implementazione OpenMP}
+
+L'implementazione per CPU proposta sfrutta il parallelismo OpenMP.
+
+Il calcolo della soluzione, per motivi legati all'utilizzo di memoria RAM, viene fatto in partizioni, considerando di default un
+numero massimo di \lstinline{100} voxel sull'asse \(y\).
+
+Nella rielaborazione dell'implementazione di partenza è stata introdotta la possibilità di specificare il numero massimo di voxel
+quando si lancia il programma da linea di comando, ignorando quindi il valore di default.
+
+\subsubsection{Parallelizzazione}
+
+In questo contesto, nonostante alcune modifiche, il modello di parallelizzazione è stato mantenuto invariato rispetto a quello del
+codice originale.
+
+\begin{lstlisting}[language=CStyle, caption={Codice C per il calcolo dell'assorbimento di un determinato pixel del rilevatore.}, label={lst:omp_D_point}]
+... // Per ogni sorgente
+#pragma omp parallel for collapse(2) schedule(dynamic) ...
+for (unsigned r = 0; r < nSidePixels; r++) {
+  for (unsigned c = 0; c < nSidePixels; c++) {
+    ... // Calcolo dell'assorbimento per il pixel considerato
+  }
+}
+\end{lstlisting}
+
+Il \autoref{lst:omp_D_point} mostra le direttive OpenMP usate per parallelizzare il codice presentato nel \autoref{lst:D_point}.
+Ogni processo OpenMP determina la posizione di un pixel del rilevatore e procede al calcolo dell'attenuazione che si verifica
+quando il raggio attraversa la partizione dell'oggetto in esame.
+La parallelizzazione viene eseguita considerando un carico di lavoro molto sbilanciato tra i diversi processi.
+Infatti il numero di computazioni necessarie, per ogni raggio relativo ad una sorgente, potrebbe portare ad un carico di lavoro
+molto disomogeneo.
+
+È stata mantenuta la stessa versione di partenza che adottava un partizionamento a grana fine seguendo il paradigma master-worker,
+in cui:
+\begin{itemize}
+  \item Partizionamento a grana fine: si riferisce a una suddivisione del lavoro in compiti molto piccoli, assegnati ai vari
+        processi per massimizzare il parallelismo e bilanciare il carico.
+        Nel nostro caso l'unità di parallelizzazione è il singolo valore fissato di \lstinline{r} e \lstinline{c}.
+  \item Paradigma master-worker: è un modello di programmazione parallela in cui un processo master si occupa di assegnare i
+        compiti ai processi worker.
+        I worker eseguono i compiti assegnati e, una volta completato un task, passano immediatamente al successivo disponibile,
+        seguendo l'ordine di completamento.
+        Questo approccio consente una distribuzione dinamica ed efficiente del carico di lavoro, ottimizzando l'utilizzo delle
+        risorse computazionali.
+\end{itemize}
+
+\subsection{Implementazione CUDA}
+
+L'implementazione per GPU NVIDIA proposta sfrutta il parallelismo CUDA.
+
+Analogamente alla versione OpenMP, la soluzione viene calcolata per partizioni, al fine di ottimizzare l'uso della memoria RAM.
+Tuttavia, in questo caso, il numero massimo di voxel lungo l'asse \(y\) viene determinato dinamicamente mediante un algoritmo
+euristico.
+Questo algoritmo stima rapidamente la memoria occupata sulla GPU, fornendo un valore approssimativo che potrebbe non essere
+necessariamente ottimale.
+
+\begin{lstlisting}[language=CStyle, caption={Codice CUDA-C per il calcolo del numero massimo di voxel sull'asse \(y\).}, label={lst:cuda_y_max}]
+size_t freeMem, totalMem;
+cudaMemGetInfo(&freeMem, &totalMem);
+freeMem -= (totalMem * 2 / 8);
+unsigned tmp = gl_nVoxel[Y];
+size_t size = sizeof(double) * gl_nVoxel[X] * tmp * gl_nVoxel[Z];
+while (size > freeMem) {
+  tmp = tmp * 5 / 8;
+  if (tmp == 0) {
+    fprintf(stderr,
+      "The voxels Y size is too small respect to the other sizes:\n"
+      "- N voxels X: %u.\n"
+      "- N voxels Y: %u.\n"
+      "- N voxels Z: %u.\n"
+      "Total size reduced to the minimum possible is %lu Bytes!\n"
+      "This is too much for this GPU with %lu Bytes of usable "
+      "global memory (of %lu Bytes total)!\n",
+      gl_nVoxel[X], gl_nVoxel[Y], gl_nVoxel[Z],
+      size, freeMem, totalMem);
+    termEnvironment();
+    exit(EXIT_FAILURE);
+  }
+  size = sizeof(double) * gl_nVoxel[X] * tmp * gl_nVoxel[Z];
+}
+yVoxels = tmp;
+\end{lstlisting}
+
+Il \autoref{lst:cuda_y_max} mostra il funzionamento dell'algoritmo per il calcolo del numero massimo di voxel sull'asse \(y\) per
+ogni partizione dell'input da considerare.
+Dopo la sua individuazione il valore calcolato è assegnato a \lstinline{yVoxels}.
+
+Anche in questo caso è stata introdotta la possibilità di specificare il numero massimo di voxel quando si lancia il programma da
+linea di comando, ignorando quindi il valore generato dall'algoritmo euristico che agisce normalmente.
+
+\subsubsection{Parallelizzazione}
+
+Nelle discussioni seguenti, il termine `esecuzione sull'host' si riferirà all'esecuzione di codice seriale sulla CPU, mentre
+`esecuzione sul device' indicherà l'esecuzione di codice parallelo sulla GPU.
+
+\begin{lstlisting}[language=CStyle, caption={Codice CUDA-C per la lettura di \(f\).}, label={lst:cuda_vector_f_read}]
+double *const f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * yVoxels * gl_nVoxel[Z]);
+...
+for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += yVoxels) {
+  unsigned short nOfSlices;
+  if (gl_nVoxel[Y] - slice < yVoxels) {
+    nOfSlices = gl_nVoxel[Y] - slice;
+  } else {
+    nOfSlices = yVoxels;
+  }
+  fread(f, sizeof(double), (size_t) gl_nVoxel[X] * nOfSlices * gl_nVoxel[Z], inputFilePointer);
+  ...
+  asyncComputeProjections(...);
+}
+\end{lstlisting}
+
+Il \autoref{lst:cuda_vector_f_read}, equivalente del \autoref{lst:vector_f_read}, mostra come viene svolta la computazione
+considerando partizioni dell'input.
+
+In questo caso, a differenza di OpenMP, la funzione \lstinline{computeProjections} non viene invocata direttamente, bensì viene
+chiamata un'altra funzione, \lstinline{asyncComputeProjections}.
+Questa scelta è motivata dalla necessità di garantire coerenza con il tipo di computazione eseguita al suo interno.
+
+Si noti che il prefisso \lstinline{async} nella funzione \lstinline{asyncComputeProjections}, chiamata dall'host, indica che
+l'esecuzione avviene in modo asincrono.
+Così si permette alla CPU di leggere simultaneamente la prossima partizione dell'input, introducendo un ulteriore livello di
+parallelismo tra le operazioni.
+
+Tale meccanismo è reso possibile dalla separazione tra la memoria RAM della CPU e quella della GPU.
+Di conseguenza, una volta copiati i dati di input nella RAM della GPU, la CPU può immediatamente sovrascrivere il buffer
+contenente la partizione appena trasferita, subito dopo aver avviato il kernel in modalità asincrona.
+Inoltre, nel caso in cui non ci siano più dati da essere letti allora il buffer di lettura può essere deallocato, in tal caso
+l'host, inevitabilmente, attenderà il completamento del kernel per poter leggere i risultati ottenuti.
+
+Questo approccio ha un impatto significativo sulla misurazione dei tempi di esecuzione: se il numero di iterazioni è elevato e la
+durata dell'esecuzione del kernel non è inferiore a quella della lettura dell'input da file, è come se dal tempo totale di
+esecuzione dei vari kernel (escluso l'ultimo) venisse sottratto il tempo di lettura da file.
+In pratica, ciò si traduce in una riduzione complessiva dei tempi di esecuzione.
+
+\begin{lstlisting}[language=CStyle, caption={Codice CUDA-C per il lancio del kernel.}, label={lst:cuda_launch_kernel}]
+void asyncComputeProjections(...)
+{
+  // Copio f dalla CPU nell'array corrispondente d_f sulla GPU
+  cudaMemcpy(d_f, f, sizeF, cudaMemcpyHostToDevice);
+  // Le dimensioni di griglia e blocco sono sempre le stesse
+  static dim3 block(BLKDIM_STEP, BLKDIM_STEP);
+  static dim3 grid((nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP, (nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP);
+  // Lancio il kernel in modo asincrono
+  computeProjections<<<grid, block>>>(slice, nTheta, nSidePixels, d_f, d_g, isFirst);
+}
+\end{lstlisting}
+
+Il \autoref{lst:cuda_launch_kernel} mostra l'inizializzazione del kernel CUDA.
+Il kernel \lstinline{computeProjections}, che si occupa del calcolo delle proiezioni, non è più eseguito nell'host,
+ma nel device.
+Quindi l'esecuzione dei passi 2-9 dell'algoritmo considerato, cioè del kernel, avviene in parallelo sul device.
+
+\begin{lstlisting}[language=CStyle, caption={Codice CUDA-C del kernel.}, label={lst:cuda_kernel}]
+__global__ void computeProjections(...)
+{
+  ...
+  // r e c mappano ogni Thread su un singolo pixel del rilevatore
+  const unsigned r = threadIdx.y + blockIdx.y * blockDim.y;
+  const unsigned c = threadIdx.x + blockIdx.x * blockDim.x;
+
+  // Gli eventuali Thread in eccesso non eseguono calcoli
+  if (r < nSidePixels && c < nSidePixels) {
+    // Calcolo dell'attenuazione di una coppia sorgente-pixel
+    for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+      const Point source = getSource(d_gl_sinTable, d_gl_cosTable, positionIndex);
+      const Point pixel = getPixel(d_gl_sinTable, d_gl_cosTable, r, c, positionIndex);
+      ... // Calcolo dell'assorbimento per il pixel considerato
+    }
+  }
+}
+\end{lstlisting}
+
+Nel \autoref{lst:cuda_kernel} viene mostrato come ogni CUDA Thread determini la posizione di un pixel del rilevatore per procedere
+al calcolo dell'attenuazione che si verifica quando il raggio attraversa la partizione dell'oggetto in esame.
+
+Nel ciclo illustrato, ogni CUDA Thread analizza ciascuna sorgente in riferimento ad uno specifico pixel, che è lo stesso per ogni
+iterazione sulle posizioni sorgente-rilevatore considerate.
+Tale pixel è però ricalcolato di volta in volta perché traslato di un certo angolo.
+
+Il vantaggio di questa soluzione è che viene creato un solo kernel per ogni partizione dell'input, garantendo così il numero
+minimo possibile di esecuzioni.
+Questo riduce al minimo l'overhead legato alla creazione dell'ambiente di esecuzione del kernel.
+Inoltre, i dati necessari per il calcolo ad eccezione dell'input, che deve essere aggiornato per ogni partizione, vengono
+trasferiti tra CPU e GPU una sola volta.
 
 \appendix
 
