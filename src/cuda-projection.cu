@@ -748,12 +748,12 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, c
         cudaMemGetInfo(&freeMem, &totalMem);
         // At least 1 GB of estimated free global memory are necessary for the kernel execution in a 8 GB RAM GPU
         freeMem -= (totalMem * 2 / 8);
-        unsigned voxelsY = gl_nVoxel[Y];
-        size_t size = sizeof(double) * gl_nVoxel[X] * voxelsY * gl_nVoxel[Z];
+        unsigned yVoxelsTmp = gl_nVoxel[Y];
+        size_t size = sizeof(double) * gl_nVoxel[X] * yVoxelsTmp * gl_nVoxel[Z];
         while (size > freeMem) {
             // 5 / 8 is around 5 GB if considering an 8 GB input size
-            voxelsY = voxelsY * 5 / 8;
-            if (voxelsY <= 0) {
+            yVoxelsTmp = yVoxelsTmp * 5 / 8;
+            if (yVoxelsTmp == 0) {
                 fprintf(stderr, "The voxels Y size is too small respect to the other sizes:\n"
                                 "- N voxels X: %u.\n"
                                 "- N voxels Y: %u.\n"
@@ -764,9 +764,9 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, c
                 termEnvironment();
                 exit(EXIT_FAILURE);
             }
-            size = sizeof(double) * gl_nVoxel[X] * voxelsY * gl_nVoxel[Z];
+            size = sizeof(double) * gl_nVoxel[X] * yVoxelsTmp * gl_nVoxel[Z];
         }
-        yVoxels = voxelsY;
+        yVoxels = yVoxelsTmp;
         *sizeF = size;
     } else {
         *sizeF = sizeof(double) * gl_nVoxel[X] * yVoxels * gl_nVoxel[Z];
@@ -791,7 +791,7 @@ void initEnvironment(size_t *sizeF, size_t sizeG, const unsigned short nTheta, c
  * @param nSidePixels It is the number of pixels per size of the detector.
  * @param isFirst Tells if `g` array is uninitialized or it is not, this function tells to initialize it if necessary.
  */
-void getProjections(const unsigned short slice, double *f, const size_t sizeF, const unsigned short nTheta, const unsigned nSidePixels, const char isFirst)
+void asyncComputeProjections(const unsigned short slice, double *f, const size_t sizeF, const unsigned short nTheta, const unsigned nSidePixels, const char isFirst)
 {
 #ifdef PRINT
     printf("%.4lf> Copying f...\n", hpc_gettime());
@@ -946,7 +946,7 @@ int main(int argc, char *argv[])
 #endif
         // Computes subsection projection
         partialTime = hpc_gettime();
-        getProjections(slice, f, sizeF, nTheta, nSidePixels, !slice);
+        asyncComputeProjections(slice, f, sizeF, nTheta, nSidePixels, !slice);
         totalTime += hpc_gettime() - partialTime;
     }
     fclose(inputFilePointer);
