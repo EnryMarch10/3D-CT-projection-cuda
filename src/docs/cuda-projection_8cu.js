@@ -1,5 +1,6 @@
 var cuda_projection_8cu =
 [
+    [ "asyncComputeProjections", "cuda-projection_8cu.html#a737c2c8401569616c90f293ecc0893b9", null ],
     [ "atomicMaxDouble", "cuda-projection_8cu.html#a3fd79c0584c62772fe1d567661aa0027", null ],
     [ "atomicMinDouble", "cuda-projection_8cu.html#af64aeee4fe94fa937cbce91f5d34890d", null ],
     [ "computeAbsorption", "cuda-projection_8cu.html#a86c152fa93089970e65e0aa8288f2cd4", null ],
@@ -9,7 +10,6 @@ var cuda_projection_8cu =
     [ "getAMin", "cuda-projection_8cu.html#ab564f003c08f9d99df3a58154f713d86", null ],
     [ "getIntersection", "cuda-projection_8cu.html#a365207302d4241079acaa1e4a4fe436a", null ],
     [ "getPixel", "cuda-projection_8cu.html#ad75bada33863f5db8c25c0558f63139a", null ],
-    [ "getProjections", "cuda-projection_8cu.html#aebedb605358f481b671b8ea31f29e8b5", null ],
     [ "getRangeOfIndex", "cuda-projection_8cu.html#ab2563934c69e461c3a8ba90e0ab118e2", null ],
     [ "getSidesXPlanes", "cuda-projection_8cu.html#a9679628dbb6a5a86eef0ed7113779866", null ],
     [ "getSidesYPlanes", "cuda-projection_8cu.html#a9e6685e4908ebe3f8b31594802077550", null ],

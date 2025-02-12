@@ -202,9 +202,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a080b810c20595610b6e65e1a577a2f01" id="r_a080b810c20595610b6e65e1a577a2f01"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cuda-projection_8cu.html#a080b810c20595610b6e65e1a577a2f01">initEnvironment</a> (<a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">size_t</a> *<a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">sizeF</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">size_t</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">sizeG</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">short</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">nTheta</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">nSidePixels</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">double</a> *<a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">gMin</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">double</a> *<a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">gMax</a>)</td></tr>
 <tr class="memdesc:a080b810c20595610b6e65e1a577a2f01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocates resources in the CUDA environment.  <br /></td></tr>
 <tr class="separator:a080b810c20595610b6e65e1a577a2f01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebedb605358f481b671b8ea31f29e8b5" id="r_aebedb605358f481b671b8ea31f29e8b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cuda-projection_8cu.html#aebedb605358f481b671b8ea31f29e8b5">getProjections</a> (<a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">short</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">slice</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">double</a> *<a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">f</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">size_t</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">sizeF</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">short</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">nTheta</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">nSidePixels</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">char</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">isFirst</a>)</td></tr>
-<tr class="memdesc:aebedb605358f481b671b8ea31f29e8b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the projection of a sub-section of the object into the detector for each source position.  <br /></td></tr>
-<tr class="separator:aebedb605358f481b671b8ea31f29e8b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a737c2c8401569616c90f293ecc0893b9" id="r_a737c2c8401569616c90f293ecc0893b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cuda-projection_8cu.html#a737c2c8401569616c90f293ecc0893b9">asyncComputeProjections</a> (<a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">short</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">slice</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">double</a> *<a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">f</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">size_t</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">sizeF</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">short</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">nTheta</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">nSidePixels</a>, <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">char</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">isFirst</a>)</td></tr>
+<tr class="memdesc:a737c2c8401569616c90f293ecc0893b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the projection of a sub-section of the object into the detector for each source position.  <br /></td></tr>
+<tr class="separator:a737c2c8401569616c90f293ecc0893b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac37ce9bdf73aae0cd2ab69003c63255" id="r_aac37ce9bdf73aae0cd2ab69003c63255"><td class="memItemLeft" align="right" valign="top"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cuda-projection_8cu.html#aac37ce9bdf73aae0cd2ab69003c63255">readSetUP</a> (<a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">FILE</a> *<a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">filePointer</a>)</td></tr>
 <tr class="memdesc:aac37ce9bdf73aae0cd2ab69003c63255"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the environment values used to compute the voxel grid from the specified binary file.  <br /></td></tr>
 <tr class="separator:aac37ce9bdf73aae0cd2ab69003c63255"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -420,6 +420,78 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a737c2c8401569616c90f293ecc0893b9" name="a737c2c8401569616c90f293ecc0893b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a737c2c8401569616c90f293ecc0893b9">&#9670;&#160;</a></span>asyncComputeProjections()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">void</a> asyncComputeProjections </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">short</a>&#160;</td>
+          <td class="paramname"><em>slice</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">double</a> *&#160;</td>
+          <td class="paramname"><em>f</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">size_t</a>&#160;</td>
+          <td class="paramname"><em>sizeF</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">short</a>&#160;</td>
+          <td class="paramname"><em>nTheta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a>&#160;</td>
+          <td class="paramname"><em>nSidePixels</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">char</a>&#160;</td>
+          <td class="paramname"><em>isFirst</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the projection of a sub-section of the object into the detector for each source position. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">slice</td><td>It is a number that indicates the first voxel in the y axis from which the projection is being computed. </td></tr>
+    <tr><td class="paramname">f</td><td>It is an array that contains the coefficients of attenuation of the voxels contained in the sub-section. </td></tr>
+    <tr><td class="paramname">sizeF</td><td>It is the size of the <code>f</code>. </td></tr>
+    <tr><td class="paramname">nTheta</td><td>It is the number of angular positions. </td></tr>
+    <tr><td class="paramname">nSidePixels</td><td>It is the number of pixels per size of the detector. </td></tr>
+    <tr><td class="paramname">isFirst</td><td>Tells if <code>g</code> array is uninitialized or it is not, this function tells to initialize it if necessary. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="cuda-projection_8cu_source.html#l00794">794</a> of file <a class="el" href="cuda-projection_8cu_source.html">cuda-projection.cu</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="cuda-projection_8cu_a737c2c8401569616c90f293ecc0893b9_cgraph.png" border="0" usemap="#acuda-projection_8cu_a737c2c8401569616c90f293ecc0893b9_cgraph" alt=""/></div>
+</div>
+
+</div>
+</div>
 <a id="a3fd79c0584c62772fe1d567661aa0027" name="a3fd79c0584c62772fe1d567661aa0027"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3fd79c0584c62772fe1d567661aa0027">&#9670;&#160;</a></span>atomicMaxDouble()</h2>
 
@@ -921,78 +993,6 @@ Here is the call graph for this function:</div>
 <b>device</b> Indicates that this is a CUDA function that can be called from a kernel. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="cuda-projection_8cu_source.html#l00420">420</a> of file <a class="el" href="cuda-projection_8cu_source.html">cuda-projection.cu</a>.</p>
-
-</div>
-</div>
-<a id="aebedb605358f481b671b8ea31f29e8b5" name="aebedb605358f481b671b8ea31f29e8b5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aebedb605358f481b671b8ea31f29e8b5">&#9670;&#160;</a></span>getProjections()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">void</a> getProjections </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">short</a>&#160;</td>
-          <td class="paramname"><em>slice</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">double</a> *&#160;</td>
-          <td class="paramname"><em>f</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">size_t</a>&#160;</td>
-          <td class="paramname"><em>sizeF</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">short</a>&#160;</td>
-          <td class="paramname"><em>nTheta</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">unsigned</a>&#160;</td>
-          <td class="paramname"><em>nSidePixels</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">const</a> <a class="el" href="cuda-projection_8cu.html#a0fe2179fc4d60666b24402053c4fb3e3">char</a>&#160;</td>
-          <td class="paramname"><em>isFirst</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes the projection of a sub-section of the object into the detector for each source position. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">slice</td><td>It is a number that indicates the first voxel in the y axis from which the projection is being computed. </td></tr>
-    <tr><td class="paramname">f</td><td>It is an array that contains the coefficients of attenuation of the voxels contained in the sub-section. </td></tr>
-    <tr><td class="paramname">sizeF</td><td>It is the size of the <code>f</code>. </td></tr>
-    <tr><td class="paramname">nTheta</td><td>It is the number of angular positions. </td></tr>
-    <tr><td class="paramname">nSidePixels</td><td>It is the number of pixels per size of the detector. </td></tr>
-    <tr><td class="paramname">isFirst</td><td>Tells if <code>g</code> array is uninitialized or it is not, this function tells to initialize it if necessary. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="cuda-projection_8cu_source.html#l00794">794</a> of file <a class="el" href="cuda-projection_8cu_source.html">cuda-projection.cu</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="cuda-projection_8cu_aebedb605358f481b671b8ea31f29e8b5_cgraph.png" border="0" usemap="#acuda-projection_8cu_aebedb605358f481b671b8ea31f29e8b5_cgraph" alt=""/></div>
-</div>
 
 </div>
 </div>
