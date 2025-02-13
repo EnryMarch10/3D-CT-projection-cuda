@@ -164,7 +164,7 @@ La Tomografia Computerizzata (TC) è una tecnica diagnostica che sfrutta le radi
 un'immagine tridimensionale di un'entità analizzata.
 Questa tecnica si basa sulla raccolta, da parte di un rilevatore, di una matrice di dati 2D.
 Tale matrice è costruita a partire da considerazioni fatte sull'attenuazione dei raggi X che, diretti da una sorgente verso il
-rilevatore, passano attraverso l'oggetto di studio, vagliandolo.
+rilevatore, passano attraverso l'oggetto di studio.
 Facendo ruotare la sorgente e il rilevatore, lungo una traiettoria nota, molte matrici di dati vengono in genere raccolte.
 Queste matrici 2D vengono poi trasferite in un calcolatore che ha il compito di ricostruire l'entità scansionata in 3D.
 Questo consente di esaminare l'oggetto ricostruito, osservandone alcune caratteristiche della sua struttura interna non note a
@@ -178,8 +178,7 @@ Il principio su cui si basa ha origine grazie al matematico austriaco Johann Rad
 ricostruire un oggetto tridimensionale mediante un numero infinito di proiezioni bidimensionali dell'oggetto stesso.
 Dal punto di vista matematico, questo rappresenta un problema inverso, cioè si determinano le cause (immagine 3D) a partire dagli
 effetti osservati (proiezioni 2D).
-
-In questa analisi viene invece affrontato il problema diretto: partendo dal corpo studiato si devono perciò determinare le
+In questa tesi viene invece affrontato il problema diretto: partendo dal corpo studiato si devono perciò determinare le
 proiezioni che una TC potrebbe generare.
 Gli obiettivi di questo lavoro sono:
 \begin{itemize}
@@ -204,20 +203,26 @@ Gli obiettivi di questo lavoro sono:
 
 \chapter{Introduzione} \label{chap:intro}
 
-Una proiezione è una matrice i cui valori rappresentano l'attenuazione dei raggi X che attraversano il corpo oggetto di studio.
-Considerando un'immagine generata a partire dalla matrice proiezione, i colori rappresentano graficamente i vari livelli di
-attenuazione: un raggio che attraversa una regione più densa del corpo subisce una maggiore attenuazione rispetto ad un
-raggio che attraversa una regione meno densa.
-
-Durante una scansione tomografica sono acquisite numerose immagini attorno all'oggetto di studio.
-Nel caso più semplice, che noi analizzeremo, si possono considerare le diverse angolazioni di una traiettoria circolare.
-Intuitivamente più sono le proiezioni acquisite, più la ricostruzione dell'oggetto sarà efficace.
+Durante una scansione tomografica sono acquisite numerose proiezioni attorno all'oggetto di studio.
+Nel caso più semplice, che noi analizzeremo, la sorgente ed il rilevatore si muovono lungo una traiettoria circolare.
+Intuitivamente più sono le proiezioni acquisite, più la ricostruzione dell'oggetto sarà accurata.
 D'altra parte, specialmente in ambito medico, ridurre l'esposizione alle radiazioni è di beneficio per l'individuo scansionato.
 Questo implica che il numero di proiezioni generate è esso stesso molto variabile in base all'applicazione.
 
+Dal punto di vista fisico, i dati di proiezione riflettono l'assorbimento dei fotoni che costituiscono i raggi X.
+Una proiezione può essere considerata come una matrice i cui valori rappresentano l'attenuazione dei raggi che attraversano il
+corpo oggetto di studio.
+Considerando la matrice proiezione, i valori rappresentano i vari livelli di attenuazione: un raggio che attraversa una regione
+più densa del corpo subisce una maggiore attenuazione rispetto ad un raggio che attraversa una regione meno densa.
+
+% TODO: Da mettere quando si parla di come vengono i risultati delle proiezioni
+% Considerando un'immagine generata a partire dalla matrice proiezione, i colori rappresentano graficamente i vari livelli di
+% attenuazione: un raggio che attraversa una regione più densa del corpo subisce una maggiore attenuazione rispetto ad un
+% raggio che attraversa una regione meno densa.
+
 Nelle sezioni successive verrà illustrato il modello matematico che costituisce la base della computazione, mettendolo in
 relazione diretta con le sue applicazioni nell'algoritmo risolutivo.
-Infine, sarà esaminato il problema dal punto di vista geometrico.
+Infine, saranno esaminate le considerazioni necessarie per risolvere il problema dal punto di vista geometrico.
 
 \section{Il modello matematico}
 
@@ -226,12 +231,11 @@ alla base della creazione delle proiezioni, vedi \cite{MoroLoli2021}.
 
 \subsection{La legge di Lambert-Beer}
 
-Dal punto di vista fisico, i dati di proiezione riflettono l'assorbimento dei fotoni che costituiscono i raggi X.
 Il modello fisico che descrive l'assorbimento dei fotoni in termini di coefficienti di attenuazione è descritto dalla legge di
 Lambert-Beer.
 
-Il meccanismo fisico che porta all'attenuazione dell'intensità dei raggi è solitamente descritto da un singolo coefficiente di
-attenuazione \(\mu = \mu(w) \ge 0\) che dipende dalla posizione lungo il percorso del raggio, indicata da \(w\).
+Il meccanismo fisico che porta all'attenuazione dell'intensità di un raggio è solitamente descritto da un singolo coefficiente di
+attenuazione \(\mu = \mu(w) \ge 0\) che dipende dalla posizione nel segmento che approssima il suo percorso, indicata da \(w\).
 Questi coefficienti determinano i vari \(m(w)\), cioè le intensità del raggio nella posizione indicata da \(w\).
 
 La \textbf{legge di Lambert-Beer} per il calcolo della proiezione del coefficiente di attenuazione lungo un segmento di lunghezza
@@ -242,10 +246,12 @@ La \textbf{legge di Lambert-Beer} per il calcolo della proiezione del coefficien
 
 Dove:
 \begin{itemize}
+  \item \(P_W\mu\) è un valore che indica l'attenuazione di un raggio; la notazione indica la \textit{proiezione integrale} di
+        \(\mu\) lungo un segmento di lunghezza \(W\).
+  \item \(W\) è la lunghezza totale del percorso attraverso il materiale.
+  \item \(\mu(w)\) è una funzione continua che descrive il coefficiente di attenuazione alla posizione \(w\) lungo il raggio.
   \item \(m\) è l'intensità finale del raggio, dopo aver attraversato il materiale.
   \item \(m_0\) è l'intensità iniziale del raggio.
-  \item \(\mu(w)\) è una funzione continua che descrive il coefficiente di attenuazione alla posizione \(w\) lungo il raggio.
-  \item \(W\) è la lunghezza totale del percorso attraverso il materiale.
 \end{itemize}
 
 \subsection{La trasformata di Radon}
@@ -257,7 +263,7 @@ La rappresentazione grafica di tutti i dati misurati nel caso bidimensionale è 
 \subsection{Il caso discreto}
 
 Nel caso discreto il corpo è diviso in volumi più piccoli, detti \textbf{voxel}, che sono elementi di dimensione molto piccola in
-cui il corpo è approssimato.
+cui l'oggetto è approssimato.
 Per ciascun voxel il coefficiente di attenuazione è un valore approssimato costante.
 
 L'\autoref{eq:law_lambert-beer} nel caso discreto, per calcolare una singola proiezione, diventa:
@@ -267,16 +273,22 @@ L'\autoref{eq:law_lambert-beer} nel caso discreto, per calcolare una singola pro
 
 Dove:
 \begin{itemize}
+  \item \(g_i\) è l'attenuazione subita dall'\(i\)-esimo raggio.
   \item \(i\) è l'\(i\)-esimo raggio, degli \(N_p\) considerati per quella proiezione.
   \item \(j\) è il \(j\)-esimo voxel, degli \(N\) totali che approssimano il corpo.
-  \item \(g_i\) è l'attenuazione subita dall'\(i\)-esimo raggio.
   \item \(M_{i,j}\) è una matrice di \(N_p \times N\) elementi che per ogni raggio \(i\) definisce la lunghezza della porzione
         sottesa al volume di ciascun voxel \(j\).
   \item \(f_j\) è il valore del coefficiente di attenuazione assunto nel volume interno al \(j\)-esimo voxel.
 \end{itemize}
 
+L'indice \(j\), considerando lo spazio cartesiano, è determinato dalle tre coordinate cartesiane, combinate tra di loro in modo da
+individuare un singolo indice.
+
 Matematicamente quindi, per il calcolo delle proiezioni, viene considerata un'approssimazione dell'oggetto analizzato, vedi
 \autoref{fig:CT_cube_to_voxels}.
+
+Ritornando all'\autoref{eq:law_lambert-beer_discrete}, si può notare come il numero totale di voxel \(N\) sia, considerando lo
+spazio cartesiano, determinata da \(N_x \times N_y \times N_z\).
 
 \begin{figure}[H]
   \centering
@@ -332,17 +344,21 @@ diverse.
 
 \section{Algoritmo risolutivo}
 
+Come già accennato in precedenza, alla base del progetto sviluppato in questa tesi c'è l'algoritmo di proiezione proposto da
+Siddon \cite{Siddon1984}.
+
 Considerando quanto già visto nel modello matematico, nel nostro caso l'algoritmo di Siddon si occupa di calcolare la matrice
 \(M\), mentre il vettore \(f\) deve essere già noto in partenza.
-Questi dati devono essere determinati per poter procedere con la computazione.
+Questi dati devono essere determinati per poter procedere con i passi successivi.
 
 L'algoritmo svolge una computazione equivalente a quella descritta nell'\autoref{eq:law_lambert-beer_discrete}:
 \begin{equation} \label{eq:law_lambert-beer_Siddon}
-  d = \sum_i \sum_j \sum_k l(i, j, k) \rho(i, j, k)
+  g = \sum_i \sum_j \sum_k l_{i, j, k} \rho_{i, j, k}
 \end{equation}
-dove i parametri \(i\), \(j\) e \(k\) individuano un singolo voxel nello spazio tridimensionale.
-In particolare, considerando una specifica configurazione di \((i, j, k)\), \(l\) rappresenta la lunghezza sottesa in quel
-voxel (equivalente di \(M\)) mentre \(\rho\) rappresenta la densità del voxel (equivalente di \(f\)).
+dove gli indici \(i\), \(j\) e \(k\) individuano un singolo voxel nello spazio tridimensionale.
+In particolare, per una specifica configurazione di \((i, j, k)\), \(l\) rappresenta la lunghezza della porzione del segmento che
+approssima un raggio nello spazio ed è sottesa in quel voxel (equivalente di \(M\)) mentre \(\rho\) rappresenta la densità del
+voxel (equivalente di \(f\)).
 
 \subsection{La matrice \texorpdfstring{\(M\)}{M}}
 
@@ -401,10 +417,10 @@ voxel (equivalente di \(M\)) mentre \(\rho\) rappresenta la densità del voxel (
     \end{scope}
     \end{tikzpicture}
   }
-  \caption{\label{fig:CT_Siddon_grid_to_planes} Pixel (voxel nel caso 2D) considerati come rette parallele che rappresentano la
-           struttura dell'oggetto considerato.
+  \caption{\label{fig:CT_Siddon_grid_to_planes} Pixel (voxel nel caso 2D) considerati nell'algoritmo come rette parallele che
+           rappresentano la struttura dell'oggetto considerato.
            Come si può notare alcune intersezioni tra il raggio e i piani non sono valide perché fuori dalla griglia, vedi i
-           puntini rossi della figura \textit{b}.}
+           punti rossi della figura \textit{b}.}
 \end{figure}
 
 I punti chiave dell'algoritmo, nella determinazione della matrice \(M\), possono essere così riassunti:
@@ -421,23 +437,26 @@ I punti chiave dell'algoritmo, nella determinazione della matrice \(M\), possono
 Il vettore \(f\) rappresenta il coefficiente di attenuazione assunto nella regione interna al volume sotteso da ciascun voxel.
 Presenta dunque un numero di elementi pari al numero di voxel in cui è suddiviso l'oggetto.
 
-Le tre diverse configurazioni utilizzate sono:
+I coefficienti di attenuazione nel progetto sviluppato sono: 1 per una regione ``molto densa'', approssimando sempre uno stesso
+tipo di materiale, 0 per una ``poco densa'', approssimando l'aria.
+
+Le tre diverse configurazioni dell'input \(f\) utilizzate sono:
 \begin{itemize}
-  \item Un \textbf{cubo}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi all'interno della
-        regione cubica sono posti ad 1, altrimenti a 0.
+  \item Un \textbf{cubo}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi di \(f\) all'interno
+        della regione cubica sono posti ad 1, altrimenti a 0.
   \item Un \textbf{cubo con cavità sferica}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi
-        all'interno della regione cubica, ad eccezione di quelli la cui distanza da un punto stabilito all'interno dell'oggetto
-        sia inferiore ad un raggio stabilito, sono posti ad 1, altrimenti a 0.
-  \item Una \textbf{semi-sfera}: stabilita la lunghezza del raggio della semisfera che si intende rappresentare, gli elementi
-        all'interno della regione semisferica sono posti ad 1, altrimenti a 0.
+        di \(f\) all'interno della regione cubica, ad eccezione di quelli la cui distanza da un punto stabilito all'interno
+        dell'oggetto sia inferiore ad un raggio stabilito, sono posti ad 1, altrimenti a 0.
+  \item Una \textbf{semi-sfera}: stabilita la lunghezza del raggio della semisfera che si intende rappresentare, gli elementi di
+        \(f\) all'interno della regione semisferica sono posti ad 1, altrimenti a 0.
 \end{itemize}
 
 \section{Considerazioni geometriche}
 
-Questa sezione approfondisce le considerazioni geometriche necessarie per poter procedere con l'implementazione dell'algoritmo di
+Di seguito si approfondiscono i riferimenti geometrici necessari per poter procedere con l'implementazione dell'algoritmo di
 Siddon.
 
-\subsection{Posizionamento sorgente, oggetto e rilevatore nello spazio}
+\subsection{Posizionamento di sorgente, oggetto e rilevatore nello spazio}
 
 \begin{figure}[H]
   \centering
@@ -494,24 +513,75 @@ Siddon.
 \end{figure}
 
 In \autoref{fig:CT_reference_plane} sono rappresentati un oggetto di forma cubica, la sorgente ed il rilevatore, tutti posti
-in uno specifico sistema cartesiano, in cui il centro dell'oggetto corrisponde con l'origine degli assi.
+in uno specifico sistema cartesiano in cui il centro dell'oggetto corrisponde con l'origine degli assi.
 
-Nel nostro caso la posizione del punto sorgente, da cui partono i raggi, e dei pixel del rilevatore, al centro di cui questi
-vengono a dirigersi, ruotano in un'orbita circolare in modo da scansionare il corpo da più posizioni.
+La sorgente dei raggi e i pixel del rilevatore, verso cui sono diretti, ruotano lungo un'orbita circolare per scansionare il corpo
+da diverse angolazioni.
 
-Quando la sorgente ruota in un senso nelle specifiche posizioni dell'orbita, il rilevatore ruota coerentemente nel senso opposto.
+Quando la sorgente ruota in un senso, orario o antiorario, fino a specifiche posizioni nell'orbita, il rilevatore ruota
+coerentemente, quindi dello stesso angolo, nel senso opposto.
 
 \subsection{Le sorgenti} \label{subsec:sources}
 
 La sorgente è approssimata ad un punto, che indica la posizione a partire dalla quale sono diretti i raggi.
-Le posizioni considerate sono più di una e sono distribuite, nell'implementazione trattata, lungo una traiettoria circolare
+Le posizioni considerate sono più di una e, nell'implementazione trattata, sono distribuite lungo una traiettoria circolare
 (o una sezione di essa) intorno all'oggetto.
-Rimane da stabilire ciascuna coordinata nello spazio.
+Occorre stabilire le coordinate cartesiane dei punti che rappresentano le sorgenti nello spazio.
+
+\begin{figure}[H]
+  \centering
+  \resizebox{0.4\textwidth}{!}{
+    \begin{tikzpicture}
+      % Define the radius of the circle trajectories
+      \def\SourceRadius{3}
+      \def\DetectorRadius{2}
+
+      % Define the points
+      \coordinate (S0) at ({\SourceRadius*cos(115)}, {\SourceRadius*sin(115)});
+      \coordinate (S1) at ({\SourceRadius*cos(95)}, {\SourceRadius*sin(95)});
+      \coordinate (D0) at ({\DetectorRadius*cos(295)}, {\DetectorRadius*sin(295)});
+      \coordinate (D1) at ({\DetectorRadius*cos(275)}, {\DetectorRadius*sin(275)});
+
+      % Draw the trajectories
+      % \draw[thick] (0,0) circle (\SourceRadius);
+      \draw[thick] (S0) arc[start angle=115,end angle=65,radius=\SourceRadius];
+      % \draw[thick] (D0) arc[start angle=295,end angle=245,radius=\DetectorRadius];
+
+      % Draw the axes
+      \draw[->] (-\SourceRadius-0.5,0) -- (\SourceRadius+0.5,0) node[below right] {$x$};
+      \draw[->] (0,-\DetectorRadius-0.5) -- (0,\SourceRadius+0.5) node[above left] {$y$};
+      \draw[->] (0.5,0.5) -- (-1.5,-1.5) node[below left] {$z$};
+
+      % Draw lines from origins to points
+      \draw[purple] (S0) -- (0,0);
+      \draw[purple,dashed] (0,0) -- (D0);
+      \draw[purple] (S1) -- (0,0);
+      \draw[purple,dashed] (0,0) -- (D1);
+      \draw[dashed] (0,0) -- ({\SourceRadius*cos(65)}, {\SourceRadius*sin(65)});
+
+      % Draw the points
+      \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=0pt, label=left:Source\textsubscript{0}] at (S0) {}; % Source0
+      \node[draw=none, fill=green, circle, minimum size=10pt, inner sep=0pt, label=above left:Source\textsubscript{1}] at (S1) {}; % Source1
+
+      % Label theta angle
+      \draw[<->] ({(\SourceRadius/3*2)*cos(115)}, {(\SourceRadius/3*2)*sin(115)}) arc[start angle=115,end angle=65,radius=\SourceRadius/3*2];
+      \node[above right] at (0,\SourceRadius/3*2) {$\theta$};
+
+      % Label alpha angle
+      \draw[<->] ({(\SourceRadius/3)*cos(115)}, {(\SourceRadius/3)*sin(115)}) arc[start angle=115,end angle=95,radius=\SourceRadius/3];
+      \node[above left] at ({(\SourceRadius/3)*cos(95)},{(\SourceRadius/3)*sin(95)}) {$\alpha$};
+
+      % Label distance
+      \node at (-1,1.4) {$d_s$};
+    \end{tikzpicture}
+  }
+  \caption{\label{fig:CT_polar_coordinates_source} Posizionamento angolare delle prime due sorgenti.}
+\end{figure}
 
 Conoscendo l'estensione angolare \(\theta\) della sezione della traiettoria considerata e la distanza angolare \(\alpha\) tra
 ciascuna posizione, si è scelto l'uso delle coordinate polari, dove una posizione è individuata dalla distanza dall'origine e
 dalla distanza angolare dall'asse polare.
-In accordo con la \autoref{fig:CT_reference_plane}, viene considerato un sistema di coordinate polari il cui polo coincide con
+In accordo con la \autoref{fig:CT_polar_coordinates_source}, viene considerato un sistema di coordinate polari il cui polo coincide con
 il centro dell'oggetto di studio, mentre si adotta l'asse \(y\) come asse polare.
 La distanza angolare è positiva in senso orario nel piano \(xy\).
 
@@ -538,7 +608,7 @@ Le coordinate cartesiane si ottengono a partire dalle coordinate polari nel segu
 dove sono state applicate le formule degli archi associati per seno e coseno per passare dal sistema con misurazione in senso
 orario a partire dal semiasse positivo delle \(y\) al sistema tradizionale con misurazione in senso antiorario a partire dal
 semiasse positivo delle \(x\).
-Inoltre, \(Z_i\) è posta a \(0\) in quanto, per costruzione, la traiettoria giace sul piano \(xy\).
+Inoltre, \(Z_i\) è posta a \(0\) in quanto, per costruzione, la traiettoria delle sorgenti giace sul piano \(xy\).
 
 \subsection{L'oggetto}
 
@@ -559,7 +629,7 @@ Dunque, le loro equazioni sono nella forma:
   cz + d &= 0 \quad \text{se parallelo al piano } xy
 \end{align*}
 
-Dato che le distanze tra i piani paralleli sono regolari, avendo l'equazione di un piano è possibile determinare l'equazione degli
+Dato che le distanze tra i piani paralleli sono uniformi, avendo l'equazione di un piano è possibile determinare l'equazione degli
 altri traslando più volte.
 L'equazione degli altri piani a partire dal primo si determina nel seguente modo:
 \begin{align*}
@@ -589,7 +659,7 @@ derivate dalla posizione \((X, Y, Z)\), ricoperta nel caso in cui il rilevatore 
 
 Considerando il semiasse negativo di \(y\) come asse polare, anche questa volta con angolo positivo in senso orario, le
 coordinate polari del punto sono:
-\begin{equation*} %\label{eq:goniometric_detector_polar}
+\begin{equation*} % \label{eq:goniometric_detector_polar}
   (d_r, \delta)
 \end{equation*}
 dove \(\delta\) è l'angolo che identifica l'unità del rilevatore.
@@ -642,7 +712,7 @@ ottiene:
       % Draw the axes
       \draw[->] (-\SourceRadius-0.5,0) -- (\SourceRadius+0.5,0) node[below right] {$x$};
       \draw[->] (0,-\DetectorRadius-0.5) -- (0,\SourceRadius+0.5) node[above left] {$y$};
-      \draw[->] (0.5,0.5) -- (-\SourceRadius-0.5,-\SourceRadius-0.5) node[below left] {$z$};
+      \draw[->] (0.5,0.5) -- (-1.5,-1.5) node[below left] {$z$};
 
       % Draw lines from origin to points
       \draw[purple] (S0) -- (D0);
@@ -668,12 +738,12 @@ ottiene:
       \node at (1.2,-1.7) {$d_r$};
     \end{tikzpicture}
   }
-  \caption{\label{fig:CT_polar_coordinates} Vista goniometrica di un raggio diretto dalla prima sorgente verso il centro del pixel
+  \caption{\label{fig:CT_polar_coordinates} Vista angolare di un raggio diretto dalla prima sorgente verso il centro del pixel
            centrale nel rilevatore. Gli angoli corrispondono esattamente a quelli nell'esempio quando la matrice che costituisce
            il rilevatore ha un numero di pixel per lato dispari.}
 \end{figure}
 
-Osservando \autoref{fig:CT_polar_coordinates}, dalle formule trigonometriche per i triangoli rettangoli:
+Osservando la \autoref{fig:CT_polar_coordinates}, dalle formule trigonometriche per i triangoli rettangoli:
 \begin{align*}
   d_r = -\frac{X}{\sin(\delta)} = -\frac{Y}{\cos(\delta)}
 \end{align*}
@@ -701,7 +771,6 @@ Le posizioni di un'unità del rilevatore possono dunque essere ottenute, a parti
 
 Un raggio, approssimazione di radiazioni elettromagnetiche, è considerato come un segmento che, nell'implementazione usata,
 collega la sorgente con il centro di un pixel del rilevatore (approccio ray-driven).
-
 Può essere rappresentato mediante l'equazione parametrica di una retta passante per due punti \(Source = (X_1, Y_1, Z_1)\) e
 \(Detector = (X_2, Y_2, Z_2)\):
 \begin{align*}
@@ -793,8 +862,9 @@ Può essere rappresentato mediante l'equazione parametrica di una retta passante
     \end{scope}
     \end{tikzpicture}
   }
-  \caption{\label{fig:CT_Siddon_ranges} Le quantità \(a_{min}\) e \(a_{max}\) sono quelle che definiscono i range da considerare
-           per ottenere solo le intersezioni con piani effettivamente all'interno della griglia di pixel (voxel nel caso 3D).
+  \caption{\label{fig:CT_Siddon_ranges} Le quantità \(a_{min}\) e \(a_{max}\) sono quelle che definiscono gli intervalli da
+           considerare per ottenere solo le intersezioni con piani effettivamente all'interno della griglia di pixel (voxel nel
+           caso 3D).
            Si può notare che \(a_{min}\) nelle figure \textit{a} e \textit{c} sarà maggiore di 0, così come \(a_{max}\) nelle
            figure \textit{a} e \textit{b} sarà minore di 1.
            Questo permette di non considerare le intersezioni in eccesso, esterne alla griglia di partenza, risolvendo il
