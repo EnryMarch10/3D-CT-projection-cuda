@@ -15,6 +15,8 @@
 \usepackage[margin=1in]{geometry} % Page geom
 \usepackage{lastpage} % To track the total number of pages
 \usepackage{fancyhdr} % To define a custom page numbering style
+\setlength{\headheight}{14.49998pt} % Avoids fancyhdr package error for 12pt titles
+\usepackage{csquotes} % Recommended package to load before biblatex
 \usepackage[backend=biber, style=alphabetic, sorting=ydnt]{biblatex} % To include bibliography
 \addbibresource{riferimenti.bib}
 \usepackage{amsmath} % Necessary for \text{} command inside maths notations
@@ -23,6 +25,7 @@
 % \setlength{\parindent}{0pt} % No paragraph indentation
 \usepackage{enumitem} % To avoid interline between bullets and text before them
 \setlist[itemize]{topsep=0pt, partopsep=0pt, parsep=0pt}
+\usepackage{subcaption} % For multiple graphs in a single picture
 \usepackage{tikz} % To draw graphs
 \usetikzlibrary{3d} % For 3D graphs
 \usepackage{listings} % To use listings
@@ -44,7 +47,7 @@
   morekeywords={ % Keywords
     static, const,
     void,
-    double, unsigned, short,
+    int, unsigned, short, double,
     sizeof,
     __global__
   },
@@ -58,14 +61,18 @@
     printf, fprintf, fread, getSource, getPixel,
     malloc, calloc, free,
     cudaMemGetInfo, cudaMemcpy,
-    exit
+    exit,
+    fopen, fclose
   },
   morekeywords=[4]{ % User types
+    FILE,
     Point, Ranges, size_t,
     dim3
   },
   morekeywords=[5]{ % Macros
-    N_VOXEL_X, N_VOXEL_Y, N_VOXEL_Z, EXIT_FAILURE, BLKDIM_STEP
+    N_VOXEL_X, N_VOXEL_Y, N_VOXEL_Z,
+    stderr, EXIT_FAILURE,
+    BLKDIM_STEP
   },
   morekeywords=[6]{ % Enums
     X, Y, Z, cudaMemcpyHostToDevice
@@ -215,11 +222,6 @@ corpo oggetto di studio.
 Considerando la matrice proiezione, i valori rappresentano i vari livelli di attenuazione: un raggio che attraversa una regione
 più densa del corpo subisce una maggiore attenuazione rispetto ad un raggio che attraversa una regione meno densa.
 
-% TODO: Da mettere quando si parla di come vengono i risultati delle proiezioni
-% Considerando un'immagine generata a partire dalla matrice proiezione, i colori rappresentano graficamente i vari livelli di
-% attenuazione: un raggio che attraversa una regione più densa del corpo subisce una maggiore attenuazione rispetto ad un
-% raggio che attraversa una regione meno densa.
-
 Nelle sezioni successive verrà illustrato il modello matematico che costituisce la base della computazione, mettendolo in
 relazione diretta con le sue applicazioni nell'algoritmo risolutivo.
 Infine, saranno esaminate le considerazioni necessarie per risolvere il problema dal punto di vista geometrico.
@@ -292,7 +294,7 @@ spazio cartesiano, determinata da \(N_x \times N_y \times N_z\).
 
 \begin{figure}[H]
   \centering
-  \resizebox{0.8\textwidth}{!}{
+  \resizebox{0.6\textwidth}{!}{
     \begin{tikzpicture}[x={(0.9cm,-0.3cm)}, y={(0cm,1cm)}, z={(-0.9cm,-0.3cm)}]
 
     % Draw the grid on the top face
@@ -344,8 +346,8 @@ diverse.
 
 \section{Algoritmo risolutivo}
 
-Come già accennato in precedenza, alla base del progetto sviluppato in questa tesi c'è l'algoritmo di proiezione proposto da
-Siddon \cite{Siddon1984}.
+Come già accennato in precedenza, alla base del progetto di tesi sviluppato in questa tesi c'è l'algoritmo di proiezione proposto
+da Siddon \cite{Siddon1984}.
 
 Considerando quanto già visto nel modello matematico, nel nostro caso l'algoritmo di Siddon si occupa di calcolare la matrice
 \(M\), mentre il vettore \(f\) deve essere già noto in partenza.
@@ -361,6 +363,8 @@ approssima un raggio nello spazio ed è sottesa in quel voxel (equivalente di \(
 voxel (equivalente di \(f\)).
 
 \subsection{La matrice \texorpdfstring{\(M\)}{M}}
+
+La matrice \(M\) ci permette di identificare, per ogni raggio, la lunghezza del segmento di raggio che attraversa ciascun voxel.
 
 \begin{figure}[H]
   \centering
@@ -417,8 +421,9 @@ voxel (equivalente di \(f\)).
     \end{scope}
     \end{tikzpicture}
   }
-  \caption{\label{fig:CT_Siddon_grid_to_planes} Pixel (voxel nel caso 2D) considerati nell'algoritmo come rette parallele che
-           rappresentano la struttura dell'oggetto considerato.
+  \caption{\label{fig:CT_Siddon_grid_to_planes} Pixel, caso 2D, considerati come rette parallele che rappresentano la
+           struttura dell'oggetto considerato.
+           Nell'algoritmo si parlerà invece di voxel e piani paralleli, caso 3D.
            Come si può notare alcune intersezioni tra il raggio e i piani non sono valide perché fuori dalla griglia, vedi i
            punti rossi della figura \textit{b}.}
 \end{figure}
@@ -427,27 +432,28 @@ I punti chiave dell'algoritmo, nella determinazione della matrice \(M\), possono
 \begin{itemize}
   \item L'algoritmo considera, invece dei singoli voxel indipendenti, tre insiemi di piani ortogonali ed equidistanti tra loro che
         vanno a costruire la griglia di discretizzazione del corpo nello spazio, vedi \autoref{fig:CT_Siddon_grid_to_planes}.
-  \item Si calcolano i punti di intersezione tra le rette, i raggi, e i piani che definiscono i voxel.
+  \item Si calcolano i punti di intersezione tra le rette, cioè i raggi, e i piani che definiscono i voxel.
   \item Si calcola la lunghezza dei segmenti sottesi ai voxel, come la differenza tra punti di intersezione consecutivi,
         determinando così la matrice \(M\).
 \end{itemize}
 
 \subsection{Il vettore \texorpdfstring{\(f\)}{f}} \label{chap:vector_f}
 
-Il vettore \(f\) rappresenta il coefficiente di attenuazione assunto nella regione interna al volume sotteso da ciascun voxel.
-Presenta dunque un numero di elementi pari al numero di voxel in cui è suddiviso l'oggetto.
+Il vettore \(f\) riassume ciò che sappiamo dell'oggetto da scansionare.
+In particolare esso rappresenta il coefficiente di attenuazione assunto nella regione interna al volume occupato da ciascun voxel.
+% Presenta dunque un numero di elementi pari al numero di voxel in cui è suddiviso l'oggetto.
 
-I coefficienti di attenuazione nel progetto sviluppato sono: 1 per una regione ``molto densa'', approssimando sempre uno stesso
-tipo di materiale, 0 per una ``poco densa'', approssimando l'aria.
+I coefficienti di attenuazione nel progetto di tesi sviluppato sono: 1 per una regione ``molto densa'', approssimando sempre uno
+stesso tipo di materiale, 0 per una ``poco densa'', approssimando l'aria.
 
-Le tre diverse configurazioni dell'input \(f\) utilizzate sono:
+I tre oggetti considerati sono:
 \begin{itemize}
-  \item Un \textbf{cubo}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi di \(f\) all'interno
+  \item \textbf{Cubo}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi di \(f\) all'interno
         della regione cubica sono posti ad 1, altrimenti a 0.
-  \item Un \textbf{cubo con cavità sferica}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi
+  \item \textbf{Cubo con cavità sferica}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi
         di \(f\) all'interno della regione cubica, ad eccezione di quelli la cui distanza da un punto stabilito all'interno
         dell'oggetto sia inferiore ad un raggio stabilito, sono posti ad 1, altrimenti a 0.
-  \item Una \textbf{semi-sfera}: stabilita la lunghezza del raggio della semisfera che si intende rappresentare, gli elementi di
+  \item \textbf{Semisfera}: stabilita la lunghezza del raggio della semisfera che si intende rappresentare, gli elementi di
         \(f\) all'interno della regione semisferica sono posti ad 1, altrimenti a 0.
 \end{itemize}
 
@@ -903,8 +909,8 @@ dove sono stati indicati i sistemi utilizzati nel caso in cui il piano sia paral
 
 \chapter{Descrizione del progetto}
 
-Il progetto include diverse implementazioni scritte in C, tra cui un programma per la generazione dei file di input, uno per il
-calcolo della proiezione basato sull'algoritmo di Siddon con OpenMP ed una versione sviluppata con CUDA.
+Il progetto di tesi include diverse implementazioni scritte in C, tra cui un programma per la generazione dei file di input, uno
+per il calcolo della proiezione basato sull'algoritmo di Siddon con OpenMP ed una versione sviluppata con CUDA.
 
 Le prime due soluzioni sono state ottenute rielaborando il lavoro di \cite{Colletta2024}, mentre l'implementazione CUDA
 costituisce il fulcro di questo progetto.
@@ -914,8 +920,8 @@ delle implementazioni sviluppate.
 
 \section{Parallelizzazione}
 
-L'ottimizzazione di un algoritmo seriale è un processo estremamente ampio e variegato, che coinvolge molteplici strategie a
-seconda del contesto applicativo, delle caratteristiche hardware e degli obiettivi di prestazione.
+L'ottimizzazione di un algoritmo seriale è un processo complesso, che coinvolge molteplici strategie a seconda del contesto
+applicativo, delle caratteristiche hardware e degli obiettivi di prestazione.
 In generale, l'ottimizzazione può riguardare la riduzione della complessità computazionale, una migliore gestione della memoria,
 l'uso di strutture dati efficienti o l'impiego di tecniche avanzate per minimizzare i tempi di esecuzione.
 
@@ -929,8 +935,8 @@ analizzando le metodologie impiegate per massimizzare le prestazioni in ciascun 
 
 La CPU (Central Processing Unit) è il componente principale di un computer responsabile dell'esecuzione delle istruzioni di un
 programma.
-È spesso definita il ``cervello'' del sistema, in quanto gestisce i calcoli, l'elaborazione dei dati e il controllo delle
-operazioni.
+Essa rappresenta l'unità di controllo ed elaborazione principale, in quanto gestisce i calcoli, l'elaborazione dei dati ed il
+controllo delle operazioni.
 
 Le CPU moderne, per motivi principalmente legati al risparmio energetico, dispongono di più core e supportano il multi-threading,
 consentendo l'esecuzione parallela di più attività.
@@ -945,8 +951,6 @@ In questo progetto è stato utilizzato il linguaggio C.
 
 OpenMP rientra nella categoria \textbf{MIMD} (Multiple Instruction, Multiple Data) secondo la tassonomia di Flynn, vedi
 \cite{Flynn1966}.
-In realtà, sfruttando il modello ``fork-join'', dove un processo principale genera più processi eseguendo la stessa operazione su
-dati diversi, il parallelismo può implicitamente assumere alcune caratteristiche SIMD (Single Instruction, Multiple Data).
 
 Caratteristiche principali di OpenMP:
 \begin{itemize}
@@ -962,7 +966,7 @@ Caratteristiche principali di OpenMP:
 
 La GPU (Graphics Processing Unit) è un processore specializzato progettato per eseguire calcoli in parallelo su grandi quantità di
 dati.
-Originariamente sviluppata per il rendering grafico.
+Come si può intuire dal nome è stata originariamente sviluppata per il rendering grafico.
 Conseguentemente alla domanda del mercato, la GPU si è oggi ampiamente evoluta in un processore generale, che quindi può svolgere
 molti diversi tipi di carichi di lavoro al di là del solo rendering grafico.
 Utilizzata in settori come intelligenza artificiale, elaborazione di immagini, deep learning e simulazioni scientifiche, grazie
@@ -1016,6 +1020,8 @@ Caratteristiche principali di CUDA:
 
 L'implementazione proposta genera le configurazioni del vettore \(f\) già discusse nella \autoref{chap:vector_f}.
 Queste configurazioni vengono scritte su file.
+Per generare input di dimensioni opportune alle necessità, quando si esegue il programma è possibile specificare il numero di
+pixel per lato della matrice rilevatore.
 La strategia adottata per la scrittura è descritta di seguito.
 
 \begin{lstlisting}[language=CStyle, caption={Codice C per inizializzazione di \(f\) per un cubo.}, label={lst:vector_f_config}]
@@ -1045,14 +1051,15 @@ Si osserva però che la specifica mappatura degli elementi scelta non è l'unica
 scambiare le varie coordinate tra di loro, invertendone i ruoli, e perciò le relative dipendenze.
 
 Il \autoref{lst:vector_f_config} rappresenta in realtà un'iterazione dell'inizializzazione di \(f\).
-Infatti \lstinline{pNy} non è assegnato a \lstinline{N_VOXELS_Y}, ma a \lstinline{k}.
-Quindi l'array \(f\), limitato nelle dimensioni da \lstinline{pNy}, rappresenta una partizione verticale dell'oggetto cubico di
-interesse e non l'array completo così come considerato nel modello matematico, rivedi la \autoref{fig:CT_reference_plane}.
-Tale partizione avrà numero di voxel sull'asse \(y\) pari a \lstinline{k}, dove \lstinline{k <= N_VOXELS_Y}.
+Infatti \lstinline{pNy} non è assegnato a \mbox{\lstinline{N_VOXELS_Y},} cioè numero totale di voxel nell'asse \(y\), ma a
+\mbox{\lstinline{k}.}
+Quindi l'array \(f\), limitato nelle dimensioni da \mbox{\lstinline{pNy},} rappresenta una partizione verticale dell'oggetto
+cubico di interesse e non l'oggetto completo così come considerato nel modello matematico, rivedi la
+\autoref{fig:CT_reference_plane}.
+Tale partizione avrà numero di voxel sull'asse \(y\) pari a \mbox{\lstinline{k},} con \mbox{\lstinline{k <= N_VOXELS_Y}.}
 Nella soluzione proposta oltretutto la singola iterazione, simile a quella presentata, viene parallelizzata sfruttando OpenMP.
 
-In questo modo, anche la lettura dell'input può essere fatta per partizioni sul numero totale di voxel nell'asse \(y\),
-cioè \lstinline{N_VOXELS_Y}.
+In questo modo, anche la lettura dell'input può essere fatta per partizioni sul numero totale di voxel nell'asse \(y\).
 È essenziale riconoscere che tali partizioni possono assumere dimensioni arbitrarie, senza vincoli reciproci e, in particolare,
 senza necessità di conoscere quella scelta per la scrittura.
 
@@ -1061,15 +1068,15 @@ In particolare, nella computazione su CPU, è fondamentale considerare la quanti
 un fattore rilevante nella parallelizzazione con OpenMP.
 Nella computazione su GPU, invece, bisogna tenere conto sia della memoria RAM della scheda madre sia di quella disponibile sulla
 GPU, aspetto cruciale quando si parallelizza con CUDA.
-Ad esempio, supponiamo di dover analizzare una partizione di lunghezza \lstinline{yVoxels}, con la condizione
-\lstinline{yVoxels <= N_VOXELS_Y}.
+Ad esempio, supponiamo di dover analizzare una partizione di lunghezza \mbox{\lstinline{yVoxels},} con la condizione
+\mbox{\lstinline{yVoxels <= N_VOXELS_Y}.}
 In questo caso, per quella partizione verranno letti solo \lstinline{N_VOXEL_X *  yVoxels * N_VOXEL_Z} valori, il che, per input
 di grandi dimensioni, può comportare un notevole risparmio di RAM.
 
 \section{Calcolo proiezioni}
 
 L'algoritmo per il calcolo delle proiezioni implementato si basa su quanto discusso nel \autoref{chap:intro}, in particolare tieni
-a mente l'\autoref{eq:law_lambert-beer_discrete}. I passi dell'algoritmo sono i seguenti:
+a mente l'\autoref{eq:law_lambert-beer_discrete} da cui siamo partiti. I passi dell'algoritmo sono i seguenti:
 \begin{enumerate}
   \item il vettore \(f\) dei coefficienti di attenuazione viene letto da file come input del programma;
   \item si calcola il prossimo punto sorgente da analizzare, nel caso in cui siano finiti l'algoritmo termina;
@@ -1198,7 +1205,7 @@ in cui:
 \begin{itemize}
   \item Partizionamento a grana fine: si riferisce a una suddivisione del lavoro in compiti molto piccoli, assegnati ai vari
         processi per massimizzare il parallelismo e bilanciare il carico.
-        Nel nostro caso l'unità di parallelizzazione è il singolo valore fissato di \lstinline{r} e \lstinline{c}.
+        Nel nostro caso l'unità di parallelizzazione è il singolo valore fissato di \lstinline{r} e \mbox{\lstinline{c}.}
   \item Paradigma master-worker: è un modello di programmazione parallela in cui un processo master si occupa di assegnare i
         compiti ai processi worker.
         I worker eseguono i compiti assegnati e, una volta completato un task, passano immediatamente al successivo disponibile,
@@ -1246,15 +1253,15 @@ yVoxels = tmp;
 
 Il \autoref{lst:cuda_y_max} mostra il funzionamento dell'algoritmo per il calcolo del numero massimo di voxel sull'asse \(y\) per
 ogni partizione dell'input da considerare.
-Dopo la sua individuazione il valore calcolato è assegnato a \lstinline{yVoxels}.
+Dopo la sua individuazione il valore calcolato è assegnato a \mbox{\lstinline{yVoxels}.}
 
 Anche in questo caso è stata introdotta la possibilità di specificare il numero massimo di voxel quando si lancia il programma da
 linea di comando, ignorando quindi il valore generato dall'algoritmo euristico che agisce normalmente.
 
 \subsubsection{Parallelizzazione}
 
-Nelle discussioni seguenti, il termine `esecuzione sull'host' si riferirà all'esecuzione di codice seriale sulla CPU, mentre
-`esecuzione sul device' indicherà l'esecuzione di codice parallelo sulla GPU.
+Nelle discussioni seguenti, il termine host si riferirà all'esecuzione di codice seriale sulla CPU, mentre device indicherà
+l'esecuzione di codice parallelo sulla GPU.
 
 \begin{lstlisting}[language=CStyle, caption={Codice CUDA-C per la lettura di \(f\).}, label={lst:cuda_vector_f_read}]
 double *const f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * yVoxels * gl_nVoxel[Z]);
@@ -1276,11 +1283,11 @@ Il \autoref{lst:cuda_vector_f_read}, equivalente del \autoref{lst:vector_f_read}
 considerando partizioni dell'input.
 
 In questo caso, a differenza di OpenMP, la funzione \lstinline{computeProjections} non viene invocata direttamente, bensì viene
-chiamata un'altra funzione, \lstinline{asyncComputeProjections}.
+chiamata un'altra funzione, \mbox{\lstinline{asyncComputeProjections}.}
 Questa scelta è motivata dalla necessità di garantire coerenza con il tipo di computazione eseguita al suo interno.
 
-Si noti che il prefisso \lstinline{async} nella funzione \lstinline{asyncComputeProjections}, chiamata dall'host, indica che
-l'esecuzione avviene in modo asincrono.
+Si noti che il prefisso \lstinline{async} nella funzione \mbox{\lstinline{asyncComputeProjections},} chiamata dall'host, indica
+che l'esecuzione avviene in modo asincrono.
 Così si permette alla CPU di leggere simultaneamente la prossima partizione dell'input, introducendo un ulteriore livello di
 parallelismo tra le operazioni.
 
@@ -1298,18 +1305,18 @@ In pratica, ciò si traduce in una riduzione complessiva dei tempi di esecuzione
 \begin{lstlisting}[language=CStyle, caption={Codice CUDA-C per il lancio del kernel.}, label={lst:cuda_launch_kernel}]
 void asyncComputeProjections(...)
 {
-  // Copio f dalla CPU nell'array corrispondente d_f sulla GPU
+  // Si copia f dalla CPU nell'array corrispondente d_f sulla GPU
   cudaMemcpy(d_f, f, sizeF, cudaMemcpyHostToDevice);
   // Le dimensioni di griglia e blocco sono sempre le stesse
   static dim3 block(BLKDIM_STEP, BLKDIM_STEP);
   static dim3 grid((nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP, (nSidePixels + BLKDIM_STEP - 1) / BLKDIM_STEP);
-  // Lancio il kernel in modo asincrono
+  // Il kernel viene lanciato in modo asincrono
   computeProjections<<<grid, block>>>(slice, nTheta, nSidePixels, d_f, d_g, isFirst);
 }
 \end{lstlisting}
 
 Il \autoref{lst:cuda_launch_kernel} mostra l'inizializzazione del kernel CUDA.
-Il kernel \lstinline{computeProjections}, che si occupa del calcolo delle proiezioni, non è più eseguito nell'host,
+Il kernel \mbox{\lstinline{computeProjections},} che si occupa del calcolo delle proiezioni, non è più eseguito nell'host,
 ma nel device.
 Quindi l'esecuzione dei passi 2-9 dell'algoritmo considerato, cioè del kernel, avviene in parallelo sul device.
 
@@ -1345,6 +1352,80 @@ minimo possibile di esecuzioni.
 Questo riduce al minimo l'overhead legato alla creazione dell'ambiente di esecuzione del kernel.
 Inoltre, i dati necessari per il calcolo ad eccezione dell'input, che deve essere aggiornato per ogni partizione, vengono
 trasferiti tra CPU e GPU una sola volta.
+
+\section{Generazione output}
+
+Il risultato dell'algoritmo di proiezione è l'array \(g\) di valori in virgola mobile, si faccia riferimento
+all'\autoref{eq:law_lambert-beer_discrete}.
+Tali valori vengono mappati su scala di grigi, facilitando la conversione in formato \lstinline{.pgm}, per poter poi essere
+visualizzati come immagini, convertendoli in formati visualizzabili graficamente come \lstinline{.png}.
+
+\begin{lstlisting}[language=CStyle, caption={Codice C per la mappatura dell'output in immagini.}, label={lst:outputs}]
+double *const g = (double *) calloc(nSidePixels * nSidePixels * nTheta, sizeof(double));
+... // Calcolo di g con OpenMP o CUDA
+FILE *const outputFilePointer = fopen(outputFileName, "w");
+if (!outputFilePointer) {
+  fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
+  free(g);
+  return EXIT_FAILURE;
+}
+// Stampa un valore nell'intervallo [0-255]
+fprintf(outputFilePointer, "P2\n%d %d\n255", nSidePixels, nSidePixels * nTheta);
+for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+  double angle = -(double) gl_angularTrajectory / 2 + (double) positionIndex * gl_positionsAngularDistance;
+  fprintf(outputFilePointer, "\n#%lf", angle);
+  for (unsigned i = 0; i < nSidePixels; i++) {
+    fprintf(outputFilePointer, "\n");
+    for (unsigned j = 0; j < nSidePixels; j++) {
+      const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + i * nSidePixels + j;
+      int color = (g[pixelIndex] - gMinValue) * 255 / (gMaxValue - gMinValue);
+      fprintf(outputFilePointer, "%d ", color);
+    }
+  }
+}
+fclose(outputFilePointer);
+\end{lstlisting}
+
+Il \autoref{lst:outputs} mostra come avviene la mappatura dei valori di \(g\) in un intervallo di valori 0-255 che individuano i
+colori nero-bianco nella scala di grigi.
+
+In un'immagine generata a partire dalla matrice di proiezione, i colori rappresentano visivamente i diversi livelli di
+attenuazione.
+Un raggio che attraversa una regione più densa del corpo subirà una maggiore attenuazione, risultando in una tonalità più chiara
+(verso il bianco), mentre un raggio che attraversa una regione meno densa subirà una minore attenuazione, apparendo in una
+tonalità più scura (verso il nero).
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{Cube}
+    \caption{\label{fig:projection_images_1} Cubo.}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{CubeWithSphericalHole}
+    \caption{\label{fig:projection_images_2} Cubo con cavità sferica.}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{HalfSphere}
+    \caption{\label{fig:projection_images_3} Semisfera.}
+  \end{subfigure}
+  \caption{\label{fig:projection_images} Immagini delle proiezioni.}
+\end{figure}
+
+La \autoref{fig:projection_images} mostra le immagini in formato \lstinline{.png} delle proiezioni ottenute eseguendo la versione
+CUDA del programma.
+Si ricorda che le immagini ottenute non sono fotografie tradizionali dell'oggetto scansionato, piuttosto sono una rappresentazione
+della distribuzione di densità dell'oggetto scansionato.
+In questo caso l'input processato è stato generato specificando \lstinline{2000} pixel per lato del detector, questo comporta che
+ciascuna proiezione qui mostrata è costituita da \lstinline{2000x2000} pixel in scala di grigi.
+In particolare le immagini riportate, lette da sinistra a destra, corrispondono alle proiezioni del rispettivo oggetto ottenute
+considerando angoli di -45°, -30°, -15°, 0°, 15°, 30° e 45° in cui come asse polare si intende l'asse \(y\) e il senso orario di
+rotazione delle sorgenti.
+Le proiezioni sono state calcolate considerando come angoli di posizionamento della sorgente rispetto all traiettoria circolare
+\(\theta = 90^\circ\) e \(\alpha = 15^\circ\), rivedi \autoref{fig:CT_polar_coordinates_source}.
 
 \appendix
 
