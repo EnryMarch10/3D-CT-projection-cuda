@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
         }
         if (argc > 3) {
             const int n = atoi(argv[3]);
-            gl_objectSideLength = n * gl_voxelXDim * ((double) OBJECT_SIDE_LENGTH / (VOXEL_X_DIM * N_PIXEL_ALONG_SIDE));
+            gl_objectSideLength = n * (gl_objectSideLength / N_PIXEL_ALONG_SIDE);
             gl_detectorSideLength = n * gl_pixelDim;
             gl_distanceObjectDetector = 1.5 * gl_objectSideLength;
             gl_distanceObjectSource = 6 * gl_objectSideLength;
