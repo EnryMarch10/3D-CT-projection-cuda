@@ -960,7 +960,7 @@ int main(int argc, char *argv[])
 
     if (outputFileName != NULL) {
         FILE *const outputFilePointer = fopen(outputFileName, "w");
-        if (!outputFileName) {
+        if (!outputFilePointer) {
             fprintf(stderr, "Unable to open file '%s'!\n", outputFileName);
             free(g);
             return EXIT_FAILURE;
