@@ -1,3 +1,8 @@
+### LibreOffice ###
+
+# locks
+.~lock.*#
+
 ### LaTeX ###
 
 ## Core latex/pdflatex auxiliary files:

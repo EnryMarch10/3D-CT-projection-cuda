@@ -29,6 +29,11 @@ function Build-LaTeX {
     Write-Host "Running pdflatex again..."
     pdflatex report
     Test-Error
+
+    # Step 3: Run pdflatex again
+    Write-Host "Running pdflatex again..."
+    pdflatex report
+    Test-Error
 }
 
 # Validate arguments count

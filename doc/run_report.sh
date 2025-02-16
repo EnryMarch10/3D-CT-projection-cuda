@@ -31,6 +31,10 @@ function BuildLaTeX() {
     echo "Running pdflatex again..."
     pdflatex "$REPORT"
     TestError
+
+    echo "Running pdflatex again..."
+    pdflatex "$REPORT"
+    TestError
 }
 
 # Check the number of arguments

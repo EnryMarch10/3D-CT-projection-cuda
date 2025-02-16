@@ -15,11 +15,12 @@
 \usepackage[margin=1in]{geometry} % Page geom
 \usepackage{lastpage} % To track the total number of pages
 \usepackage{fancyhdr} % To define a custom page numbering style
-\setlength{\headheight}{14.49998pt} % Avoids fancyhdr package error for 12pt titles
+\setlength{\headheight}{14.49998pt} % Avoids fancyhdr Warning, due to 12pt titles
 \usepackage{csquotes} % Recommended package to load before biblatex
 \usepackage[backend=biber, style=alphabetic, sorting=ydnt]{biblatex} % To include bibliography
 \addbibresource{riferimenti.bib}
 \usepackage{amsmath} % Necessary for \text{} command inside maths notations
+\usepackage{bm} % Import the bm package, for bold math expressions
 \usepackage{parskip} % Avoids paragraph indentation and puts spacing instead, better than the following two
 % \setlength{\parskip}{0.5em} % Set global paragraph spacing
 % \setlength{\parindent}{0pt} % No paragraph indentation
@@ -27,13 +28,17 @@
 \setlist[itemize]{topsep=0pt, partopsep=0pt, parsep=0pt}
 \usepackage{subcaption} % For multiple graphs in a single picture
 \usepackage{tikz} % To draw graphs
+\usepackage{pgfplots} % To plot inside a graph in 2D
+\pgfplotsset{compat=1.18} % Avoids pgfplots Warning
 \usetikzlibrary{3d} % For 3D graphs
 \usepackage{listings} % To use listings
 % \usepackage{inconsolata} % Use Inconsolata
 \renewcommand{\lstlistingname}{Listato} % Configurazione italiana del listato
+\usepackage{tabularray} % For tables
 
 \usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue, pdfborder={0 0 0}, hyperfootnotes=true]{hyperref}
-\usepackage[figure]{hypcap} % Ensures that references go to the figure, not the caption. You must include hyperref first
+% You must include hyperref before hypcap
+\usepackage[table, figure]{hypcap} % Ensures that references go to the figure or the table and not the caption
 
 \definecolor{C_comment_green}{rgb}{0.0, 0.5, 0.0}
 \definecolor{C_types_blue}{RGB}{30, 60, 240}
@@ -246,7 +251,7 @@ La \textbf{legge di Lambert-Beer} per il calcolo della proiezione del coefficien
   P_W\mu = - \ln{(\frac{m}{m_0})} = \int_0^W \mu(w) \, dw
 \end{equation}
 
-Dove:
+dove:
 \begin{itemize}
   \item \(P_W\mu\) è un valore che indica l'attenuazione di un raggio; la notazione indica la \textit{proiezione integrale} di
         \(\mu\) lungo un segmento di lunghezza \(W\).
@@ -273,7 +278,7 @@ L'\autoref{eq:law_lambert-beer} nel caso discreto, per calcolare una singola pro
   g_i = \sum_{j=0}^N M_{i, j} f_j \quad \forall i \in 1, \dots, N_p
 \end{equation}
 
-Dove:
+dove:
 \begin{itemize}
   \item \(g_i\) è l'attenuazione subita dall'\(i\)-esimo raggio.
   \item \(i\) è l'\(i\)-esimo raggio, degli \(N_p\) considerati per quella proiezione.
@@ -987,7 +992,7 @@ Instruction, Multiple Data) della tassonomia di Flynn, vedi \cite{Flynn1966}.
 
 In realtà l'hardware delle GPU prevede esecuzione:
 \begin{itemize}
-  \item SIMT: a livello di Warp (unità di schedulazione)
+  \item SIMT, a livello di Warp (unità di schedulazione):
         \begin{itemize}
           \item Le GPU eseguono gruppi di Thread chiamati Warp (tipicamente 32 Thread) che eseguono la stessa istruzione
                 simultaneamente, ma su dati diversi. Questo è il comportamento tipico del paradigma SIMD.
@@ -995,7 +1000,7 @@ In realtà l'hardware delle GPU prevede esecuzione:
                 Thread in un Warp possono, anche se inefficiente, divergere (ad esempio, con istruzioni condizionali), motivo per
                 cui il modello è chiamato SIMT.
         \end{itemize}
-  \item MIMD: a livello di multiprocessore
+  \item MIMD, a livello di multiprocessore:
         \begin{itemize}
           \item Ogni Streaming Multiprocessor (SM) della GPU può eseguire più Warp indipendenti, ognuno con istruzioni diverse.
           \item Questo significa che, considerando l'intera GPU, essa opera in modo MIMD, poiché più SM possono eseguire
@@ -1084,11 +1089,11 @@ a mente l'\autoref{eq:law_lambert-beer_discrete} da cui siamo partiti. I passi d
         punto 2;
   \item per procedere si calcolano i valori parametrici di intersezione del raggio individuato dalla sorgente e dal pixel del
         rilevatore con il primo e l'ultimo piano di ogni dimensione, per verificare che il raggio attraversi l'oggetto, in caso
-        contrario si ritorna al punto 3.
+        contrario si ritorna al punto 3;
   \item a questo punto si calcolano i valori parametrici dei piani estremi (il primo e l'ultimo) che devono essere considerati per
         calcolare il sottoinsieme delle intersezioni con il raggio che risultano dentro la griglia dei voxel, rivedi la
-        \autoref{fig:CT_Siddon_grid_to_planes}.
-  \item poi si calcolano i valori parametrici delle intersezioni tra il raggio ed i piani considerati.
+        \autoref{fig:CT_Siddon_grid_to_planes};
+  \item poi si calcolano i valori parametrici delle intersezioni tra il raggio ed i piani considerati;
   \item si calcola la lunghezza del prossimo segmento sotteso ai voxel (valore di \(M\)), nel caso in cui siano finiti si ritorna
         al punto 3;
   \item ora si calcola l'indice del voxel che sottende il segmento;
@@ -1426,6 +1431,280 @@ considerando angoli di -45°, -30°, -15°, 0°, 15°, 30° e 45° in cui come a
 rotazione delle sorgenti.
 Le proiezioni sono state calcolate considerando come angoli di posizionamento della sorgente rispetto all traiettoria circolare
 \(\theta = 90^\circ\) e \(\alpha = 15^\circ\), rivedi \autoref{fig:CT_polar_coordinates_source}.
+
+È importante inoltre considerare che, a causa delle differenze nelle architetture hardware di CPU e GPU, unitamente al fatto che
+l'ordine dei l'ordine dei calcoli in virgola mobile eseguiti in OpenMP e CUDA può variare, i risultati ottenuti non saranno
+esattamente identici.
+Per confrontare i risultati delle due versioni del programma e verificarne la correttezza, si possono adottare due approcci:
+\begin{itemize}
+  \item Comparare direttamente le versioni binarie dei risultati, scrivendo la matrice \(g\) su file.
+        Questo è il metodo più accurato.
+  \item Comparare le versioni \lstinline{.pgm} dei risultati, dove gg viene mappata da una matrice di valori in virgola mobile a
+        un'altra di valori nell'intervallo 0-255.
+        Questo metodo è meno accurato.
+  \item Comparare le versioni \lstinline{.png} dei risultati ad occhio.
+        Questo metodo è il meno accurato.
+\end{itemize}
+Per i risultati generati, oltre alla verifica visiva, cioè il terzo metodo, come conferma è stato utilizzato il secondo metodo.
+Su Linux, questo confronto può essere effettuato tramite il comando:
+
+\lstinline{compare -metric RMSE PGM1 PGM2 OUTPUT}
+
+dove:
+\begin{itemize}
+  \item \lstinline{PGM1} va rimpiazzato con il percorso del primo file in formato \lstinline{.pgm} da considerare.
+  \item \lstinline{PGM2} va rimpiazzato con il percorso del secondo file in formato \lstinline{.pgm} da considerare.
+  \item \lstinline{OUTPUT} va rimpiazzato con il percorso del file in cui verranno scritte le differenze tra i due file
+        considerati.
+\end{itemize}
+
+Si deve inoltre considerare che se la metrica RMSE (Root Mean Square Error) ottenuta è un valore sotto a \lstinline{1000}
+allora i due risultati possono essere considerati molto simili.
+
+\chapter{Valutazione delle prestazioni}
+
+Nella valutazione delle prestazioni per l'implementazioni CUDA trattata in questo progetto di tesi, le metriche di analisi
+considerate sono il tempo di esecuzione, il throughput e lo speedup rispetto alla versione OpenMP.
+
+Si inizierà analizzando la complessità computazionale dell'algoritmo implementato, per poi presentare le statistiche ottenute dai
+test pratici eseguiti su un server.
+
+\section{Statistiche}
+
+Prima di analizzare i risultati ottenuti è utile individuare la complessità computazionale dell'algoritmo considerato.
+Il limite superiore del tempo di esecuzione dell'algoritmo viene già individuato nella tesi di Colletta \cite{Colletta2024}.
+Tale complessità computazionale è qui riproposta:
+
+\begin{equation} \label{eq:computational_complexity}
+  O(N_\theta \cdot N_{pixel}^2 \cdot (N_x + N_y + N_z))
+\end{equation}
+
+dove:
+\begin{itemize}
+  \item \(O\) detta o-grande, indica che si tratta di un limite superiore del tempo di esecuzione, relativo al caso in cui un
+        raggio interseca tutti i piani.
+  \item \(N_\theta\) è il numero di proiezioni calcolate, cioè il numero di posizioni della sorgente considerate.
+  \item \(N_{pixel}\) è il numero di unità di misurazione per lato del rilevatore.
+  \item \(N_x\) è il numero di voxel lungo l'asse \(x\).
+  \item \(N_y\) è il numero di voxel lungo l'asse \(y\).
+  \item \(N_z\) è il numero di voxel lungo l'asse \(z\).
+\end{itemize}
+
+Il server considerato nei test riportati successivamente è l'\mbox{\lstinline{isi-raptor03.csr.unibo.it}.}
+La CPU del server è un \lstinline{Intel(R) Xeon(R) CPU E5-2603 v4 @ 1.70GHz} con 12 core fisici e 12 core logici (quindi senza
+Hyper-Threading).
+La scheda madre è dotata di 64 GB di RAM.
+La GPU usata nel server è una \mbox{\lstinline{NVIDIA GeForce GTX 1070}.}
+La scheda grafica è dotata di 8 GB di RAM.
+
+Gli input considerati sono i file \lstinline|CubeWithSphericalHole{400-1500}.dat|, cioè del tipo: cubo con cavità sferica.
+Il numero di pixel per lato della matrice rilevatore varia da \lstinline{400} a \lstinline{1500} con intervalli di \lstinline{100}
+pixel tra un input ed il successivo, per un totale di 12 input diversi.
+
+\begin{table}[H]
+  \centering
+  \begin{tblr}{
+      colspec={*{4}{Q[c]}},
+      width=\textwidth,
+      row{odd}={gray!15},
+      row{even}={white},
+      row{1}={bg=gray!90,fg=white},
+      colsep=4pt
+    }
+      \textbf{Iterazione} & $\bm{N_\theta}$ & $\bm{N_{pixel}}$ & $\bm{N_x}$ & $\bm{N_y}$ & $\bm{N_z}$ \\
+      \textbf{1} & 7 & 400 & \SetCell[c=3]{c} 168 \\
+      \textbf{2} & 7 & 500 & \SetCell[c=3]{c} 210 \\
+      \textbf{3} & 7 & 600 & \SetCell[c=3]{c} 252 \\
+      \textbf{4} & 7 & 700 & \SetCell[c=3]{c} 294 \\
+      \textbf{5} & 7 & 800 & \SetCell[c=3]{c} 336 \\
+      \textbf{6} & 7 & 900 & \SetCell[c=3]{c} 378 \\
+      \textbf{7} & 7 & 1000 & \SetCell[c=3]{c} 420 \\
+      \textbf{8} & 7 & 1100 & \SetCell[c=3]{c} 462 \\
+      \textbf{9} & 7 & 1200 & \SetCell[c=3]{c} 504 \\
+      \textbf{10} & 7 & 1300 & \SetCell[c=3]{c} 546 \\
+      \textbf{11} & 7 & 1400 & \SetCell[c=3]{c} 588 \\
+      \textbf{12} & 7 & 1500 & \SetCell[c=3]{c} 630 \\
+  \end{tblr}
+  \caption{\label{tab:cuda_it_sizes} Dimensioni del problema per ogni iterazione considerata.}
+\end{table}
+
+La \autoref{tab:cuda_it_sizes} mostra quali sono le dimensioni del problema.
+\(N_\theta\) è costante perché identificato dagli angoli fissati \(\theta = 90^\circ\) e \(\alpha = 15^\circ\).
+Il numero di voxel sui vari assi \(N_x\), \(N_y\) e \(N_z\) sono uguali perché viene considerato un oggetto cubico.
+Tale valore del numero di voxel per asse viene calcolato dal generatore di input in base al numero di pixel per lato del
+rilevatore scelti per ogni iterazione in modo empirico in base all'hardware a disposizione, \(N_{pixel}\).
+
+\subsection{Tempo di esecuzione}
+
+Il tempo di esecuzione potrebbe essere semplicemente considerato come il tempo totale impiegato dal programma per completare
+l'elaborazione.
+Tuttavia, questo includerebbe anche i tempi di lettura dell'input e di scrittura dell'output, influenzando significativamente la
+misurazione.
+Per questo motivo, nel seguito verrà considerato il tempo di esecuzione dato da:
+\begin{itemize}
+  \item Allocazione dati: per la CPU semplicemente l'allocazione delle strutture dati e la loro opportuna inizializzazione, per la
+        GPU anche il trasferimento dalla RAM dell'host a quella del device.
+  \item Esecuzione dei calcoli dei valori di attenuazione per ogni chiamata alla funzione OpenMP \lstinline{computeProjections} o
+        a quella CUDA \mbox{\lstinline{asyncComputeProjections}.}
+  \item Deallocazione dati: per la CPU semplicemente la deallocazione delle strutture dati, per la GPU anche il trasferimento
+        dalla RAM del device a quella dell'host.
+\end{itemize}
+Non verranno considerati:
+\begin{itemize}
+  \item Tempo di esecuzione della lettura da file dell'input, perché le operazioni sono le stesse in entrambe le versioni.
+  \item Tempo di esecuzione della scrittura su file dell'output, perché anche se il risultato delle due versioni è leggermente
+        diverso a causa dei calcoli in virgola mobile, le operazioni eseguite sono le stesse.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+    \begin{tikzpicture}[scale=0.9]
+      \begin{axis}[
+        title={Tempi di esecuzione},
+        xlabel={Numero di pixel per lato del rilevatore},
+        ylabel={Tempo di esecuzione (s)},
+        xlabel style={yshift=-10pt},
+        xtick=data,
+        symbolic x coords={400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500},
+        x tick label style={rotate=45, anchor=east},
+        ymin=0, ymax=30,
+        ytick={0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30},
+        legend pos=north west,
+        grid=both
+      ]
+        % OpenMP
+        \addplot[
+          thick,
+          color=blue,
+          mark=*,
+        ]
+          coordinates {
+            (400, 0.55) (500, 1.18) (600, 1.88)
+            (700, 2.73) (800, 4.33) (900, 6.05)
+            (1000, 8.56) (1100, 10.92) (1200, 15.21)
+            (1300, 17.97) (1400, 21.97) (1500, 27.82)
+          };
+        \addlegendentry{\small{OpenMP}}
+        % CUDA
+        \addplot[
+          thick,
+          color=green,
+          mark=*,
+        ]
+          coordinates {
+            (400, 0.37) (500, 0.43) (600, 0.55)
+            (700, 0.69) (800, 0.86) (900, 1.06)
+            (1000, 1.38) (1100, 1.66) (1200, 2.20)
+            (1300, 3.06) (1400, 3.31) (1500, 4.43)
+          };
+        \addlegendentry{\small{CUDA}}
+      \end{axis}
+    \end{tikzpicture}
+    \caption{\label{fig:cuda_wall_clock_time} Tempi di esecuzione di CUDA ed OpenMP a confronto.}
+\end{figure}
+
+La \autoref{fig:cuda_wall_clock_time} mostra i tempi di esecuzione a confronto per OpenMP e CUDA.
+Come si può notare i tempi di esecuzione della versione CUDA sono fino alle 7 volte inferiori rispetto a quelli della versione
+OpenMP.
+
+\subsection{Throughput}
+
+Il throughput, è il numero di operazioni al secondo in funzione della dimensione dell'input.
+La dimensione dell'input è approssimata con il lavoro svolto dall'algoritmo, vedi l'\autoref{eq:computational_complexity}.
+Il throughput è calcolato come \(\frac{Numero\ di\ operazioni}{Tempo\ di\ esecuzione\ (s)}\).
+Per il calcolo del numero di operazioni al secondo sono stati utilizzati i dati riportati nella \autoref{tab:cuda_it_sizes}.
+
+\begin{figure}[H]
+  \centering
+    \begin{tikzpicture}[scale=0.9]
+      \begin{axis}[
+        title={Throughput},
+        xlabel={Numero di pixel per lato del rilevatore},
+        ylabel={Operazioni (Gops/s)},
+        xlabel style={yshift=-10pt},
+        xtick=data,
+        symbolic x coords={400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500},
+        x tick label style={rotate=45, anchor=east},
+        ymin=0, ymax=8,
+        scaled y ticks=false,
+        ytick={0,1,2,3,4,5,6,7,8},
+        legend pos=north west,
+        grid=both
+      ]
+        % OpenMP
+        \addplot[
+          thick,
+          color=orange,
+          mark=*,
+        ]
+          coordinates {
+            (400, 1.03) (500, 0.94) (600, 1.01)
+            (700, 1.11) (800, 1.04) (900, 1.06)
+            (1000, 1.03) (1100, 1.08) (1200, 1.00)
+            (1300, 1.08) (1400, 1.10) (1500, 1.07)
+        };
+        \addlegendentry{\small{OpenMP}}
+        % CUDA
+        \addplot[
+          thick,
+          color=pink,
+          mark=*,
+        ]
+          coordinates {
+            (400, 1.53) (500, 2.59) (600, 3.48)
+            (700, 4.36) (800, 5.26) (900, 6.05)
+            (1000, 6.39) (1100, 7.09) (1200, 6.94)
+            (1300, 6.34) (1400, 7.31) (1500, 6.72)
+        };
+        \addlegendentry{\small{CUDA}}
+      \end{axis}
+    \end{tikzpicture}
+    \caption{\label{fig:cuda_throughput} Throughput di CUDA ed OpenMP a confronto.}
+\end{figure}
+
+La \autoref{fig:cuda_throughput} mostra il limite superiore di istruzioni stimato per OpenMP e CUDA.
+Tale numero di istruzioni è approssimato a miliardi di operazioni per secondo.
+In questo caso, il numero di operazioni al secondo per CUDA arriva fino a 7x rispetto a quello della versione OpenMP.
+
+\subsection{Speedup}
+
+Lo speedup di CUDA è inteso come il confronto dei tempi di esecuzione della versione CUDA rispetto a quella OpenMP.
+Indica quanto l'implementazione per GPU è mediamente più veloce rispetto a quella per la CPU, al variare della dimensione
+dell'input.
+
+\begin{figure}[H]
+  \centering
+    \begin{tikzpicture}[scale=0.8]
+        \begin{axis}[
+          x=1cm,
+          width=12cm, height=8cm,
+          title={Speedup},
+          xlabel={Numero di pixel per lato del rilevatore},
+          ylabel={Speedup},
+          xlabel style={yshift=-10pt},
+          xtick=data,
+          symbolic x coords={400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500},
+          x tick label style={rotate=45, anchor=east},
+          ymin=0, ymax=8,
+          legend pos=north west,
+          bar width=0.7cm,
+          nodes near coords,
+          grid=none
+        ]
+          \addplot[ybar, fill=cyan] coordinates {
+            (400, 1.48) (500, 2.77) (600, 3.43)
+            (700, 3.93) (800, 5.04) (900, 5.69)
+            (1000, 6.20) (1100, 6.59) (1200, 6.93)
+            (1300, 5.88) (1400, 6.64) (1500, 6.28)
+          };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{\label{fig:cuda_speedup} Accelerazione di CUDA rispetto ad OpenMP.}
+\end{figure}
+
+La \autoref{fig:cuda_speedup} mostra le performance della versione CUDA rispetto a quella OpenMP.
+Per input piccoli, l'accelerazione della versione CUDA è limitata, mentre cresce con la dimensione, stabilizzandosi intorno a 6x,
+con un picco di 7x in un caso favorevole.
 
 \appendix
 
