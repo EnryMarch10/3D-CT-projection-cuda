@@ -3,6 +3,11 @@
 # Generated file
 *.pdf
 
+### LibreOffice ###
+
+# locks
+.~lock.*#
+
 ### LaTeX ###
 
 ## Core latex/pdflatex auxiliary files:
