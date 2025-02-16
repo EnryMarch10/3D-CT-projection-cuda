@@ -13,7 +13,6 @@
 \newcounter{figcounter} % Initialize new counter to 0
 \usepackage{setspace} % For flexible line spacing management
 \usepackage[margin=1in]{geometry} % Page geom
-\usepackage{lastpage} % To track the total number of pages
 \usepackage{fancyhdr} % To define a custom page numbering style
 \setlength{\headheight}{14.49998pt} % Avoids fancyhdr Warning, due to 12pt titles
 \usepackage{csquotes} % Recommended package to load before biblatex
@@ -207,8 +206,8 @@ Gli obiettivi di questo lavoro sono:
 \tableofcontents
 \clearpage
 
-\fancypagestyle{fancy}{\fancyfoot[C]{\thepage\ di \pageref{LastPage}}}
-\fancypagestyle{plain}{\fancyfoot[C]{\thepage\ di \pageref{LastPage}}}
+\fancypagestyle{fancy}{\fancyfoot[C]{\thepage\ di \pageref{mylastpage}}}
+\fancypagestyle{plain}{\fancyfoot[C]{\thepage\ di \pageref{mylastpage}}}
 \pagestyle{fancy}
 \newpage
 \pagenumbering{arabic}
@@ -1469,6 +1468,10 @@ considerate sono il tempo di esecuzione, il throughput e lo speedup rispetto all
 Si inizierà analizzando la complessità computazionale dell'algoritmo implementato, per poi presentare le statistiche ottenute dai
 test pratici eseguiti su un server.
 
+Sia per OpenMP che per CUDA è stata utilizzata la versione di default dei programmi.
+Per OpenMP si considera un numero massimo di \lstinline{100} voxel sull'asse \(y\), mentre per CUDA questo valore è determinato
+dall'algoritmo euristico descritto in precedenza.
+
 \section{Statistiche}
 
 Prima di analizzare i risultati ottenuti è utile individuare la complessità computazionale dell'algoritmo considerato.
@@ -1592,10 +1595,10 @@ Non verranno considerati:
           mark=*,
         ]
           coordinates {
-            (400, 0.37) (500, 0.43) (600, 0.55)
-            (700, 0.69) (800, 0.86) (900, 1.06)
-            (1000, 1.38) (1100, 1.66) (1200, 2.20)
-            (1300, 3.06) (1400, 3.31) (1500, 4.43)
+            (400, 0.37) (500, 0.42) (600, 0.54)
+            (700, 0.67) (800, 0.83) (900, 1.05)
+            (1000, 1.30) (1100, 1.62) (1200, 2.02)
+            (1300, 2.58) (1400, 3.13) (1500, 3.66)
           };
         \addlegendentry{\small{CUDA}}
       \end{axis}
@@ -1611,8 +1614,6 @@ OpenMP.
 
 Il throughput, è il numero di operazioni al secondo in funzione della dimensione dell'input.
 La dimensione dell'input è approssimata con il lavoro svolto dall'algoritmo, vedi l'\autoref{eq:computational_complexity}.
-Il throughput è calcolato come \(\frac{Numero\ di\ operazioni}{Tempo\ di\ esecuzione\ (s)}\).
-Per il calcolo del numero di operazioni al secondo sono stati utilizzati i dati riportati nella \autoref{tab:cuda_it_sizes}.
 
 \begin{figure}[H]
   \centering
@@ -1625,9 +1626,9 @@ Per il calcolo del numero di operazioni al secondo sono stati utilizzati i dati 
         xtick=data,
         symbolic x coords={400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500},
         x tick label style={rotate=45, anchor=east},
-        ymin=0, ymax=8,
+        ymin=0, ymax=9,
         scaled y ticks=false,
-        ytick={0,1,2,3,4,5,6,7,8},
+        ytick={0,1,2,3,4,5,6,7,8,9},
         legend pos=north west,
         grid=both
       ]
@@ -1651,10 +1652,10 @@ Per il calcolo del numero di operazioni al secondo sono stati utilizzati i dati 
           mark=*,
         ]
           coordinates {
-            (400, 1.53) (500, 2.59) (600, 3.48)
-            (700, 4.36) (800, 5.26) (900, 6.05)
-            (1000, 6.39) (1100, 7.09) (1200, 6.94)
-            (1300, 6.34) (1400, 7.31) (1500, 6.72)
+            (400, 1.55) (500, 2.61) (600, 3.50)
+            (700, 4.55) (800, 5.43) (900, 6.15)
+            (1000, 6.77) (1100, 7.26) (1200, 7.54)
+            (1300, 7.51) (1400, 7.74) (1500, 8.13)
         };
         \addlegendentry{\small{CUDA}}
       \end{axis}
@@ -1662,9 +1663,11 @@ Per il calcolo del numero di operazioni al secondo sono stati utilizzati i dati 
     \caption{\label{fig:cuda_throughput} Throughput di CUDA ed OpenMP a confronto.}
 \end{figure}
 
-La \autoref{fig:cuda_throughput} mostra il limite superiore di istruzioni stimato per OpenMP e CUDA.
+Il throughput è calcolato come \(\frac{Numero\ di\ operazioni}{Tempo\ di\ esecuzione\ (s)}\).
+Per stimare il limite superiore del numero di operazioni al secondo svolte dai programmi sono stati utilizzati i dati riportati
+nella \autoref{tab:cuda_it_sizes}, i risultati sono osservabili nella \autoref{fig:cuda_throughput}.
 Tale numero di istruzioni è approssimato a miliardi di operazioni per secondo.
-In questo caso, il numero di operazioni al secondo per CUDA arriva fino a 7x rispetto a quello della versione OpenMP.
+In questo caso, il numero di operazioni al secondo per CUDA arriva fino a 8x rispetto a quello della versione OpenMP.
 
 \subsection{Speedup}
 
@@ -1692,10 +1695,10 @@ dell'input.
           grid=none
         ]
           \addplot[ybar, fill=cyan] coordinates {
-            (400, 1.48) (500, 2.77) (600, 3.43)
-            (700, 3.93) (800, 5.04) (900, 5.69)
-            (1000, 6.20) (1100, 6.59) (1200, 6.93)
-            (1300, 5.88) (1400, 6.64) (1500, 6.28)
+            (400, 1.50) (500, 2.79) (600, 3.46)
+            (700, 4.10) (800, 5.21) (900, 5.79)
+            (1000, 6.57) (1100, 6.75) (1200, 7.53)
+            (1300, 6.97) (1400, 7.03) (1500, 7.60)
           };
         \end{axis}
     \end{tikzpicture}
@@ -1704,7 +1707,7 @@ dell'input.
 
 La \autoref{fig:cuda_speedup} mostra le performance della versione CUDA rispetto a quella OpenMP.
 Per input piccoli, l'accelerazione della versione CUDA è limitata, mentre cresce con la dimensione, stabilizzandosi intorno a 6x,
-con un picco di 7x in un caso favorevole.
+con un picco di 7.6x in un caso favorevole.
 
 \appendix
 
@@ -1712,7 +1715,9 @@ con un picco di 7x in un caso favorevole.
 
 \dots
 
-\printbibliography
-\thispagestyle{empty}
+\label{mylastpage}
+\printbibliography % Print the bibliography
+\thispagestyle{empty} % Avoids numbering on the first bibliography page
+\pagestyle{empty} % Avoids numbering on all bibliography pages after the first
 
 \end{document}
