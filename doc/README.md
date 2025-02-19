@@ -20,3 +20,7 @@ To compile it on a Windows machine with TeX Live installed execute:
 ```shell
 ./run_report.ps1 {clean|build|rebuild}
 ```
+
+## License
+
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)

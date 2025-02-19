@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPORT=relazione
+REPORT=tesi
 
 # Function to check for errors and exit if the previous command failed
 function TestError() {

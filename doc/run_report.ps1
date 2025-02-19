@@ -1,3 +1,5 @@
+$ReportName = "tesi"
+
 # Function to check for errors and exit if the previous command failed
 function Test-Error {
     if ($LASTEXITCODE -ne 0) {
@@ -17,22 +19,22 @@ function Reset-All {
 function Build-LaTeX {
     # Step 1: Run pdflatex
     Write-Host "Running pdflatex..."
-    pdflatex report
+    pdflatex $ReportName
     Test-Error
 
     # Step 2: Run biber
     Write-Host "Running biber..."
-    biber report
+    biber $ReportName
     Test-Error
 
     # Step 3: Run pdflatex again
     Write-Host "Running pdflatex again..."
-    pdflatex report
+    pdflatex $ReportName
     Test-Error
 
     # Step 3: Run pdflatex again
     Write-Host "Running pdflatex again..."
-    pdflatex report
+    pdflatex $ReportName
     Test-Error
 }
 
