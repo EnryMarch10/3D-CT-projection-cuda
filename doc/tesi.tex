@@ -112,6 +112,12 @@
   % literate={*}{{\raisebox{0.3ex}{*}}}1, % Scale * character
 }
 
+\fancyhf{} % Clear all header and footer settings
+
+% Customize header
+\fancyhead[L]{\nouppercase{\leftmark}} % Left header for chapter title
+\fancyhead[R]{\nouppercase{\rightmark}} % Right header for section title
+
 \begin{document}
 
 \begin{spacing}{1.5}
@@ -164,38 +170,40 @@
 
 \begin{center}
 {Sessione marzo 2025\\}
-{Anno Accademico 2024/2025\\}
+{Anno Accademico 2023/2024\\}
 \end{center}
 
 \end{titlepage}
 \end{spacing}
 
 \begin{abstract}
-La Tomografia Computerizzata (TC) è una tecnica diagnostica che sfrutta le radiazioni ionizzanti (o raggi X) per ottenere
-un'immagine tridimensionale di un'entità analizzata.
-Questa tecnica si basa sulla raccolta, da parte di un rilevatore, di una matrice di dati 2D.
-Tale matrice è costruita a partire da considerazioni fatte sull'attenuazione dei raggi X che, diretti da una sorgente verso il
-rilevatore, passano attraverso l'oggetto di studio.
-Facendo ruotare la sorgente e il rilevatore, lungo una traiettoria nota, molte matrici di dati vengono in genere raccolte.
-Queste matrici 2D vengono poi trasferite in un calcolatore che ha il compito di ricostruire l'entità scansionata in 3D.
-Questo consente di esaminare l'oggetto ricostruito, osservandone alcune caratteristiche della sua struttura interna non note a
-priori, senza doverlo a tal scopo necessariamente disassemblare.
+La tomografia computerizzata (TC) è una tecnica diagnostica che sfrutta le radiazioni ionizzanti (o raggi X) per ottenere una
+rappresentazione tridimensionale di un'entità analizzata.
+Questa tecnica si basa sulla raccolta, da parte di un rilevatore, di più viste, dette proiezioni.
+Tali proiezioni sono realizzate a partire da considerazioni fatte sull'attenuazione dei raggi X che, diretti da una sorgente verso
+un rilevatore, passano attraverso l'oggetto di studio.
+Facendo ruotare la sorgente ed il rilevatore, lungo una traiettoria nota, molte proiezioni vengono in genere raccolte.
+Queste proiezioni vengono poi trasferite in un calcolatore che ha il compito di convertirle in immagini 2D e, se necessario,
+di ricostruire l'entità scansionata in 3D.
+La TC permette di analizzare l'oggetto ricostruito, evidenziando proprietà di densità della sua struttura interna precedentemente
+ignote, senza la necessità di ricorrere a tecniche distruttive.
 
-Nonostante sfruttata principalmente in ambito medico, la teoria su cui si basa la TC, in realtà, non fu ideata per scopi medici.
+Nonostante molto sfruttata in ambito medico, la teoria su cui si basa la TC, in realtà, non fu ideata per scopi medici.
 Infatti tale tecnica trova applicazione in numerosi altri ambiti oltre alla medicina, tra cui vari settori industriali, la
 paleontologia, l'archeologia e numerosi altri campi.
 
-Il principio su cui si basa ha origine grazie al matematico austriaco Johann Radon, che nel 1917 dimostrò la possibilità di
-ricostruire un oggetto tridimensionale mediante un numero infinito di proiezioni bidimensionali dell'oggetto stesso.
-Dal punto di vista matematico, questo rappresenta un problema inverso, cioè si determinano le cause (immagine 3D) a partire dagli
-effetti osservati (proiezioni 2D).
-In questa tesi viene invece affrontato il problema diretto: partendo dal corpo studiato si devono perciò determinare le
+Il principio su cui si basa ha origine grazie al matematico austriaco Johann Radon, che dimostrò la possibilità di ricostruire un
+oggetto tridimensionale mediante un numero infinito di proiezioni bidimensionali dell'oggetto stesso.
+L'adattamento di queste teorie ad un numero finito di proiezioni ha reso possibile lo sviluppo di questa tecnica.
+Dal punto di vista matematico, questo rappresenta un problema inverso, cioè si determinano le cause, oggetto 3D, a partire dagli
+effetti osservati, proiezioni 2D.
+In questa tesi viene invece affrontato il problema diretto, partendo dal corpo studiato si devono perciò determinare le
 proiezioni che una TC potrebbe generare.
 Gli obiettivi di questo lavoro sono:
 \begin{itemize}
-  \item Implementare una versione CUDA di un certo algoritmo di proiezione proposto da Siddon \cite{Siddon1984} partendo da
-        una sua implementazione parallela in C che sfrutta OpenMP \cite{Colletta2024}.
-  \item Analizzare le prestazioni della versione CUDA per GPU e confrontarle con la versione parallela per CPU già nota.
+  \item Implementare una versione per GPU NVIDIA ottimizzata dell'algoritmo di proiezione proposto da Siddon \cite{Siddon1984}
+        partendo da una sua implementazione multicore per la CPU \cite{Colletta2024}.
+  \item Analizzare le prestazioni della versione per GPU realizzata e confrontarle con la versione per CPU già nota.
 \end{itemize}
 \end{abstract}
 
@@ -212,7 +220,117 @@ Gli obiettivi di questo lavoro sono:
 \newpage
 \pagenumbering{arabic}
 
-\chapter{Introduzione} \label{chap:intro}
+\chapter{Introduzione}
+
+La tomografia computerizzata a raggi X (TC) è una tecnica di imaging\footnote{Consente di esplorare le strutture interne di un
+corpo in modo non invasivo.} introdotta nel 1972.
+È ampiamente utilizzata per individuare eventuali anomalie nei volumi corporei esaminati.
+In ambito medico per esempio è uno strumento essenziale per lo studio di molteplici condizioni cliniche.
+
+La TC è frequentemente paragonata alla radiografia tradizionale.
+Entrambe, la radiografia e la tomografia computerizzata, sono tecniche di imaging basate sui raggi X, ma hanno differenze
+fondamentali in termini di acquisizione delle immagini, qualità e applicazioni.
+La radiografia è una tecnica rapida ed economica che fornisce immagini bidimensionali, ma con sovrapposizione delle strutture e
+di conseguenza minore dettaglio.
+Espone l'oggetto ad una bassa dose di radiazioni ed è ideale per lo studio di strutture ad alto contrasto.
+La tomografia computerizzata, invece, utilizza scansioni da diverse angolazioni per generare immagini dettagliate in sezioni
+assiali, permettendo una migliore visualizzazione dell'oggetto.
+I diversi risultati, cioè le proiezioni possono risultare utili in quanto tali o essere usate per una ricostruzione della
+struttura dell'oggetto di studio in tre dimensioni.
+Offre un contrasto superiore, ma ha un costo più elevato ed un'esposizione maggiore alle radiazioni rispetto alla radiografia
+tradizionale.
+
+Segue una breve introduzione alla TC, per approfondimenti si rimanda a \cite{Faggioni2011} e \cite{MoroLoli2021}.
+
+\section{Cenni storici}
+
+La nascita dell'imaging medico risale a non molto tempo dopo che Wilhelm Röntge scoprì i raggi X, nel 1985.
+Non appena gli scienziati si resero conto delle capacità dei raggi X di attraversare gli oggetti, le immagini 2D (radiografie)
+sono state usate per decenni per investigare i volumi interni del corpo umano.
+Comunque, queste immagini rappresentano solo una vista delle informazioni dell'oggetto 3D scannerizzato, rappresentato su un piano
+2D.
+Negli anni '30 del Novecento, la teoria matematica pubblicata da Johann Radon nel 1917, gli studi del fisico Grossmann, insieme al
+desiderio di superare il processo della radiografia a raggi X, hanno portato alla definizione della tomografia come nuovo
+strumento per ispezionare gli oggetti.
+Dall'avvento dei computer, negli anni '70 del Novecento, la TC ha rivoluzionato l'imaging diagnostico, permettendo di ricostruire
+l'orientamento tridimensionale dell'anatomia di un oggetto.
+
+La transizione dell'imaging medico da semplice curiosità sperimentale a vera e propria applicazione clinica è stata resa
+possibile, in gran parte, dal lavoro dell'ingegnere inglese Godfrey Hounsfield.
+
+Nell'ottobre del 1971, nel reparto radiologico dell'Atkinson Morley Hospital di Londra, fu prodotta la prima immagine di un
+encefalo, dalla quale risultava chiaramente la presenza di una lesione tumorale nel lobo frontale.
+
+Il prototipo, basato su movimenti di traslazione e rotazione del complesso tubo radiogeno-detettore, produceva un'immagine su una
+matrice di \(80 \times 80\) con una risoluzione spaziale di 0,5 cm, e richiedeva per l'acquisizione e la ricostruzione di ciascuna
+fetta, rispettivamente, 4 e 7 minuti.
+
+Nel 1972 furono sottoposti a esame tomografico ben 70 pazienti e i risultati furono presentati al congresso annuale del British
+Institute of Radiology di Londra.
+Nello stesso anno, i risultati ottenuti furono pubblicati su un articolo del London Times e l'entusiasmo per questa nuova tecnica
+diagnostica crebbe notevolmente.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{scanner-Mark-I}
+  \caption{\label{fig:history_mark_1} Qui rappresentato il primo tomografo computerizzato commerciale per lo studio del cranio
+           prodotto dalla EMI nel 1973. Si tratta dell'EMI Mark 1 a sinistra, mentre a destra vi è il computer usato per
+           processare i dati raccolti dal tomografo.}
+\end{figure}
+
+Nella \autoref{fig:history_mark_1} è rappresentato il primo tomografo computerizzato commerciale, denominato EMI Mark 1.
+
+Oggi, grazie ai progressi tecnologici e all'innovazione nelle tecniche, la TC è sempre più diffusa e utilizzata.
+
+\section{Tecniche}
+
+Negli anni sono stati fatti vari studi per migliorare le tecnologie di scansione ed i metodi di ricostruzione software.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{tecniche-di-scansione}
+  \caption{\label{fig:history_tecnologies} Schizzi di dispositivi tomografici, dalla tecnologia primordiale
+           con scansioni parallele a raggi X (in alto a sinistra) alle soluzioni più moderne che utilizzano fasci a ventaglio per
+           la TC 2D (in alto a destra) e fasci conici per la TC 3D (in basso). \cite{MoroLoli2021}}
+\end{figure}
+
+Osserva la \autoref{fig:history_tecnologies}.
+La prima generazione di scanner per la TC, sviluppata negli anni '70, utilizzava un fascio di raggi X paralleli con movimenti
+alternati di traslazione e rotazione.
+Questo approccio, sebbene pionieristico, richiedeva tempi di scansione prolungati, rendendo possibile l'analisi solo di organi
+statici come l'encefalo.
+Successivamente, la seconda generazione introdusse l'uso di fasci a ventaglio, migliorando l'efficienza della scansione e
+riducendo i tempi necessari per acquisire le immagini.
+L'ulteriore evoluzione ha portato all'adozione di fasci a cono.
+Questa tecnica utilizza un fascio di raggi X a forma di cono per acquisire immagini tridimensionali in una singola rotazione
+attorno al paziente, offrendo dettagli ad alta risoluzione con una dose di radiazioni inferiore rispetto alle TC tradizionali.
+Questi sviluppi nelle tecnologie di scansione sono stati accompagnati da avanzamenti nei metodi di ricostruzione software,
+migliorando la qualità delle immagini e l'efficienza diagnostica.
+
+Oltre alla geometria adottata, il numero di proiezioni acquisite influisce significativamente sulla qualità della ricostruzione
+dell'oggetto, mentre, inversamente, incide sul tempo necessario per completarla.
+
+\section{Processo}
+
+Indipendentemente dalla tecnica, il processo di scansione nella TC consiste nell'acquisizione di numerose proiezioni dello stesso
+oggetto in esame, da varie angolazioni diverse, seguendo una specifica traiettoria.
+Durante questo processo, un fascio di raggi X attraversa l'oggetto, e i dati raccolti dai rivelatori vengono elaborati da un
+software per ricostruire un'immagine dettagliata della sua struttura interna.
+
+Dal punto di vista matematico, si parla di:
+\begin{itemize}
+  \item Problema diretto: dall'oggetto alle proiezioni, consiste nell'acquisizioni del sinogramma, cioè l'insieme di tutte le
+        proiezioni.
+  \item Problema inverso: dalle proiezioni all'oggetto, consiste nella ricostruzione dell'oggetto.
+\end{itemize}
+
+Entrambi questi problemi possono essere affrontati mediante diversi algoritmi disponibili in letteratura, ciascuno con specifici
+vantaggi e limitazioni in termini di accuratezza, velocità di calcolo e robustezza ai disturbi.
+
+Nei capitoli successivi, si approfondirà il problema diretto e la sua risoluzione mediante l'algoritmo di proiezione proposto da
+Siddon \cite{Siddon1984}, utilizzato per simulare il passaggio dei raggi X attraverso l'oggetto ed ottenere infine il sinogramma.
+
+\chapter{Fondamenti matematici e geometrici} \label{chap:math}
 
 Durante una scansione tomografica sono acquisite numerose proiezioni attorno all'oggetto di studio.
 Nel caso più semplice, che noi analizzeremo, la sorgente ed il rilevatore si muovono lungo una traiettoria circolare.
@@ -264,7 +382,7 @@ dove:
 
 La \textbf{trasformata di Radon}, in un modello continuo, è data dall'insieme delle proiezioni acquisite lungo l'intera
 traiettoria circolare.
-La rappresentazione grafica di tutti i dati misurati nel caso bidimensionale è chiamata \textit{sinogramma}.
+La rappresentazione grafica di tutti i dati misurati nel caso bidimensionale è chiamata sinogramma.
 
 \subsection{Il caso discreto}
 
@@ -1079,7 +1197,7 @@ di grandi dimensioni, può comportare un notevole risparmio di RAM.
 
 \section{Calcolo proiezioni}
 
-L'algoritmo per il calcolo delle proiezioni implementato si basa su quanto discusso nel \autoref{chap:intro}, in particolare tieni
+L'algoritmo per il calcolo delle proiezioni implementato si basa su quanto discusso nel \autoref{chap:math}, in particolare tieni
 a mente l'\autoref{eq:law_lambert-beer_discrete} da cui siamo partiti. I passi dell'algoritmo sono i seguenti:
 \begin{enumerate}
   \item il vettore \(f\) dei coefficienti di attenuazione viene letto da file come input del programma;
@@ -1177,7 +1295,7 @@ Le computazioni seguenti sono eseguite facendo riferimento all'algoritmo di Sidd
 L'implementazione per CPU proposta sfrutta il parallelismo OpenMP.
 
 Il calcolo della soluzione, per motivi legati all'utilizzo di memoria RAM, viene fatto in partizioni, considerando di default un
-numero massimo di \lstinline{100} voxel sull'asse \(y\).
+numero massimo di \(100\) voxel sull'asse \(y\).
 
 Nella rielaborazione dell'implementazione di partenza è stata introdotta la possibilità di specificare il numero massimo di voxel
 quando si lancia il programma da linea di comando, ignorando quindi il valore di default.
@@ -1423,8 +1541,8 @@ La \autoref{fig:projection_images} mostra le immagini in formato \lstinline{.png
 CUDA del programma.
 Si ricorda che le immagini ottenute non sono fotografie tradizionali dell'oggetto scansionato, piuttosto sono una rappresentazione
 della distribuzione di densità dell'oggetto scansionato.
-In questo caso l'input processato è stato generato specificando \lstinline{2000} pixel per lato del detector, questo comporta che
-ciascuna proiezione qui mostrata è costituita da \lstinline{2000x2000} pixel in scala di grigi.
+In questo caso l'input processato è stato generato specificando \(2000\) pixel per lato del detector, questo comporta che
+ciascuna proiezione qui mostrata è costituita da \(2000 \times 2000\) pixel in scala di grigi.
 In particolare le immagini riportate, lette da sinistra a destra, corrispondono alle proiezioni del rispettivo oggetto ottenute
 considerando angoli di -45°, -30°, -15°, 0°, 15°, 30° e 45° in cui come asse polare si intende l'asse \(y\) e il senso orario di
 rotazione delle sorgenti.
@@ -1432,9 +1550,9 @@ Le proiezioni sono state calcolate considerando come angoli di posizionamento de
 \(\theta = 90^\circ\) e \(\alpha = 15^\circ\), rivedi \autoref{fig:CT_polar_coordinates_source}.
 
 È importante inoltre considerare che, a causa delle differenze nelle architetture hardware di CPU e GPU, unitamente al fatto che
-l'ordine dei l'ordine dei calcoli in virgola mobile eseguiti in OpenMP e CUDA può variare, i risultati ottenuti non saranno
-esattamente identici.
-Per confrontare i risultati delle due versioni del programma e verificarne la correttezza, si possono adottare due approcci:
+l'ordine dei l'ordine dei calcoli in virgola mobile eseguiti in OpenMP e CUDA può variare, i risultati ottenuti dalle due versioni
+del programma non saranno esattamente identici.
+Per confrontare i risultati e verificare la correttezza, si possono adottare due approcci:
 \begin{itemize}
   \item Comparare direttamente le versioni binarie dei risultati, scrivendo la matrice \(g\) su file.
         Questo è il metodo più accurato.
@@ -1457,8 +1575,8 @@ dove:
         considerati.
 \end{itemize}
 
-Si deve inoltre considerare che se la metrica RMSE (Root Mean Square Error) ottenuta è un valore sotto a \lstinline{1000}
-allora i due risultati possono essere considerati molto simili.
+Si deve inoltre considerare che se la metrica RMSE (Root Mean Square Error) ottenuta è un valore sotto a \(1000\) allora i due
+risultati possono essere considerati molto simili.
 
 \chapter{Valutazione delle prestazioni}
 
@@ -1469,7 +1587,7 @@ Si inizierà analizzando la complessità computazionale dell'algoritmo implement
 test pratici eseguiti su un server.
 
 Sia per OpenMP che per CUDA è stata utilizzata la versione di default dei programmi.
-Per OpenMP si considera un numero massimo di \lstinline{100} voxel sull'asse \(y\), mentre per CUDA questo valore è determinato
+Per OpenMP si considera un numero massimo di \(100\) voxel sull'asse \(y\), mentre per CUDA questo valore è determinato
 dall'algoritmo euristico descritto in precedenza.
 
 \section{Statistiche}
@@ -1501,8 +1619,8 @@ La GPU usata nel server è una \mbox{\lstinline{NVIDIA GeForce GTX 1070}.}
 La scheda grafica è dotata di 8 GB di RAM.
 
 Gli input considerati sono i file \lstinline|CubeWithSphericalHole{400-1500}.dat|, cioè del tipo: cubo con cavità sferica.
-Il numero di pixel per lato della matrice rilevatore varia da \lstinline{400} a \lstinline{1500} con intervalli di \lstinline{100}
-pixel tra un input ed il successivo, per un totale di 12 input diversi.
+Il numero di pixel per lato della matrice rilevatore varia da \(400\) a \(1500\) con intervalli di \(100\) pixel tra un input ed
+il successivo, per un totale di 12 input diversi.
 
 \begin{table}[H]
   \centering
@@ -1566,7 +1684,6 @@ Non verranno considerati:
         title={Tempi di esecuzione},
         xlabel={Numero di pixel per lato del rilevatore},
         ylabel={Tempo di esecuzione (s)},
-        xlabel style={yshift=-10pt},
         xtick=data,
         symbolic x coords={400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500},
         x tick label style={rotate=45, anchor=east},
@@ -1622,7 +1739,6 @@ La dimensione dell'input è approssimata con il lavoro svolto dall'algoritmo, ve
         title={Throughput},
         xlabel={Numero di pixel per lato del rilevatore},
         ylabel={Operazioni (Gops/s)},
-        xlabel style={yshift=-10pt},
         xtick=data,
         symbolic x coords={400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500},
         x tick label style={rotate=45, anchor=east},
@@ -1684,11 +1800,10 @@ dell'input.
           title={Speedup},
           xlabel={Numero di pixel per lato del rilevatore},
           ylabel={Speedup},
-          xlabel style={yshift=-10pt},
           xtick=data,
           symbolic x coords={400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500},
           x tick label style={rotate=45, anchor=east},
-          ymin=0, ymax=8,
+          ymin=0, ymax=9,
           legend pos=north west,
           bar width=0.7cm,
           nodes near coords,

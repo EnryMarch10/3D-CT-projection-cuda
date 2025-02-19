@@ -1,9 +1,24 @@
 @Thesis{Colletta2024,
-  author      = {Colletta, Lorenzo},
-  title       = {Implementazione parallela di un algoritmo di proiezione tomografica},
-  type        = {Tesi di laurea triennale},
+  author   = {Colletta, Lorenzo},
+  title    = {Implementazione Parallela di un Algoritmo di Proiezione Tomografica},
+  type     = {Tesi di laurea triennale},
   institution = {Ingegneria e Scienze Informatiche, Università di Bologna, Cesena},
-  year        = {2024},
+  year = {2024},
+  keywords = {Tomografia Computerizzata,C,OpenMP,Calcolo parallelo,High Performance Computing},
+  abstract = {La Tomografia Computerizzata (TC) {\`e} una tecnica diagnostica che sfrutta le radiazioni ionizzanti (o raggi X) per
+  ottenere immagini dettagliate di sezioni trasversali di un corpo studiato. Questo metodo si basa sulla raccolta di dati
+  proiettivi da diverse angolazioni, che vengono poi elaborati per ricostruire immagini bidimensionali o tridimensionali degli
+  oggetti studiati. La tomografia computerizzata trova applicazione in molti settori, tra cui la medicina, l'archeologia, la
+  paleontologia e numerosi altri campi. Un problema tipico della tomografia computerizzata consiste nella ricostruzione delle
+  immagini a partire dai dati raccolti dal dispositivo di scansione. Dal punto di vista matematico, questo rappresenta un problema
+  inverso, cio{\`e} un problema in cui si cerca di determinare le cause (l'immagine originale) dagli effetti osservati (le
+  proiezioni raccolte). In questa sede viene invece affrontato il problema diretto: conoscendo le propriet{\`a} del corpo studiato
+  si ottengono le immagini di proiezione. 
+  Scopo di questa tesi {\`e}: implementare in linguaggio C un algoritmo che risolva il problema diretto della tomografia
+  computerizzata; implementare una versione parallela dell'algoritmo utilizzando OpenMP, un'interfaccia di programmazione per il
+  parallelismo su piattaforma a memoria condivisa; studiare e analizzare le prestazioni della versione parallela dell'algoritmo al
+  fine di valutarne la scalabilit{\`a} e l'efficienza nel migliorare le prestazioni complessive del codice seriale.},
+  url  = {https://amslaurea.unibo.it/id/eprint/33715/}
 }
 
 @Inbook{MoroLoli2021,
@@ -29,7 +44,15 @@
   url = "https://doi.org/10.1007/978-3-030-03009-4_123-1"
 }
 
-@ARTICLE{NVIDIA2008,
+@Book{Faggioni2011,
+  title     = {Elementi di tomografia computerizzata},
+  author    = {Faggioni, Lorenzo and Paolicchi, Fabio and Neri, Emanuele},
+  volume    = {4},
+  year      = {2011},
+  publisher = {Springer Science \& Business Media}
+}
+
+@Article{NVIDIA2008,
   author   = {Lindholm, Erik and Nickolls, John and Oberman, Stuart and Montrym, John},
   journal  = {IEEE Micro}, 
   title    = {NVIDIA Tesla: A Unified Graphics and Computing Architecture}, 

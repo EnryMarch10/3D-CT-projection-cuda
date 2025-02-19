@@ -20,4 +20,4 @@ The main folders of this project and their purposes are:
 
 ## License
 
-[GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/)
+[GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html)
