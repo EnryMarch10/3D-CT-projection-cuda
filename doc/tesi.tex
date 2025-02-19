@@ -177,28 +177,27 @@
 \end{spacing}
 
 \begin{abstract}
-La tomografia computerizzata (TC) è una tecnica diagnostica che sfrutta le radiazioni ionizzanti (o raggi X) per ottenere una
-rappresentazione tridimensionale di un'entità analizzata.
+La tomografia computerizzata (TC) è una tecnica diagnostica molto utilizzata negli ultimi cinquant'anni che sfrutta radiazioni
+ionizzanti (o raggi X) per ottenere una rappresentazione tridimensionale dell'entità in esame.
 Questa tecnica si basa sulla raccolta, da parte di un rilevatore, di più viste, dette proiezioni.
-Tali proiezioni sono realizzate a partire da considerazioni fatte sull'attenuazione dei raggi X che, diretti da una sorgente verso
-un rilevatore, passano attraverso l'oggetto di studio.
-Facendo ruotare la sorgente ed il rilevatore, lungo una traiettoria nota, molte proiezioni vengono in genere raccolte.
-Queste proiezioni vengono poi trasferite in un calcolatore che ha il compito di convertirle in immagini 2D e, se necessario,
-di ricostruire l'entità scansionata in 3D.
+Tali proiezioni sono date da considerazioni fatte sull'attenuazione dei raggi X che, diretti da una sorgente verso un rilevatore,
+passano attraverso l'oggetto di studio.
+Facendo ruotare la sorgente ed il rilevatore lungo una traiettoria nota, molte proiezioni vengono raccolte.
+Le proiezioni ottenute vengono poi trasferite in un calcolatore che ha il compito di convertirle in immagini 2D che sono
+essenziali per ricostruire il volume 3D dell'entità scansionata.
 La TC permette di analizzare l'oggetto ricostruito, evidenziando proprietà di densità della sua struttura interna precedentemente
 ignote, senza la necessità di ricorrere a tecniche distruttive.
 
-Nonostante molto sfruttata in ambito medico, la teoria su cui si basa la TC, in realtà, non fu ideata per scopi medici.
-Infatti tale tecnica trova applicazione in numerosi altri ambiti oltre alla medicina, tra cui vari settori industriali, la
-paleontologia, l'archeologia e numerosi altri campi.
+Nonostante sia molto sfruttata in ambito medico, la TC, in realtà, non fu ideata solamente per scopi medici ma trova applicazione
+in vari settori industriali, la paleontologia, l'archeologia e numerosi altri campi.
 
-Il principio su cui si basa ha origine grazie al matematico austriaco Johann Radon, che dimostrò la possibilità di ricostruire un
-oggetto tridimensionale mediante un numero infinito di proiezioni bidimensionali dell'oggetto stesso.
-L'adattamento di queste teorie ad un numero finito di proiezioni ha reso possibile lo sviluppo di questa tecnica.
-Dal punto di vista matematico, questo rappresenta un problema inverso, cioè si determinano le cause, oggetto 3D, a partire dagli
-effetti osservati, proiezioni 2D.
-In questa tesi viene invece affrontato il problema diretto, partendo dal corpo studiato si devono perciò determinare le
-proiezioni che una TC potrebbe generare.
+La TC originò grazie agli studi del matematico austriaco Johann Radon, che dimostrò teoricamente la possibilità di ricostruire
+un oggetto tridimensionale mediante un numero infinito di proiezioni bidimensionali dell'oggetto stesso.
+L'adattamento di queste teorie all'uso di un numero finito di proiezioni ha reso possibile lo sviluppo di questa tecnica.
+Dal punto di vista matematico, la ricostruzione dell'oggetto 3D a partire dalle proiezioni 2D rappresenta un problema inverso,
+cioè si determinano le cause a partire dagli effetti osservati.
+In questa tesi viene invece affrontato il problema diretto, partendo dal corpo studiato si devono determinare le proiezioni che
+una TC potrebbe generare.
 Gli obiettivi di questo lavoro sono:
 \begin{itemize}
   \item Implementare una versione per GPU NVIDIA ottimizzata dell'algoritmo di proiezione proposto da Siddon \cite{Siddon1984}
@@ -222,71 +221,73 @@ Gli obiettivi di questo lavoro sono:
 
 \chapter{Introduzione}
 
-La tomografia computerizzata a raggi X (TC) è una tecnica di imaging\footnote{Consente di esplorare le strutture interne di un
-corpo in modo non invasivo.} introdotta nel 1972.
-È ampiamente utilizzata per individuare eventuali anomalie nei volumi corporei esaminati.
-In ambito medico per esempio è uno strumento essenziale per lo studio di molteplici condizioni cliniche.
+Introdotta nel 1972, la tomografia computerizzata a raggi X (TC) è una tecnica di imaging, che consente di esplorare le strutture
+interne di un corpo in modo non invasivo, ampiamente utilizzata per individuare eventuali anomalie nei volumi corporei esaminati.
+In ambito medico è diventata uno strumento essenziale per lo studio di molteplici condizioni cliniche.
+
+Ancora presente, ma in disuso, è l'acronimo TAC, che sta per tomografia ``assiale'' computerizzata, ad indicare che l'esame
+inizialmente era condotto lungo un solo asse, con sezioni perpendicolari alla lunghezza del corpo.
+Oggi esistono macchinari più moderni e la tomografia computerizzata non è più solo assiale, le immagini sono acquisite con una
+tecnica spirale che permette di ottenere immagini tridimensionali.
+Il termine TAC è ora ritenuto improprio e obsoleto.
 
 La TC è frequentemente paragonata alla radiografia tradizionale.
-Entrambe, la radiografia e la tomografia computerizzata, sono tecniche di imaging basate sui raggi X, ma hanno differenze
-fondamentali in termini di acquisizione delle immagini, qualità e applicazioni.
-La radiografia è una tecnica rapida ed economica che fornisce immagini bidimensionali, ma con sovrapposizione delle strutture e
-di conseguenza minore dettaglio.
+Entrambe, sono tecniche di imaging basate sui raggi X, ma hanno differenze fondamentali in termini di acquisizione delle immagini,
+qualità e applicazioni.
+La radiografia è una tecnica rapida ed economica che fornisce immagini bidimensionali con sovrapposizione delle strutture e di
+conseguenza minore dettaglio.
 Espone l'oggetto ad una bassa dose di radiazioni ed è ideale per lo studio di strutture ad alto contrasto.
-La tomografia computerizzata, invece, utilizza scansioni da diverse angolazioni per generare immagini dettagliate in sezioni
-assiali, permettendo una migliore visualizzazione dell'oggetto.
-I diversi risultati, cioè le proiezioni possono risultare utili in quanto tali o essere usate per una ricostruzione della
-struttura dell'oggetto di studio in tre dimensioni.
-Offre un contrasto superiore, ma ha un costo più elevato ed un'esposizione maggiore alle radiazioni rispetto alla radiografia
-tradizionale.
+La TC, invece, utilizza varie scansioni da diverse angolazioni per generare immagini dettagliate in sezioni assiali (2D) o volumi
+(3D), permettendo una migliore visualizzazione dell'oggetto, ma ad un costo più elevato ed un'esposizione maggiore alle radiazioni
+rispetto alla radiografia.
 
 Segue una breve introduzione alla TC, per approfondimenti si rimanda a \cite{Faggioni2011} e \cite{MoroLoli2021}.
 
 \section{Cenni storici}
 
-La nascita dell'imaging medico risale a non molto tempo dopo che Wilhelm Röntge scoprì i raggi X, nel 1985.
+Gli studi dell'imaging medico cominciano dopo la scoperta dei raggi X da parte di Wilhelm Röntge, nel 1895.
 Non appena gli scienziati si resero conto delle capacità dei raggi X di attraversare gli oggetti, le immagini 2D (radiografie)
-sono state usate per decenni per investigare i volumi interni del corpo umano.
-Comunque, queste immagini rappresentano solo una vista delle informazioni dell'oggetto 3D scannerizzato, rappresentato su un piano
-2D.
-Negli anni '30 del Novecento, la teoria matematica pubblicata da Johann Radon nel 1917, gli studi del fisico Grossmann, insieme al
-desiderio di superare il processo della radiografia a raggi X, hanno portato alla definizione della tomografia come nuovo
-strumento per ispezionare gli oggetti.
-Dall'avvento dei computer, negli anni '70 del Novecento, la TC ha rivoluzionato l'imaging diagnostico, permettendo di ricostruire
-l'orientamento tridimensionale dell'anatomia di un oggetto.
+sono state largamente usate per investigare i volumi interni del corpo umano.
+Comunque, queste immagini rappresentano solo una vista delle informazioni del volume scannerizzato, rappresentato su un piano.
+La teoria matematica pubblicata da Johann Radon nel 1917, gli studi del fisico tedesco Grossmann, insieme al desiderio di superare
+il processo della radiografia a raggi X, hanno portato allo sviluppo della tomografia come nuovo strumento per ispezionare gli
+oggetti.
 
+Dall'avvento dei computer, attorno al 1970, la TC ha rivoluzionato l'imaging diagnostico, permettendo di ricostruire
+l'orientamento tridimensionale dell'anatomia di un oggetto.
 La transizione dell'imaging medico da semplice curiosità sperimentale a vera e propria applicazione clinica è stata resa
 possibile, in gran parte, dal lavoro dell'ingegnere inglese Godfrey Hounsfield.
 
-Nell'ottobre del 1971, nel reparto radiologico dell'Atkinson Morley Hospital di Londra, fu prodotta la prima immagine di un
-encefalo, dalla quale risultava chiaramente la presenza di una lesione tumorale nel lobo frontale.
-
-Il prototipo, basato su movimenti di traslazione e rotazione del complesso tubo radiogeno-detettore, produceva un'immagine su una
-matrice di \(80 \times 80\) con una risoluzione spaziale di 0,5 cm, e richiedeva per l'acquisizione e la ricostruzione di ciascuna
-fetta, rispettivamente, 4 e 7 minuti.
+Nell'ottobre del 1971, con l'aiuto di un prototipo di tomografo, nel reparto radiologico dell'Atkinson Morley Hospital di Londra,
+fu prodotta la prima immagine di un encefalo, dalla quale risultava chiaramente la presenza di una lesione tumorale nel lobo
+frontale.
+Questo tomografo permetteva movimenti di traslazione e rotazione del complesso tubo radiogeno-detettore e produceva un'immagine su
+una matrice di \(80 \times 80\) con una risoluzione spaziale di 0,5 cm, richiedendo per l'acquisizione e la ricostruzione di
+ciascuna fetta, rispettivamente, 4 e 7 minuti.
 
 Nel 1972 furono sottoposti a esame tomografico ben 70 pazienti e i risultati furono presentati al congresso annuale del British
 Institute of Radiology di Londra.
 Nello stesso anno, i risultati ottenuti furono pubblicati su un articolo del London Times e l'entusiasmo per questa nuova tecnica
 diagnostica crebbe notevolmente.
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.9\textwidth]{scanner-Mark-I}
-  \caption{\label{fig:history_mark_1} Qui rappresentato il primo tomografo computerizzato commerciale per lo studio del cranio
-           prodotto dalla EMI nel 1973. Si tratta dell'EMI Mark 1 a sinistra, mentre a destra vi è il computer usato per
-           processare i dati raccolti dal tomografo.}
+  \caption{\label{fig:history_mark_1} EMI Mark 1, il primo tomografo computerizzato commerciale.
+           Sulla destra si vede il computer usato per processare i dati raccolti dal tomografo.}
 \end{figure}
 
-Nella \autoref{fig:history_mark_1} è rappresentato il primo tomografo computerizzato commerciale, denominato EMI Mark 1.
+Nella \autoref{fig:history_mark_1} è rappresentato l'EMI Mark 1, il primo tomografo computerizzato commerciale prodotto dalla EMI
+nel 1973 per lo studio del cranio.
 
-Oggi, grazie ai progressi tecnologici e all'innovazione nelle tecniche, la TC è sempre più diffusa e utilizzata.
+Oggi, grazie ai continui avanzamenti tecnologici e all'innovazione nelle metodologie, la TC è sempre più diffusa e impiegata.
 
-\section{Tecniche}
+\section{Le tecnologie}
 
-Negli anni sono stati fatti vari studi per migliorare le tecnologie di scansione ed i metodi di ricostruzione software.
+L'evoluzione dei dispositivi tomografici ha seguito un percorso di costante innovazione tecnologica, migliorando progressivamente
+la qualità delle immagini diagnostiche e la velocità di acquisizione dei dati.
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth]{tecniche-di-scansione}
   \caption{\label{fig:history_tecnologies} Schizzi di dispositivi tomografici, dalla tecnologia primordiale
@@ -294,48 +295,46 @@ Negli anni sono stati fatti vari studi per migliorare le tecnologie di scansione
            la TC 2D (in alto a destra) e fasci conici per la TC 3D (in basso). \cite{MoroLoli2021}}
 \end{figure}
 
-Osserva la \autoref{fig:history_tecnologies}.
-La prima generazione di scanner per la TC, sviluppata negli anni '70, utilizzava un fascio di raggi X paralleli con movimenti
+Si osservi la \autoref{fig:history_tecnologies}.
+La prima generazione di scanner per la TC, sviluppata attorno al 1970, utilizzava un fascio di raggi X paralleli con movimenti
 alternati di traslazione e rotazione.
 Questo approccio, sebbene pionieristico, richiedeva tempi di scansione prolungati, rendendo possibile l'analisi solo di organi
 statici come l'encefalo.
-Successivamente, la seconda generazione introdusse l'uso di fasci a ventaglio, migliorando l'efficienza della scansione e
-riducendo i tempi necessari per acquisire le immagini.
-L'ulteriore evoluzione ha portato all'adozione di fasci a cono.
-Questa tecnica utilizza un fascio di raggi X a forma di cono per acquisire immagini tridimensionali in una singola rotazione
-attorno al paziente, offrendo dettagli ad alta risoluzione con una dose di radiazioni inferiore rispetto alle TC tradizionali.
+Successivamente, la seconda generazione di scanner produceva fasci di raggi X a ventaglio, migliorando l'efficienza della
+scansione e riducendo i tempi necessari per acquisire le immagini.
+Come ulteriore evoluzione, la terza generazione ha portato all'adozione di un fascio di raggi X a forma di cono per acquisire
+immagini tridimensionali in una singola rotazione attorno al paziente, offrendo dettagli ad alta risoluzione con un'esposizione
+inferiore alle radiazioni rispetto alle generazioni precedenti.
 Questi sviluppi nelle tecnologie di scansione sono stati accompagnati da avanzamenti nei metodi di ricostruzione software,
 migliorando la qualità delle immagini e l'efficienza diagnostica.
 
-Oltre alla geometria adottata, il numero di proiezioni acquisite influisce significativamente sulla qualità della ricostruzione
-dell'oggetto, mentre, inversamente, incide sul tempo necessario per completarla.
+\section{Il processo}
 
-\section{Processo}
-
-Indipendentemente dalla tecnica, il processo di scansione nella TC consiste nell'acquisizione di numerose proiezioni dello stesso
-oggetto in esame, da varie angolazioni diverse, seguendo una specifica traiettoria.
+Indipendentemente dalla tecnologia usata, la scansione nella TC consiste nell'acquisizione di numerose proiezioni dello stesso
+oggetto in esame, ottenute da varie angolazioni diverse, seguendo una specifica traiettoria.
 Durante questo processo, un fascio di raggi X attraversa l'oggetto, e i dati raccolti dai rivelatori vengono elaborati da un
-software per ricostruire un'immagine dettagliata della sua struttura interna.
+software per ricostruire un'immagine dettagliata tridimensionale della sua struttura interna.
 
 Dal punto di vista matematico, si parla di:
 \begin{itemize}
-  \item Problema diretto: dall'oggetto alle proiezioni, consiste nell'acquisizioni del sinogramma, cioè l'insieme di tutte le
-        proiezioni.
-  \item Problema inverso: dalle proiezioni all'oggetto, consiste nella ricostruzione dell'oggetto.
+  \item Problema diretto: partendo dall'oggetto 3D si calcolano le proiezioni 2D ottenendo il sinogramma, cioè l'insieme di tutte
+        le proiezioni.
+  \item Problema inverso: partendo dalle proiezioni 2D viene ricostruito l'oggetto 3D.
 \end{itemize}
 
 Entrambi questi problemi possono essere affrontati mediante diversi algoritmi disponibili in letteratura, ciascuno con specifici
-vantaggi e limitazioni in termini di accuratezza, velocità di calcolo e robustezza ai disturbi.
+vantaggi e limitazioni in termini di accuratezza, costo computazionale e robustezza ai disturbi.
 
 Nei capitoli successivi, si approfondirà il problema diretto e la sua risoluzione mediante l'algoritmo di proiezione proposto da
-Siddon \cite{Siddon1984}, utilizzato per simulare il passaggio dei raggi X attraverso l'oggetto ed ottenere infine il sinogramma.
+Siddon \cite{Siddon1984}, utilizzato per simulare il passaggio dei raggi X attraverso l'oggetto per ottenere il sinogramma.
 
 \chapter{Fondamenti matematici e geometrici} \label{chap:math}
 
 Durante una scansione tomografica sono acquisite numerose proiezioni attorno all'oggetto di studio.
 Nel caso più semplice, che noi analizzeremo, la sorgente ed il rilevatore si muovono lungo una traiettoria circolare.
 Intuitivamente più sono le proiezioni acquisite, più la ricostruzione dell'oggetto sarà accurata.
-D'altra parte, specialmente in ambito medico, ridurre l'esposizione alle radiazioni è di beneficio per l'individuo scansionato.
+D'altra parte, specialmente in ambito medico, ridurre l'esposizione del corpo alle radiazioni è di beneficio per l'individuo
+scansionato.
 Questo implica che il numero di proiezioni generate è esso stesso molto variabile in base all'applicazione.
 
 Dal punto di vista fisico, i dati di proiezione riflettono l'assorbimento dei fotoni che costituiscono i raggi X.
@@ -1065,7 +1064,7 @@ consentendo l'esecuzione parallela di più attività.
 
 \subsubsection{OpenMP}
 
-OpenMP\footnote{Per maggiori informazioni vedi \url{https://www.openmp.org/}.} (Open Multi-Processing) è un'API (Application
+OpenMP (Open Multi-Processing) è un'API (Application
 Programming Interface) che supporta la programmazione parallela su architetture multi core con memoria condivisa.
 Fornisce un insieme di direttive per il compilatore, librerie runtime e variabili d'ambiente che permettono di scrivere programmi
 paralleli.
@@ -1074,7 +1073,7 @@ In questo progetto è stato utilizzato il linguaggio C.
 OpenMP rientra nella categoria \textbf{MIMD} (Multiple Instruction, Multiple Data) secondo la tassonomia di Flynn, vedi
 \cite{Flynn1966}.
 
-Caratteristiche principali di OpenMP:
+Le caratteristiche principali di OpenMP sono:
 \begin{itemize}
   \item Parallelismo a memoria condivisa: I processi condividono lo stesso spazio di indirizzamento.
   \item Programmazione basata su direttive: Le sezioni di codice parallelo sono specificate tramite pragma.
@@ -1098,7 +1097,7 @@ in cui sono specializzate.
 
 \subsubsection{CUDA}
 
-CUDA\footnote{Per maggiori informazioni vedi \url{https://docs.nvidia.com/cuda/}.} (Compute Unified Device Architecture) è una
+CUDA (Compute Unified Device Architecture) è una
 piattaforma di calcolo parallelo e un modello di programmazione sviluppato da NVIDIA che consente di sfruttare le GPU NVIDIA per
 l'elaborazione generale, GPGPU (General-Purpose computing on Graphics Processing Units).
 In questo progetto è stato utilizzato il linguaggio `CUDA-C' (C con estensioni NVIDIA).
@@ -1129,7 +1128,7 @@ Il meccanismo di computazione basato sulle unità Warp implica che le computazio
 Questo perché le divergenze, ovvero le istruzioni condizionali nel codice, causano la serializzazione dell'esecuzione dei Thread
 all'interno di un singolo Warp.
 
-Caratteristiche principali di CUDA:
+Le caratteristiche principali di CUDA sono:
 \begin{itemize}
   \item Parallelismo massivo: Permette di eseguire migliaia di Thread in parallelo sulla GPU. Adatto a risolvere problemi del
         tipo `Embarrassingly Parallel', quindi in cui la computazione può essere decomposta in task indipendenti, con poche
@@ -1297,8 +1296,8 @@ L'implementazione per CPU proposta sfrutta il parallelismo OpenMP.
 Il calcolo della soluzione, per motivi legati all'utilizzo di memoria RAM, viene fatto in partizioni, considerando di default un
 numero massimo di \(100\) voxel sull'asse \(y\).
 
-Nella rielaborazione dell'implementazione di partenza è stata introdotta la possibilità di specificare il numero massimo di voxel
-quando si lancia il programma da linea di comando, ignorando quindi il valore di default.
+Nella rielaborazione dell'implementazione di partenza \cite{Colletta2024} è stata introdotta la possibilità di specificare il
+numero massimo di voxel quando si lancia il programma da linea di comando, ignorando quindi il valore di default.
 
 \subsubsection{Parallelizzazione}
 
@@ -1406,7 +1405,8 @@ considerando partizioni dell'input.
 
 In questo caso, a differenza di OpenMP, la funzione \lstinline{computeProjections} non viene invocata direttamente, bensì viene
 chiamata un'altra funzione, \mbox{\lstinline{asyncComputeProjections}.}
-Questa scelta è motivata dalla necessità di garantire coerenza con il tipo di computazione eseguita al suo interno.
+La scelta è stata fatta per mantenere la stessa struttura di calcolo all'interno dello stesso identificatore di funzione,
+\lstinline{computeProjections}, garantendo coerenza con il tipo di computazione eseguita.
 
 Si noti che il prefisso \lstinline{async} nella funzione \mbox{\lstinline{asyncComputeProjections},} chiamata dall'host, indica
 che l'esecuzione avviene in modo asincrono.
@@ -1552,14 +1552,14 @@ Le proiezioni sono state calcolate considerando come angoli di posizionamento de
 È importante inoltre considerare che, a causa delle differenze nelle architetture hardware di CPU e GPU, unitamente al fatto che
 l'ordine dei l'ordine dei calcoli in virgola mobile eseguiti in OpenMP e CUDA può variare, i risultati ottenuti dalle due versioni
 del programma non saranno esattamente identici.
-Per confrontare i risultati e verificare la correttezza, si possono adottare due approcci:
+Per verificare la correttezza dei risultati, si possono adottare due approcci:
 \begin{itemize}
-  \item Comparare direttamente le versioni binarie dei risultati, scrivendo la matrice \(g\) su file.
+  \item Confrontare direttamente le versioni binarie dei risultati, scrivendo la matrice \(g\) su file.
         Questo è il metodo più accurato.
-  \item Comparare le versioni \lstinline{.pgm} dei risultati, dove gg viene mappata da una matrice di valori in virgola mobile a
+  \item Confrontare le versioni \lstinline{.pgm} dei risultati, dove gg viene mappata da una matrice di valori in virgola mobile a
         un'altra di valori nell'intervallo 0-255.
         Questo metodo è meno accurato.
-  \item Comparare le versioni \lstinline{.png} dei risultati ad occhio.
+  \item Confrontare le versioni \lstinline{.png} dei risultati ad occhio.
         Questo metodo è il meno accurato.
 \end{itemize}
 Per i risultati generati, oltre alla verifica visiva, cioè il terzo metodo, come conferma è stato utilizzato il secondo metodo.
@@ -1593,7 +1593,7 @@ dall'algoritmo euristico descritto in precedenza.
 \section{Statistiche}
 
 Prima di analizzare i risultati ottenuti è utile individuare la complessità computazionale dell'algoritmo considerato.
-Il limite superiore del tempo di esecuzione dell'algoritmo viene già individuato nella tesi di Colletta \cite{Colletta2024}.
+Il limite superiore del tempo di esecuzione dell'algoritmo viene già individuato in \cite{Colletta2024}.
 Tale complessità computazionale è qui riproposta:
 
 \begin{equation} \label{eq:computational_complexity}
@@ -1611,11 +1611,13 @@ dove:
   \item \(N_z\) è il numero di voxel lungo l'asse \(z\).
 \end{itemize}
 
-Il server considerato nei test riportati successivamente è l'\mbox{\lstinline{isi-raptor03.csr.unibo.it}.}
-La CPU del server è un \lstinline{Intel(R) Xeon(R) CPU E5-2603 v4 @ 1.70GHz} con 12 core fisici e 12 core logici (quindi senza
-Hyper-Threading).
+L'\mbox{\lstinline{isi-raptor03.csr.unibo.it}} è il server di riferimento utilizzato per effettuare i test riportati
+successivamente.
+È dotato di una CPU del tipo \lstinline{Intel(R) Xeon(R) CPU E5-2603 v4 @ 1.70GHz} con 12 core fisici e 12 core logici (quindi
+senza Hyper-Threading).
+Nei test OpenMP riportati di seguito sono stati sfruttati tutti i 12 core disponibili.
 La scheda madre è dotata di 64 GB di RAM.
-La GPU usata nel server è una \mbox{\lstinline{NVIDIA GeForce GTX 1070}.}
+La GPU impiegata nei test è una \mbox{\lstinline{NVIDIA GeForce GTX 1070}.}
 La scheda grafica è dotata di 8 GB di RAM.
 
 Gli input considerati sono i file \lstinline|CubeWithSphericalHole{400-1500}.dat|, cioè del tipo: cubo con cavità sferica.
@@ -1632,7 +1634,7 @@ il successivo, per un totale di 12 input diversi.
       row{1}={bg=gray!90,fg=white},
       colsep=4pt
     }
-      \textbf{Iterazione} & $\bm{N_\theta}$ & $\bm{N_{pixel}}$ & $\bm{N_x}$ & $\bm{N_y}$ & $\bm{N_z}$ \\
+      \textbf{Configurazione} & $\bm{N_\theta}$ & $\bm{N_{pixel}}$ & $\bm{N_x}$ & $\bm{N_y}$ & $\bm{N_z}$ \\
       \textbf{1} & 7 & 400 & \SetCell[c=3]{c} 168 \\
       \textbf{2} & 7 & 500 & \SetCell[c=3]{c} 210 \\
       \textbf{3} & 7 & 600 & \SetCell[c=3]{c} 252 \\
@@ -1646,14 +1648,17 @@ il successivo, per un totale di 12 input diversi.
       \textbf{11} & 7 & 1400 & \SetCell[c=3]{c} 588 \\
       \textbf{12} & 7 & 1500 & \SetCell[c=3]{c} 630 \\
   \end{tblr}
-  \caption{\label{tab:cuda_it_sizes} Dimensioni del problema per ogni iterazione considerata.}
+  \caption{\label{tab:cuda_it_sizes} Dimensione del problema per ogni configurazione considerata.}
 \end{table}
 
-La \autoref{tab:cuda_it_sizes} mostra quali sono le dimensioni del problema.
+La \autoref{tab:cuda_it_sizes} mostra quali sono la dimensione del problema.
+La configurazione indica le dimensioni dei parametri dell'input per ogni istanza testata.
 \(N_\theta\) è costante perché identificato dagli angoli fissati \(\theta = 90^\circ\) e \(\alpha = 15^\circ\).
 Il numero di voxel sui vari assi \(N_x\), \(N_y\) e \(N_z\) sono uguali perché viene considerato un oggetto cubico.
 Tale valore del numero di voxel per asse viene calcolato dal generatore di input in base al numero di pixel per lato del
-rilevatore scelti per ogni iterazione in modo empirico in base all'hardware a disposizione, \(N_{pixel}\).
+rilevatore scelti.
+Il valore di \(N_{pixel}\) viene fissato per ogni configurazione in modo empirico, cioè in base alle prestazioni del calcolatore
+a disposizione, quindi questa configurazione è adatta per lo specifico server utilizzato.
 
 \subsection{Tempo di esecuzione}
 
@@ -1672,54 +1677,103 @@ Per questo motivo, nel seguito verrà considerato il tempo di esecuzione dato da
 \end{itemize}
 Non verranno considerati:
 \begin{itemize}
-  \item Tempo di esecuzione della lettura da file dell'input, perché le operazioni sono le stesse in entrambe le versioni.
-  \item Tempo di esecuzione della scrittura su file dell'output, perché anche se il risultato delle due versioni è leggermente
-        diverso a causa dei calcoli in virgola mobile, le operazioni eseguite sono le stesse.
+  \item Tempo di lettura da file dell'input, perché le operazioni sono le stesse in entrambe le versioni.
+  \item Tempo di scrittura su file dell'output, perché anche se il risultato delle due versioni è leggermente diverso a causa dei
+        calcoli in virgola mobile, le operazioni eseguite sono le stesse.
 \end{itemize}
 
 \begin{figure}[H]
   \centering
-    \begin{tikzpicture}[scale=0.9]
-      \begin{axis}[
-        title={Tempi di esecuzione},
-        xlabel={Numero di pixel per lato del rilevatore},
-        ylabel={Tempo di esecuzione (s)},
-        xtick=data,
-        symbolic x coords={400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500},
-        x tick label style={rotate=45, anchor=east},
-        ymin=0, ymax=30,
-        ytick={0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30},
-        legend pos=north west,
-        grid=both
-      ]
-        % OpenMP
-        \addplot[
-          thick,
-          color=blue,
-          mark=*,
+    \begin{tikzpicture}[scale=0.8]
+        \begin{axis}[
+          x=1cm,
+          width=12cm, height=8cm,
+          title={Tempi di esecuzione OpenMP},
+          xlabel={Configurazione},
+          ylabel={Tempo di esecuzione (s)},
+          xtick=data,
+          xmin=0, xmax=13,
+          ymin=0, ymax=32,
+          ytick={0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32},
+          legend pos=north west,
+          bar width=0.7cm,
+          nodes near coords,
+          grid=none
         ]
-          coordinates {
-            (400, 0.55) (500, 1.18) (600, 1.88)
-            (700, 2.73) (800, 4.33) (900, 6.05)
-            (1000, 8.56) (1100, 10.92) (1200, 15.21)
-            (1300, 17.97) (1400, 21.97) (1500, 27.82)
+          % OpenMP
+          \addplot[ybar, fill=blue] coordinates {
+            (1, 0.55) (2, 1.18) (3, 1.88)
+            (4, 2.73) (5, 4.33) (6, 6.05)
+            (7, 8.56) (8, 10.92) (9, 15.21)
+            (10, 17.97) (11, 21.97) (12, 27.82)
           };
-        \addlegendentry{\small{OpenMP}}
-        % CUDA
-        \addplot[
-          thick,
-          color=green,
-          mark=*,
-        ]
-          coordinates {
-            (400, 0.37) (500, 0.42) (600, 0.54)
-            (700, 0.67) (800, 0.83) (900, 1.05)
-            (1000, 1.30) (1100, 1.62) (1200, 2.02)
-            (1300, 2.58) (1400, 3.13) (1500, 3.66)
-          };
-        \addlegendentry{\small{CUDA}}
-      \end{axis}
+        \end{axis}
     \end{tikzpicture}
+    \begin{tikzpicture}[scale=0.8]
+        \begin{axis}[
+          x=1cm,
+          width=12cm, height=8cm,
+          title={Tempi di esecuzione CUDA},
+          xlabel={Configurazione},
+          ylabel={Tempo di esecuzione (s)},
+          xtick=data,
+          xmin=0, xmax=13,
+          ymin=0, ymax=32,
+          ytick={0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32},
+          legend pos=north west,
+          bar width=0.7cm,
+          nodes near coords,
+          grid=none
+        ]
+          % CUDA
+          \addplot[ybar, fill=green] coordinates {
+            (1, 0.37) (2, 0.42) (3, 0.54)
+            (4, 0.67) (5, 0.83) (6, 1.05)
+            (7, 1.30) (8, 1.62) (9, 2.02)
+            (10, 2.58) (11, 3.13) (12, 3.66)
+          };
+        \end{axis}
+    \end{tikzpicture}
+    % \begin{tikzpicture}[scale=0.9]
+    %   \begin{axis}[
+    %     title={Tempi di esecuzione},
+    %     xlabel={Configurazione},
+    %     ylabel={Tempo di esecuzione (s)},
+    %     xtick=data,
+    %     xmin=1, xmax=12,
+    %     ymin=0, ymax=30,
+    %     ytick={0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30},
+    %     legend pos=north west,
+    %     grid=both
+    %   ]
+    %     % OpenMP
+    %     \addplot[
+    %       thick,
+    %       color=blue,
+    %       mark=*,
+    %     ]
+    %       coordinates {
+    %         (1, 0.55) (2, 1.18) (3, 1.88)
+    %         (4, 2.73) (5, 4.33) (6, 6.05)
+    %         (7, 8.56) (8, 10.92) (9, 15.21)
+    %         (10, 17.97) (11, 21.97) (12, 27.82)
+    %       };
+    %     \addlegendentry{\small{OpenMP}}
+    %     % CUDA
+    %     \addplot[
+    %       thick,
+    %       color=green,
+    %       mark=*,
+    %     ]
+    %       coordinates {
+    %         (1, 0.37) (2, 0.42) (3, 0.54)
+    %         (4, 0.67) (5, 0.83) (6, 1.05)
+    %         (7, 1.30) (8, 1.62) (9, 2.02)
+    %         (10, 2.58) (11, 3.13) (12, 3.66)
+    %       };
+    %     \addlegendentry{\small{CUDA}}
+    %   \end{axis}
+    % \end{tikzpicture}
     \caption{\label{fig:cuda_wall_clock_time} Tempi di esecuzione di CUDA ed OpenMP a confronto.}
 \end{figure}
 
@@ -1734,48 +1788,97 @@ La dimensione dell'input è approssimata con il lavoro svolto dall'algoritmo, ve
 
 \begin{figure}[H]
   \centering
-    \begin{tikzpicture}[scale=0.9]
-      \begin{axis}[
-        title={Throughput},
-        xlabel={Numero di pixel per lato del rilevatore},
-        ylabel={Operazioni (Gops/s)},
-        xtick=data,
-        symbolic x coords={400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500},
-        x tick label style={rotate=45, anchor=east},
-        ymin=0, ymax=9,
-        scaled y ticks=false,
-        ytick={0,1,2,3,4,5,6,7,8,9},
-        legend pos=north west,
-        grid=both
-      ]
-        % OpenMP
-        \addplot[
-          thick,
-          color=orange,
-          mark=*,
+    \begin{tikzpicture}[scale=0.8]
+        \begin{axis}[
+          x=1cm,
+          width=12cm, height=8cm,
+          title={Throughput OpenMP},
+          xlabel={Configurazione},
+          ylabel={Operazioni (Gops/s)},
+          xtick=data,
+          xmin=0, xmax=13,
+          ymin=0, ymax=10,
+          ytick={0,1,2,3,4,5,6,7,8,9,10},
+          legend pos=north west,
+          bar width=0.7cm,
+          nodes near coords,
+          grid=none
         ]
-          coordinates {
-            (400, 1.03) (500, 0.94) (600, 1.01)
-            (700, 1.11) (800, 1.04) (900, 1.06)
-            (1000, 1.03) (1100, 1.08) (1200, 1.00)
-            (1300, 1.08) (1400, 1.10) (1500, 1.07)
-        };
-        \addlegendentry{\small{OpenMP}}
-        % CUDA
-        \addplot[
-          thick,
-          color=pink,
-          mark=*,
-        ]
-          coordinates {
-            (400, 1.55) (500, 2.61) (600, 3.50)
-            (700, 4.55) (800, 5.43) (900, 6.15)
-            (1000, 6.77) (1100, 7.26) (1200, 7.54)
-            (1300, 7.51) (1400, 7.74) (1500, 8.13)
-        };
-        \addlegendentry{\small{CUDA}}
-      \end{axis}
+          % OpenMP
+          \addplot[ybar, fill=orange] coordinates {
+            (1, 1.03) (2, 0.94) (3, 1.01)
+            (4, 1.11) (5, 1.04) (6, 1.06)
+            (7, 1.03) (8, 1.08) (9, 1.00)
+            (10, 1.08) (11, 1.10) (12, 1.07)
+          };
+        \end{axis}
     \end{tikzpicture}
+    \begin{tikzpicture}[scale=0.8]
+        \begin{axis}[
+          x=1cm,
+          width=12cm, height=8cm,
+          title={Throughput CUDA},
+          xlabel={Configurazione},
+          ylabel={Operazioni (Gops/s)},
+          xtick=data,
+          xmin=0, xmax=13,
+          ymin=0, ymax=10,
+          ytick={0,1,2,3,4,5,6,7,8,9,10},
+          legend pos=north west,
+          bar width=0.7cm,
+          nodes near coords,
+          grid=none
+        ]
+          % CUDA
+          \addplot[ybar, fill=pink] coordinates {
+            (1, 1.55) (2, 2.61) (3, 3.50)
+            (4, 4.55) (5, 5.43) (6, 6.15)
+            (7, 6.77) (8, 7.26) (9, 7.54)
+            (10, 7.51) (11, 7.74) (12, 8.13)
+          };
+        \end{axis}
+    \end{tikzpicture}
+    % \begin{tikzpicture}[scale=0.9]
+    %   \begin{axis}[
+    %     title={Throughput},
+    %     xlabel={Configurazione},
+    %     ylabel={Operazioni (Gops/s)},
+    %     xtick=data,
+    %     xmin=1, xmax=12,
+    %     ymin=0, ymax=9,
+    %     scaled y ticks=false,
+    %     ytick={0,1,2,3,4,5,6,7,8,9},
+    %     legend pos=north west,
+    %     grid=both
+    %   ]
+    %     % OpenMP
+    %     \addplot[
+    %       thick,
+    %       color=orange,
+    %       mark=*,
+    %     ]
+    %       coordinates {
+    %         (1, 1.03) (2, 0.94) (3, 1.01)
+    %         (4, 1.11) (5, 1.04) (6, 1.06)
+    %         (7, 1.03) (8, 1.08) (9, 1.00)
+    %         (10, 1.08) (11, 1.10) (12, 1.07)
+    %     };
+    %     \addlegendentry{\small{OpenMP}}
+    %     % CUDA
+    %     \addplot[
+    %       thick,
+    %       color=pink,
+    %       mark=*,
+    %     ]
+    %       coordinates {
+    %         (1, 1.55) (2, 2.61) (3, 3.50)
+    %         (4, 4.55) (5, 5.43) (6, 6.15)
+    %         (7, 6.77) (8, 7.26) (9, 7.54)
+    %         (10, 7.51) (11, 7.74) (12, 8.13)
+    %     };
+    %     \addlegendentry{\small{CUDA}}
+    %   \end{axis}
+    % \end{tikzpicture}
     \caption{\label{fig:cuda_throughput} Throughput di CUDA ed OpenMP a confronto.}
 \end{figure}
 
@@ -1798,11 +1901,10 @@ dell'input.
           x=1cm,
           width=12cm, height=8cm,
           title={Speedup},
-          xlabel={Numero di pixel per lato del rilevatore},
-          ylabel={Speedup},
+          xlabel={Configurazione},
+          ylabel={Accelerazione},
           xtick=data,
-          symbolic x coords={400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500},
-          x tick label style={rotate=45, anchor=east},
+          xmin=0, xmax=13,
           ymin=0, ymax=9,
           legend pos=north west,
           bar width=0.7cm,
@@ -1810,17 +1912,17 @@ dell'input.
           grid=none
         ]
           \addplot[ybar, fill=cyan] coordinates {
-            (400, 1.50) (500, 2.79) (600, 3.46)
-            (700, 4.10) (800, 5.21) (900, 5.79)
-            (1000, 6.57) (1100, 6.75) (1200, 7.53)
-            (1300, 6.97) (1400, 7.03) (1500, 7.60)
+            (1, 1.50) (2, 2.79) (3, 3.46)
+            (4, 4.10) (5, 5.21) (6, 5.79)
+            (7, 6.57) (8, 6.75) (9, 7.53)
+            (10, 6.97) (11, 7.03) (12, 7.60)
           };
         \end{axis}
     \end{tikzpicture}
     \caption{\label{fig:cuda_speedup} Accelerazione di CUDA rispetto ad OpenMP.}
 \end{figure}
 
-La \autoref{fig:cuda_speedup} mostra le performance della versione CUDA rispetto a quella OpenMP.
+La \autoref{fig:cuda_speedup} mostra le prestazioni della versione CUDA rispetto a quella OpenMP.
 Per input piccoli, l'accelerazione della versione CUDA è limitata, mentre cresce con la dimensione, stabilizzandosi intorno a 6x,
 con un picco di 7.6x in un caso favorevole.
 
