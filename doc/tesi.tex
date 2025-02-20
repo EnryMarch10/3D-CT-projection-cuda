@@ -272,7 +272,7 @@ diagnostica crebbe notevolmente.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth]{scanner-Mark-I}
+  \includegraphics[width=0.8\textwidth]{scanner-Mark-I}
   \caption{\label{fig:history_mark_1} EMI Mark 1, il primo tomografo computerizzato commerciale.
            Sulla destra si vede il computer usato per processare i dati raccolti dal tomografo.}
 \end{figure}
@@ -280,7 +280,11 @@ diagnostica crebbe notevolmente.
 Nella \autoref{fig:history_mark_1} è rappresentato l'EMI Mark 1, il primo tomografo computerizzato commerciale prodotto dalla EMI
 nel 1973 per lo studio del cranio.
 
-Oggi, grazie ai continui avanzamenti tecnologici e all'innovazione nelle metodologie, la TC è sempre più diffusa e impiegata.
+Oggi, grazie ai continui avanzamenti tecnologici e all'innovazione nelle metodologie, la TC è sempre più diffusa e impiegata in
+svariati ambiti, dalla diagnostica medica alla ricerca scientifica, fino alle applicazioni industriali e archeologiche.
+La maggiore precisione e velocità di acquisizione dei dati nei tomografi insieme alle necessità di migliorare la qualità delle
+analisi e ottimizzare i tempi di risposta ha reso necessaria l'evoluzione dei software di elaborazione delle proiezioni ottenute,
+argomento di cui questa tesi si occupa.
 
 \section{Le tecnologie}
 
@@ -300,13 +304,14 @@ La prima generazione di scanner per la TC, sviluppata attorno al 1970, utilizzav
 alternati di traslazione e rotazione.
 Questo approccio, sebbene pionieristico, richiedeva tempi di scansione prolungati, rendendo possibile l'analisi solo di organi
 statici come l'encefalo.
-Successivamente, la seconda generazione di scanner produceva fasci di raggi X a ventaglio, migliorando l'efficienza della
+Successivamente, la seconda generazione di scanner produceva fasci di raggi a ventaglio, migliorando l'efficienza della
 scansione e riducendo i tempi necessari per acquisire le immagini.
-Come ulteriore evoluzione, la terza generazione ha portato all'adozione di un fascio di raggi X a forma di cono per acquisire
+Come ulteriore evoluzione, la terza generazione ha portato all'adozione di un fascio di raggi a forma di cono per acquisire
 immagini tridimensionali in una singola rotazione attorno al paziente, offrendo dettagli ad alta risoluzione con un'esposizione
 inferiore alle radiazioni rispetto alle generazioni precedenti.
-Questi sviluppi nelle tecnologie di scansione sono stati accompagnati da avanzamenti nei metodi di ricostruzione software,
-migliorando la qualità delle immagini e l'efficienza diagnostica.
+
+In questa tesi verrà simulata una tecnologia di proiezione paragonabile a quella di fasci conici, per produrre cioè scansioni 2D
+del corpo analizzato.
 
 \section{Il processo}
 
@@ -1522,17 +1527,17 @@ tonalità più scura (verso il nero).
   \begin{subfigure}{\textwidth}
     \centering
     \includegraphics[width=\textwidth]{Cube}
-    \caption{\label{fig:projection_images_1} Cubo.}
+    \caption{Cubo}
   \end{subfigure}
   \begin{subfigure}{\textwidth}
     \centering
     \includegraphics[width=\textwidth]{CubeWithSphericalHole}
-    \caption{\label{fig:projection_images_2} Cubo con cavità sferica.}
+    \caption{Cubo con cavità sferica}
   \end{subfigure}
   \begin{subfigure}{\textwidth}
     \centering
     \includegraphics[width=\textwidth]{HalfSphere}
-    \caption{\label{fig:projection_images_3} Semisfera.}
+    \caption{Semisfera}
   \end{subfigure}
   \caption{\label{fig:projection_images} Immagini delle proiezioni.}
 \end{figure}
@@ -1684,56 +1689,66 @@ Non verranno considerati:
 
 \begin{figure}[H]
   \centering
-    \begin{tikzpicture}[scale=0.8]
-        \begin{axis}[
-          x=1cm,
-          width=12cm, height=8cm,
-          title={Tempi di esecuzione OpenMP},
-          xlabel={Configurazione},
-          ylabel={Tempo di esecuzione (s)},
-          xtick=data,
-          xmin=0, xmax=13,
-          ymin=0, ymax=32,
-          ytick={0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32},
-          legend pos=north west,
-          bar width=0.7cm,
-          nodes near coords,
-          grid=none
-        ]
-          % OpenMP
-          \addplot[ybar, fill=blue] coordinates {
-            (1, 0.55) (2, 1.18) (3, 1.88)
-            (4, 2.73) (5, 4.33) (6, 6.05)
-            (7, 8.56) (8, 10.92) (9, 15.21)
-            (10, 17.97) (11, 21.97) (12, 27.82)
-          };
-        \end{axis}
-    \end{tikzpicture}
-    \begin{tikzpicture}[scale=0.8]
-        \begin{axis}[
-          x=1cm,
-          width=12cm, height=8cm,
-          title={Tempi di esecuzione CUDA},
-          xlabel={Configurazione},
-          ylabel={Tempo di esecuzione (s)},
-          xtick=data,
-          xmin=0, xmax=13,
-          ymin=0, ymax=32,
-          ytick={0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32},
-          legend pos=north west,
-          bar width=0.7cm,
-          nodes near coords,
-          grid=none
-        ]
-          % CUDA
-          \addplot[ybar, fill=green] coordinates {
-            (1, 0.37) (2, 0.42) (3, 0.54)
-            (4, 0.67) (5, 0.83) (6, 1.05)
-            (7, 1.30) (8, 1.62) (9, 2.02)
-            (10, 2.58) (11, 3.13) (12, 3.66)
-          };
-        \end{axis}
-    \end{tikzpicture}
+    \begin{subfigure}{\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=0.8]
+          \begin{axis}[
+            x=1cm,
+            width=12cm, height=8cm,
+            title={Tempi di esecuzione},
+            xlabel={Configurazione},
+            ylabel={Tempo di esecuzione (s)},
+            xtick=data,
+            xmin=0, xmax=13,
+            ymin=0, ymax=32,
+            ytick={0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32},
+            legend pos=north west,
+            bar width=0.7cm,
+            nodes near coords,
+            grid=none
+          ]
+            % OpenMP
+            \addplot[ybar, fill=gray] coordinates {
+              (1, 0.55) (2, 1.18) (3, 1.88)
+              (4, 2.73) (5, 4.33) (6, 6.05)
+              (7, 8.56) (8, 10.92) (9, 15.21)
+              (10, 17.97) (11, 21.97) (12, 27.82)
+            };
+          \end{axis}
+      \end{tikzpicture}
+      \caption{OpenMP}
+    \end{subfigure}
+    \vskip 5mm
+    \begin{subfigure}{\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=0.8]
+          \begin{axis}[
+            x=1cm,
+            width=12cm, height=8cm,
+            title={Tempi di esecuzione},
+            xlabel={Configurazione},
+            ylabel={Tempo di esecuzione (s)},
+            xtick=data,
+            xmin=0, xmax=13,
+            ymin=0, ymax=32,
+            ytick={0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32},
+            legend pos=north west,
+            bar width=0.7cm,
+            nodes near coords,
+            grid=none
+          ]
+            % CUDA
+            \addplot[ybar, fill=orange] coordinates {
+              (1, 0.37) (2, 0.42) (3, 0.54)
+              (4, 0.67) (5, 0.83) (6, 1.05)
+              (7, 1.30) (8, 1.62) (9, 2.02)
+              (10, 2.58) (11, 3.13) (12, 3.66)
+            };
+          \end{axis}
+      \end{tikzpicture}
+      \caption{CUDA}
+    \end{subfigure}
+    \caption{\label{fig:openmp_cuda_wall_clock_time} Tempi di esecuzione a confronto.}
     % \begin{tikzpicture}[scale=0.9]
     %   \begin{axis}[
     %     title={Tempi di esecuzione},
@@ -1774,12 +1789,11 @@ Non verranno considerati:
     %     \addlegendentry{\small{CUDA}}
     %   \end{axis}
     % \end{tikzpicture}
-    \caption{\label{fig:cuda_wall_clock_time} Tempi di esecuzione di CUDA ed OpenMP a confronto.}
+    % \caption{\label{fig:cuda_wall_clock_time} Tempi di esecuzione di CUDA ed OpenMP a confronto.}
 \end{figure}
 
-La \autoref{fig:cuda_wall_clock_time} mostra i tempi di esecuzione a confronto per OpenMP e CUDA.
-Come si può notare i tempi di esecuzione della versione CUDA sono fino alle 7 volte inferiori rispetto a quelli della versione
-OpenMP.
+La \autoref{fig:openmp_cuda_wall_clock_time} mostra i tempi di esecuzione a confronto per OpenMP e CUDA.
+Come si può notare i tempi di esecuzione in CUDA sono fino alle 7 volte inferiori rispetto a quelli in OpenMP.
 
 \subsection{Throughput}
 
@@ -1788,56 +1802,66 @@ La dimensione dell'input è approssimata con il lavoro svolto dall'algoritmo, ve
 
 \begin{figure}[H]
   \centering
-    \begin{tikzpicture}[scale=0.8]
-        \begin{axis}[
-          x=1cm,
-          width=12cm, height=8cm,
-          title={Throughput OpenMP},
-          xlabel={Configurazione},
-          ylabel={Operazioni (Gops/s)},
-          xtick=data,
-          xmin=0, xmax=13,
-          ymin=0, ymax=10,
-          ytick={0,1,2,3,4,5,6,7,8,9,10},
-          legend pos=north west,
-          bar width=0.7cm,
-          nodes near coords,
-          grid=none
-        ]
-          % OpenMP
-          \addplot[ybar, fill=orange] coordinates {
-            (1, 1.03) (2, 0.94) (3, 1.01)
-            (4, 1.11) (5, 1.04) (6, 1.06)
-            (7, 1.03) (8, 1.08) (9, 1.00)
-            (10, 1.08) (11, 1.10) (12, 1.07)
-          };
-        \end{axis}
-    \end{tikzpicture}
-    \begin{tikzpicture}[scale=0.8]
-        \begin{axis}[
-          x=1cm,
-          width=12cm, height=8cm,
-          title={Throughput CUDA},
-          xlabel={Configurazione},
-          ylabel={Operazioni (Gops/s)},
-          xtick=data,
-          xmin=0, xmax=13,
-          ymin=0, ymax=10,
-          ytick={0,1,2,3,4,5,6,7,8,9,10},
-          legend pos=north west,
-          bar width=0.7cm,
-          nodes near coords,
-          grid=none
-        ]
-          % CUDA
-          \addplot[ybar, fill=pink] coordinates {
-            (1, 1.55) (2, 2.61) (3, 3.50)
-            (4, 4.55) (5, 5.43) (6, 6.15)
-            (7, 6.77) (8, 7.26) (9, 7.54)
-            (10, 7.51) (11, 7.74) (12, 8.13)
-          };
-        \end{axis}
-    \end{tikzpicture}
+    \begin{subfigure}{\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=0.8]
+          \begin{axis}[
+            x=1cm,
+            width=12cm, height=8cm,
+            title={Throughput},
+            xlabel={Configurazione},
+            ylabel={Operazioni (Gops/s)},
+            xtick=data,
+            xmin=0, xmax=13,
+            ymin=0, ymax=10,
+            ytick={0,1,2,3,4,5,6,7,8,9,10},
+            legend pos=north west,
+            bar width=0.7cm,
+            nodes near coords,
+            grid=none
+          ]
+            % OpenMP
+            \addplot[ybar, fill=gray] coordinates {
+              (1, 1.03) (2, 0.94) (3, 1.01)
+              (4, 1.11) (5, 1.04) (6, 1.06)
+              (7, 1.03) (8, 1.08) (9, 1.00)
+              (10, 1.08) (11, 1.10) (12, 1.07)
+            };
+          \end{axis}
+      \end{tikzpicture}
+      \caption{OpenMP}
+    \end{subfigure}
+    \vskip 5mm
+    \begin{subfigure}{\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=0.8]
+          \begin{axis}[
+            x=1cm,
+            width=12cm, height=8cm,
+            title={Throughput},
+            xlabel={Configurazione},
+            ylabel={Operazioni (Gops/s)},
+            xtick=data,
+            xmin=0, xmax=13,
+            ymin=0, ymax=10,
+            ytick={0,1,2,3,4,5,6,7,8,9,10},
+            legend pos=north west,
+            bar width=0.7cm,
+            nodes near coords,
+            grid=none
+          ]
+            % CUDA
+            \addplot[ybar, fill=orange] coordinates {
+              (1, 1.55) (2, 2.61) (3, 3.50)
+              (4, 4.55) (5, 5.43) (6, 6.15)
+              (7, 6.77) (8, 7.26) (9, 7.54)
+              (10, 7.51) (11, 7.74) (12, 8.13)
+            };
+          \end{axis}
+      \end{tikzpicture}
+      \caption{CUDA}
+    \end{subfigure}
+    \caption{\label{fig:openmp_cuda_throughput} Throughput a confronto.}
     % \begin{tikzpicture}[scale=0.9]
     %   \begin{axis}[
     %     title={Throughput},
@@ -1879,14 +1903,14 @@ La dimensione dell'input è approssimata con il lavoro svolto dall'algoritmo, ve
     %     \addlegendentry{\small{CUDA}}
     %   \end{axis}
     % \end{tikzpicture}
-    \caption{\label{fig:cuda_throughput} Throughput di CUDA ed OpenMP a confronto.}
+    % \caption{\label{fig:cuda_throughput} Throughput di CUDA ed OpenMP a confronto.}
 \end{figure}
 
 Il throughput è calcolato come \(\frac{Numero\ di\ operazioni}{Tempo\ di\ esecuzione\ (s)}\).
 Per stimare il limite superiore del numero di operazioni al secondo svolte dai programmi sono stati utilizzati i dati riportati
-nella \autoref{tab:cuda_it_sizes}, i risultati sono osservabili nella \autoref{fig:cuda_throughput}.
+nella \autoref{tab:cuda_it_sizes}, i risultati sono osservabili nella \autoref{fig:openmp_cuda_throughput}.
 Tale numero di istruzioni è approssimato a miliardi di operazioni per secondo.
-In questo caso, il numero di operazioni al secondo per CUDA arriva fino a 8x rispetto a quello della versione OpenMP.
+In questo caso, il numero di operazioni al secondo in CUDA arriva fino a 8x rispetto a quello in OpenMP.
 
 \subsection{Speedup}
 
@@ -1911,7 +1935,7 @@ dell'input.
           nodes near coords,
           grid=none
         ]
-          \addplot[ybar, fill=cyan] coordinates {
+          \addplot[ybar, fill=yellow] coordinates {
             (1, 1.50) (2, 2.79) (3, 3.46)
             (4, 4.10) (5, 5.21) (6, 5.79)
             (7, 6.57) (8, 6.75) (9, 7.53)
