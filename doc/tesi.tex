@@ -53,7 +53,8 @@
     void,
     int, unsigned, short, double,
     sizeof,
-    __global__
+    __global__,
+    __shared__
   },
   morekeywords=[2]{ % Directives
     for, if, else, return, do, while,
@@ -64,9 +65,12 @@
     initEnvironment, termEnvironment,
     printf, fprintf, fread, getSource, getPixel,
     malloc, calloc, free,
-    cudaMemGetInfo, cudaMemcpy,
+    cudaMemGetInfo, cudaMemcpy, __syncthreads,
     exit,
-    fopen, fclose
+    fopen, fclose,
+    max, fmin, fmax,
+    getRangeOfIndex, getAllIntersections, merge3, computeAbsorption,
+    atomicMinDouble, atomicMaxDouble
   },
   morekeywords=[4]{ % User types
     FILE,
@@ -74,9 +78,10 @@
     dim3
   },
   morekeywords=[5]{ % Macros
+    INFINITY,
     N_VOXEL_X, N_VOXEL_Y, N_VOXEL_Z,
     stderr, EXIT_FAILURE,
-    BLKDIM_STEP
+    BLKDIM_STEP, BLKDIM
   },
   morekeywords=[6]{ % Enums
     X, Y, Z, cudaMemcpyHostToDevice
@@ -177,27 +182,27 @@
 \end{spacing}
 
 \begin{abstract}
-La tomografia computerizzata (TC) è una tecnica diagnostica molto utilizzata negli ultimi cinquant'anni che sfrutta radiazioni
-ionizzanti (o raggi X) per ottenere una rappresentazione tridimensionale dell'entità in esame.
-Questa tecnica si basa sulla raccolta, da parte di un rilevatore, di più viste, dette proiezioni.
-Tali proiezioni sono date da considerazioni fatte sull'attenuazione dei raggi X che, diretti da una sorgente verso un rilevatore,
-passano attraverso l'oggetto di studio.
-Facendo ruotare la sorgente ed il rilevatore lungo una traiettoria nota, molte proiezioni vengono raccolte.
-Le proiezioni ottenute vengono poi trasferite in un calcolatore che ha il compito di convertirle in immagini 2D che sono
-essenziali per ricostruire il volume 3D dell'entità scansionata.
-La TC permette di analizzare l'oggetto ricostruito, evidenziando proprietà di densità della sua struttura interna precedentemente
+La tomografia computerizzata (TC) è una tecnica diagnostica ampiamente utilizzata negli ultimi anni, che sfrutta radiazioni
+ionizzanti (o raggi X) per ottenere una rappresentazione tridimensionale dell'oggetto in esame.
+Questa tecnica si basa sulla raccolta, da parte di un rilevatore, di diverse viste, chiamate proiezioni.
+Tali proiezioni sono il risultato dell'attenuazione dei raggi X, che, diretti da una sorgente verso un rilevatore, attraversano
+l'oggetto di studio.\newline
+Ruotando la sorgente e il rilevatore lungo una traiettoria prestabilita, vengono raccolte molteplici proiezioni.
+Le informazioni ottenute vengono successivamente trasferite a un calcolatore, che ha il compito di convertirle in immagini 2D,
+fondamentali per la ricostruzione del volume 3D dell'oggetto scansionato.
+La TC consente di analizzare l'oggetto ricostruito, rivelando proprietà di densità della sua struttura interna precedentemente
 ignote, senza la necessità di ricorrere a tecniche distruttive.
 
 Nonostante sia molto sfruttata in ambito medico, la TC, in realtà, non fu ideata solamente per scopi medici ma trova applicazione
-in vari settori industriali, la paleontologia, l'archeologia e numerosi altri campi.
+in vari settori industriali, nella paleontologia, nell'archeologia ed in numerosi altri ambiti.
 
-La TC originò grazie agli studi del matematico austriaco Johann Radon, che dimostrò teoricamente la possibilità di ricostruire
-un oggetto tridimensionale mediante un numero infinito di proiezioni bidimensionali dell'oggetto stesso.
-L'adattamento di queste teorie all'uso di un numero finito di proiezioni ha reso possibile lo sviluppo di questa tecnica.
+La TC è stata possibile grazie agli studi del matematico austriaco Johann Radon, che dimostrò teoricamente la possibilità di
+ricostruire un oggetto tridimensionale a partire da un numero infinito di proiezioni bidimensionali dell'oggetto stesso.
+L'adattamento di queste teorie all'uso di un numero finito di proiezioni ha reso concreta l'applicazione della TC.
 Dal punto di vista matematico, la ricostruzione dell'oggetto 3D a partire dalle proiezioni 2D rappresenta un problema inverso,
-cioè si determinano le cause a partire dagli effetti osservati.
+in cui si determinano le cause a partire dagli effetti osservati.\newline
 In questa tesi viene invece affrontato il problema diretto, partendo dal corpo studiato si devono determinare le proiezioni che
-una TC potrebbe generare.
+una TC potrebbe generare.\newline
 Gli obiettivi di questo lavoro sono:
 \begin{itemize}
   \item Implementare una versione per GPU NVIDIA ottimizzata dell'algoritmo di proiezione proposto da Siddon \cite{Siddon1984}
@@ -219,7 +224,7 @@ Gli obiettivi di questo lavoro sono:
 \newpage
 \pagenumbering{arabic}
 
-\chapter{Introduzione}
+\chapter{Introduzione} \label{chap:intro}
 
 Introdotta nel 1972, la tomografia computerizzata a raggi X (TC) è una tecnica di imaging, che consente di esplorare le strutture
 interne di un corpo in modo non invasivo, ampiamente utilizzata per individuare eventuali anomalie nei volumi corporei esaminati.
@@ -563,7 +568,7 @@ I punti chiave dell'algoritmo, nella determinazione della matrice \(M\), possono
         determinando così la matrice \(M\).
 \end{itemize}
 
-\subsection{Il vettore \texorpdfstring{\(f\)}{f}} \label{chap:vector_f}
+\subsection{Il vettore \texorpdfstring{\(f\)}{f}} \label{subsec:vector_f}
 
 Il vettore \(f\) riassume ciò che sappiamo dell'oggetto da scansionare.
 In particolare esso rappresenta il coefficiente di attenuazione assunto nella regione interna al volume occupato da ciascun voxel.
@@ -1033,7 +1038,7 @@ piano e una componente della retta come di seguito:
 dove sono stati indicati i sistemi utilizzati nel caso in cui il piano sia parallelo al piano \(yz\) (primo sistema), al piano
 \(xz\) (secondo sistema) o al piano \(xy\) (terzo sistema).
 
-\chapter{Descrizione del progetto}
+\chapter{Descrizione del progetto} \label{chap:proj}
 
 Il progetto di tesi include diverse implementazioni scritte in C, tra cui un programma per la generazione dei file di input, uno
 per il calcolo della proiezione basato sull'algoritmo di Siddon con OpenMP ed una versione sviluppata con CUDA.
@@ -1142,9 +1147,9 @@ Le caratteristiche principali di CUDA sono:
   \item Elevata efficienza: Permette di accelerare calcoli scientifici, AI, machine learning, rendering, simulazioni fisiche, ecc.
 \end{itemize}
 
-\section{Generazione input}
+\section{Generazione dell'input}
 
-L'implementazione proposta genera le configurazioni del vettore \(f\) già discusse nella \autoref{chap:vector_f}.
+L'implementazione proposta genera le configurazioni del vettore \(f\) già discusse nella \autoref{subsec:vector_f}.
 Queste configurazioni vengono scritte su file.
 Per generare input di dimensioni opportune alle necessità, quando si esegue il programma è possibile specificare il numero di
 pixel per lato della matrice rilevatore.
@@ -1185,9 +1190,9 @@ cubico di interesse e non l'oggetto completo così come considerato nel modello 
 Tale partizione avrà numero di voxel sull'asse \(y\) pari a \mbox{\lstinline{k},} con \mbox{\lstinline{k <= N_VOXELS_Y}.}
 Nella soluzione proposta oltretutto la singola iterazione, simile a quella presentata, viene parallelizzata sfruttando OpenMP.
 
-In questo modo, anche la lettura dell'input può essere fatta per partizioni sul numero totale di voxel nell'asse \(y\).
-È essenziale riconoscere che tali partizioni possono assumere dimensioni arbitrarie, senza vincoli reciproci e, in particolare,
-senza necessità di conoscere quella scelta per la scrittura.
+Seguendo questo schema, anche la lettura dell'input può essere fatta per partizioni sul numero totale di voxel nell'asse \(y\).
+È essenziale riconoscere che tali partizioni possono essere lette con dimensioni arbitrarie, indipendentemente l'una dall'altra e,
+soprattutto, senza la necessità di conoscere in lettura la dimensione utilizzata per la scrittura.
 
 Questa strategia di scrittura è essenziale per gestire input di grandi dimensioni.
 In particolare, nella computazione su CPU, è fondamentale considerare la quantità di memoria RAM disponibile sulla scheda madre,
@@ -1199,7 +1204,7 @@ Ad esempio, supponiamo di dover analizzare una partizione di lunghezza \mbox{\ls
 In questo caso, per quella partizione verranno letti solo \lstinline{N_VOXEL_X *  yVoxels * N_VOXEL_Z} valori, il che, per input
 di grandi dimensioni, può comportare un notevole risparmio di RAM.
 
-\section{Calcolo proiezioni}
+\section{Calcolo delle proiezioni}
 
 L'algoritmo per il calcolo delle proiezioni implementato si basa su quanto discusso nel \autoref{chap:math}, in particolare tieni
 a mente l'\autoref{eq:law_lambert-beer_discrete} da cui siamo partiti. I passi dell'algoritmo sono i seguenti:
@@ -1233,7 +1238,7 @@ In \autoref{fig:flowchart} è presentato il diagramma di flusso relativo ai punt
 
 \subsection{Implementazione generale}
 
-\subsubsection{1. Lettura input}
+\subsubsection{1. Lettura dell'input}
 
 \begin{lstlisting}[language=CStyle, caption={Codice C per la lettura di \(f\).}, label={lst:vector_f_read}]
 double *const f = (double *) malloc(sizeof(double) * gl_nVoxel[X] * yVoxels * gl_nVoxel[Z]);
@@ -1254,7 +1259,7 @@ for (unsigned short slice = 0; slice < gl_nVoxel[Y]; slice += yVoxels) {
 Il \autoref{lst:vector_f_read} mostra la gestione dell'array \(f\), che può costituire l'intero insieme di voxel o un suo
 sottoinsieme.
 La lettura dei dati viene quindi fatta considerando \lstinline{nOfSlices} voxel alla volta sull'asse \(y\), dove
-\lstinline{yVoxels} è il numero di voxel considerati in una singola iterazione sull'asse \(y\).
+\lstinline{yVoxels} è il numero massimo di voxel da considerare in ogni iterazione sull'asse \(y\).
 Nella funzione \lstinline{computeProjections} sono sviluppati tutti i calcoli necessari per ottenere le proiezione.
 Tutti i passi descritti successivamente sono svolti all'interno di tale funzione.
 
@@ -1294,6 +1299,58 @@ I dettagli della funzione \lstinline{getPixel} non sono mostrati, il calcolo è 
 
 Le computazioni seguenti sono eseguite facendo riferimento all'algoritmo di Siddon \cite{Siddon1984}.
 
+Per quanto riguarda l'implementazione di questi passaggi dell'algoritmo, si analizza una scelta specifica adottata seguendo
+fedelmente l'algoritmo di Siddon.
+In particolare, l'attenzione è rivolta all'implementazione in C dei punti 6-9 del processo di calcolo delle proiezioni.
+
+\begin{lstlisting}[language=CStyle, caption={Codice C per il calcolo dell'attenuazione.}, label={lst:attenuation}]
+... // Si procede con un raggio che interseca l'oggetto
+// Calcolo dei valori parametrici del primo ed ultimo piano validi
+Ranges indices[3];
+indices[X] = getRangeOfIndex(source.x, pixel.x, isParallel, aMin, aMax, X);
+indices[Y] = getRangeOfIndex(source.y, pixel.y, isParallel, aMin, aMax, Y);
+indices[Z] = getRangeOfIndex(source.z, pixel.z, isParallel, aMin, aMax, Z);
+
+// Si calcola la lunghezza degli array contenenti i valori
+// parametrici delle intersezioni raggio-piani
+const unsigned short lenX = max(0, indices[X].maxIndx - indices[X].minIndx);
+const unsigned short lenY = max(0, indices[Y].maxIndx - indices[Y].minIndx);
+const unsigned short lenZ = max(0, indices[Z].maxIndx - indices[Z].minIndx);
+...
+// Si calcolano i valori parametrici delle intersezioni raggio-piani
+double aX[gl_nPlanes[X]];
+double aY[gl_nPlanes[Y]];
+double aZ[gl_nPlanes[Z]];
+getAllIntersections(source.x, pixel.x, indices[X], aX, X);
+getAllIntersections(source.y, pixel.y, indices[Y], aY, Y);
+getAllIntersections(source.z, pixel.z, indices[Z], aZ, Z);
+
+// Si fa un merge degli array che server per calcolare M
+double aMerged[gl_nPlanes[X] + gl_nPlanes[Y] + gl_nPlanes[Z]];
+const unsigned short lenA = merge3(aX, aY, aZ, lenX, lenY, lenZ, aMerged);
+
+// Si calcola l'attenuazione totale del raggio considerato in g
+const unsigned pixelIndex = positionIndex * nSidePixels * nSidePixels + r * nSidePixels + c;
+g[pixelIndex] += computeAbsorption(slice, source, pixel, aMerged, lenA, f);
+...
+\end{lstlisting}
+
+Il \autoref{lst:attenuation} illustra gli ultimi passi del calcolo dell'attenuazione nell'algoritmo descritto in
+\cite{Colletta2024}, seguendo fedelmente l'implementazione di Siddon.
+
+I dettagli relativi alle funzioni per il calcolo delle intersezioni e dell'assorbimento non sono mostrati.
+Tuttavia, come verrà discusso in seguito, l'allocazione dei quattro array \lstinline{aX}, \lstinline{aY}, \lstinline{aZ} e
+\lstinline{aMerged} comporta un utilizzo di memoria che può diventare significativo quando allocato simultaneamente da un elevato
+numero di processi paralleli.
+
+Senza considerare gli array di appoggio presenti nelle funzioni omesse, un singolo processo richiede comunque
+\lstinline{2 * gl_nPlanes[X] * gl_nPlanes[Y] * gl_nPlanes[Z] * sizeof(double)} Byte di memoria.
+Se vengono eseguiti \lstinline{p} processi, l'utilizzo totale diventa di
+\lstinline{p * 2 * gl_nPlanes[X] * gl_nPlanes[Y] * gl_nPlanes[Z] * sizeof(double)} Byte.
+
+Ciò evidenzia come, al crescere di \lstinline{p}, l'utilizzo di memoria possa aumentare rapidamente, rappresentando un potenziale
+fattore limitante nelle esecuzioni altamente parallele.
+
 \subsection{Implementazione OpenMP}
 
 L'implementazione per CPU proposta sfrutta il parallelismo OpenMP.
@@ -1322,16 +1379,17 @@ for (unsigned r = 0; r < nSidePixels; r++) {
 Il \autoref{lst:omp_D_point} mostra le direttive OpenMP usate per parallelizzare il codice presentato nel \autoref{lst:D_point}.
 Ogni processo OpenMP determina la posizione di un pixel del rilevatore e procede al calcolo dell'attenuazione che si verifica
 quando il raggio attraversa la partizione dell'oggetto in esame.
-La parallelizzazione viene eseguita considerando un carico di lavoro molto sbilanciato tra i diversi processi.
-Infatti il numero di computazioni necessarie, per ogni raggio relativo ad una sorgente, potrebbe portare ad un carico di lavoro
-molto disomogeneo.
+La parallelizzazione viene eseguita considerando un carico di lavoro fortemente sbilanciato tra i diversi processi.
+Questo è dovuto al fatto che il numero di computazioni richieste per determinare l'attenuazione di ciascun raggio, relativo a una
+sorgente, varia in base al numero di voxel attraversati, portando così a una distribuzione del carico di lavoro potenzialmente
+molto disomogenea.
 
 È stata mantenuta la stessa versione di partenza che adottava un partizionamento a grana fine seguendo il paradigma master-worker,
 in cui:
 \begin{itemize}
   \item Partizionamento a grana fine: si riferisce a una suddivisione del lavoro in compiti molto piccoli, assegnati ai vari
         processi per massimizzare il parallelismo e bilanciare il carico.
-        Nel nostro caso l'unità di parallelizzazione è il singolo valore fissato di \lstinline{r} e \mbox{\lstinline{c}.}
+        In questo problema l'unità di parallelizzazione è il singolo valore fissato di \lstinline{r} e \mbox{\lstinline{c}.}
   \item Paradigma master-worker: è un modello di programmazione parallela in cui un processo master si occupa di assegnare i
         compiti ai processi worker.
         I worker eseguono i compiti assegnati e, una volta completato un task, passano immediatamente al successivo disponibile,
@@ -1340,15 +1398,20 @@ in cui:
         risorse computazionali.
 \end{itemize}
 
+Nella parallelizzazione con OpenMP, l'allocazione degli array discussa nel \autoref{lst:attenuation} non rappresenta un problema,
+poiché il numero di processi in esecuzione parallela è relativamente limitato.
+Infatti, il numero di core in una CPU è generalmente nell'ordine delle decine, evitando così un utilizzo eccessivo di memoria.
+
 \subsection{Implementazione CUDA}
 
 L'implementazione per GPU NVIDIA proposta sfrutta il parallelismo CUDA.
 
-Analogamente alla versione OpenMP, la soluzione viene calcolata per partizioni, al fine di ottimizzare l'uso della memoria RAM.
+Analogamente alla versione OpenMP, la soluzione viene calcolata per partizioni, al fine di ottimizzare l'utilizzo della memoria
+RAM.
 Tuttavia, in questo caso, il numero massimo di voxel lungo l'asse \(y\) viene determinato dinamicamente mediante un algoritmo
 euristico.
 Questo algoritmo stima rapidamente la memoria occupata sulla GPU, fornendo un valore approssimativo che potrebbe non essere
-necessariamente ottimale.
+necessariamente quello ottimale.
 
 \begin{lstlisting}[language=CStyle, caption={Codice CUDA-C per il calcolo del numero massimo di voxel sull'asse \(y\).}, label={lst:cuda_y_max}]
 size_t freeMem, totalMem;
@@ -1454,9 +1517,11 @@ __global__ void computeProjections(...)
   // r e c mappano ogni Thread su un singolo pixel del rilevatore
   const unsigned r = threadIdx.y + blockIdx.y * blockDim.y;
   const unsigned c = threadIdx.x + blockIdx.x * blockDim.x;
+  ...
 
   // Gli eventuali Thread in eccesso non eseguono calcoli
   if (r < nSidePixels && c < nSidePixels) {
+    ...
     // Calcolo dell'attenuazione di una coppia sorgente-pixel
     for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
       const Point source = getSource(d_gl_sinTable, d_gl_cosTable, positionIndex);
@@ -1472,13 +1537,74 @@ al calcolo dell'attenuazione che si verifica quando il raggio attraversa la part
 
 Nel ciclo illustrato, ogni CUDA Thread analizza ciascuna sorgente in riferimento ad uno specifico pixel, che è lo stesso per ogni
 iterazione sulle posizioni sorgente-rilevatore considerate.
-Tale pixel è però ricalcolato di volta in volta perché traslato di un certo angolo.
+Tale pixel è però ricalcolato di volta in volta perché la sua posizione è ogni volta traslata di un angolo \(\alpha\).
 
-Il vantaggio di questa soluzione è che viene creato un solo kernel per ogni partizione dell'input, garantendo così il numero
-minimo possibile di esecuzioni.
-Questo riduce al minimo l'overhead legato alla creazione dell'ambiente di esecuzione del kernel.
-Inoltre, i dati necessari per il calcolo ad eccezione dell'input, che deve essere aggiornato per ogni partizione, vengono
-trasferiti tra CPU e GPU una sola volta.
+\begin{lstlisting}[language=CStyle, caption={Codice CUDA-C per effettuare la riduzione nel kernel.}, label={lst:cuda_kernel_reduction}]
+__global__ void computeProjections(...)
+{
+  __shared__ double l_gMins[BLKDIM];
+  __shared__ double l_gMaxs[BLKDIM];
+  const unsigned l_index = threadIdx.x + threadIdx.y * blockDim.x;
+  ...
+  l_gMins[l_index] = INFINITY;
+  l_gMaxs[l_index] = -INFINITY;
+
+  // Gli eventuali Thread in eccesso non eseguono calcoli
+  if (r < nSidePixels && c < nSidePixels) {
+    ...
+    for (unsigned short positionIndex = 0; positionIndex < nTheta; positionIndex++) {
+      ...
+      // Calcolo dell'attenuazione di una coppia sorgente-pixel
+      g[pixelIndex] += computeAbsorption(...);
+      l_gMins[l_index] = fmin(l_gMins[l_index], g[pixelIndex]);
+      l_gMaxs[l_index] = fmax(l_gMaxs[l_index], g[pixelIndex]);
+    }
+  }
+
+  unsigned b_size = blockDim.x / 2;
+  __syncthreads();
+  while (b_size > 0) {
+    if (l_index < b_size) {
+      if (l_gMins[l_index] > l_gMins[l_index + b_size]) {
+        l_gMins[l_index] = l_gMins[l_index + b_size];
+      }
+      if (l_gMaxs[l_index] < l_gMaxs[l_index + b_size]) {
+        l_gMaxs[l_index] = l_gMaxs[l_index + b_size];
+      }
+    }
+    b_size = b_size / 2;
+    __syncthreads();
+  }
+
+  if (l_index == 0) {
+    atomicMinDouble(&d_gMin, l_gMins[l_index]);
+    atomicMaxDouble(&d_gMax, l_gMaxs[l_index]);
+  }
+}
+\end{lstlisting}
+
+Il \autoref{lst:cuda_kernel_reduction} mostra come avvengono le riduzioni, cioè il calcolo del minimo e massimo valore di
+attenuazione.
+In questa implementazione si fa uso della shared memory, cioè memoria condivisa tra tutti i thread di un blocco, per effettuare la
+riduzione in \(O(\log_2 n)\) passi paralleli.
+
+Il principale vantaggio di questa soluzione è la creazione di un unico kernel per ogni partizione dell'input, garantendo così il
+minor numero possibile di esecuzioni.
+Ciò consente di ridurre al minimo l'overhead associato alla creazione dell'ambiente di esecuzione del kernel.
+Inoltre, tutti i dati necessari per il calcolo ad eccezione dell'input \(f\), che deve essere aggiornato per ogni partizione,
+vengono trasferiti tra CPU e GPU una sola volta, ottimizzando la gestione della memoria.
+
+Tuttavia, poiché il calcolo dell'attenuazione di ciascun raggio è stato parallelizzato, come avviene con OpenMP, il carico di
+lavoro potrebbe risultare sbilanciato in alcuni scenari.
+Questo squilibrio potrebbe penalizzare le prestazioni di CUDA, causando una serializzazione parziale dell'esecuzione a causa del
+modello SIMT su cui si basa l'architettura delle GPU.
+
+Un'ulteriore criticità nella parallelizzazione con CUDA riguarda l'allocazione degli array discussa nel \autoref{lst:attenuation}.
+A differenza della CPU, la GPU esegue migliaia di unità parallele simultaneamente, il che può portare ad un utilizzo di memoria
+significativo.
+Inoltre, per ragioni di efficienza, la dimensione degli array deve essere definita a priori.
+Per questo motivo, è stato scelto un valore massimo di 1000 piani per asse, imponendo così un limite alla dimensione totale
+dell'input.
 
 \section{Generazione output}
 
@@ -1524,17 +1650,17 @@ tonalità più scura (verso il nero).
 
 \begin{figure}[H]
   \centering
-  \begin{subfigure}{\textwidth}
+  \begin{subfigure}{0.9\textwidth}
     \centering
     \includegraphics[width=\textwidth]{Cube}
     \caption{Cubo}
   \end{subfigure}
-  \begin{subfigure}{\textwidth}
+  \begin{subfigure}{0.9\textwidth}
     \centering
     \includegraphics[width=\textwidth]{CubeWithSphericalHole}
     \caption{Cubo con cavità sferica}
   \end{subfigure}
-  \begin{subfigure}{\textwidth}
+  \begin{subfigure}{0.9\textwidth}
     \centering
     \includegraphics[width=\textwidth]{HalfSphere}
     \caption{Semisfera}
@@ -1583,7 +1709,7 @@ dove:
 Si deve inoltre considerare che se la metrica RMSE (Root Mean Square Error) ottenuta è un valore sotto a \(1000\) allora i due
 risultati possono essere considerati molto simili.
 
-\chapter{Valutazione delle prestazioni}
+\chapter{Valutazione delle prestazioni} \label{chap:perf}
 
 Nella valutazione delle prestazioni per l'implementazioni CUDA trattata in questo progetto di tesi, le metriche di analisi
 considerate sono il tempo di esecuzione, il throughput e lo speedup rispetto alla versione OpenMP.
@@ -1618,12 +1744,16 @@ dove:
 
 L'\mbox{\lstinline{isi-raptor03.csr.unibo.it}} è il server di riferimento utilizzato per effettuare i test riportati
 successivamente.
-È dotato di una CPU del tipo \lstinline{Intel(R) Xeon(R) CPU E5-2603 v4 @ 1.70GHz} con 12 core fisici e 12 core logici (quindi
-senza Hyper-Threading).
+La CPU utilizzata è un \lstinline{Intel Xeon CPU E5-2603 v4 @ 1.70GHz} con 12 core fisici e 12 core logici (quindi senza
+Hyper-Threading), dotata di 64 GB di RAM.
 Nei test OpenMP riportati di seguito sono stati sfruttati tutti i 12 core disponibili.
-La scheda madre è dotata di 64 GB di RAM.
-La GPU impiegata nei test è una \mbox{\lstinline{NVIDIA GeForce GTX 1070}.}
-La scheda grafica è dotata di 8 GB di RAM.
+La GPU impiegata nei test è una \mbox{\lstinline{NVIDIA GeForce GTX 1070},} dotata di 8 GB di RAM.
+Va ricordato che, su una GPU NVIDIA, l'esecuzione parallela dei processi avviene per blocchi, unità di lavoro indipendenti che
+possono essere eseguite in qualsiasi ordine.
+Nei test CUDA condotti, il numero di CUDA Thread per blocco è stato ridotto in modo significativo (da 1024 a 512) a causa
+dell'impiego dei registri nell'implementazione adottata.
+Tuttavia, quando possibile, è preferibile utilizzare il numero massimo di CUDA Thread per blocco disponibile per ottimizzare le
+prestazioni.
 
 Gli input considerati sono i file \lstinline|CubeWithSphericalHole{400-1500}.dat|, cioè del tipo: cubo con cavità sferica.
 Il numero di pixel per lato della matrice rilevatore varia da \(400\) a \(1500\) con intervalli di \(100\) pixel tra un input ed
@@ -1952,9 +2082,52 @@ con un picco di 7.6x in un caso favorevole.
 
 \appendix
 
-\chapter{Conclusioni}
+\chapter{Conclusioni e sviluppi futuri}
 
-\dots
+In questa tesi è stato affrontato il problema diretto della tomografia computerizzata 3D, con l'obiettivo di sviluppare
+un'implementazione dell'algoritmo di Siddon \cite{Siddon1984} per GPU NVIDIA utilizzando CUDA, partendo da una versione parallela
+per CPU basata su OpenMP \cite{Colletta2024}.
+Il lavoro è stato articolato in diverse fasi, ciascuna delle quali ha contribuito al raggiungimento gli obiettivi prefissati.
+
+Inizialmente, in una breve \hyperref[chap:intro]{introduzione} sono stati presentati l'evoluzione della tomografia computerizzata
+e i principi fondamentali della tecnica.
+
+Di seguito sono stati presentati i \hyperref[chap:math]{fondamenti matematici e geometrici} alla base della risoluzione del
+problema diretto.
+In particolare, l'equazione di Lambert-Beer è stata esaminata dal punto di vista matematico, evidenziando il ruolo della matrice
+\(M\) e del vettore \(f\) nel processo di proiezione.
+Inoltre, il posizionamento della sorgente, dell'oggetto e del rilevatore ha permesso di definire il sistema di riferimento
+geometrico adottato.
+
+Successivamente, nella \hyperref[chap:proj]{descrizione del progetto di tesi}, sono state illustrate le versioni del generatore di
+input e del proiettore OpenMP utilizzate come punto di partenza.
+Si è quindi discusso il processo di parallelizzazione adottato per lo sviluppo della versione CUDA, mettendo in evidenza i
+vantaggi e le criticità dell'implementazione proposta.
+Infine, è stata descritta la struttura dell'output generato ed il metodo di verifica della correttezza dei risultati ottenuti.
+
+Nella fase di \hyperref[chap:perf]{valutazione delle prestazioni} la versione CUDA è stata confrontata con l'implementazione
+OpenMP iniziale, analizzando i risultati attraverso diverse metriche di performance.
+I test hanno confermato un significativo miglioramento delle prestazioni grazie all'uso della GPU.
+
+In conclusione, questa tesi ha approfondito le tecniche di parallelizzazione di un algoritmo di proiezione tomografica su GPU.
+I risultati ottenuti dimostrano che l'implementazione CUDA sviluppata offre un'efficienza superiore rispetto alla versione OpenMP
+di partenza.
+
+Tuttavia, rimangono alcune aree di miglioramento e possibili sviluppi futuri, tra cui:
+\begin{itemize}
+  \item Determinare dinamicamente il numero massimo di piani da trattare sull'asse \(y\), ad esempio mediante un algoritmo
+        euristico, tenendo conto della quantità di memoria RAM disponibile sulla scheda madre, sia per la versione OpenMP che per
+        quella CUDA.
+  \item Ottimizzare l'utilizzo di memoria nei CUDA Thread nella GPU, valutando alternative all'algoritmo classico di Siddon per
+        ridurre la necessità di array di appoggio.
+  \item Modificare la strategia di scrittura e lettura dell'input per supportare input con una distribuzione non uniforme di voxel
+        lungo i vari assi.
+  \item Riorganizzare il codice in modo da unificare le parti comuni delle due implementazioni, ad esempio attraverso lo sviluppo
+        di librerie distinte con un'interfaccia condivisa.
+\end{itemize}
+
+Questi miglioramenti potrebbero contribuire a rendere l'algoritmo ancora più efficiente e flessibile, ampliandone le potenziali
+applicazioni in ambito tomografico.
 
 \label{mylastpage}
 \printbibliography % Print the bibliography
