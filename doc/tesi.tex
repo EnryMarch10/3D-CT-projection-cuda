@@ -34,6 +34,8 @@
 % \usepackage{inconsolata} % Use Inconsolata
 \renewcommand{\lstlistingname}{Listato} % Configurazione italiana del listato
 \usepackage{tabularray} % For tables
+\usepackage{caption} % To personalize captions
+\captionsetup{font=small} % To make captions font smaller
 
 \usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue, pdfborder={0 0 0}, hyperfootnotes=true]{hyperref}
 % You must include hyperref before hypcap
@@ -182,33 +184,46 @@
 \end{spacing}
 
 \begin{abstract}
-La tomografia computerizzata (TC) è una tecnica diagnostica ampiamente utilizzata negli ultimi anni, che sfrutta radiazioni
-ionizzanti (o raggi X) per ottenere una rappresentazione tridimensionale dell'oggetto in esame.
+
+La tomografia computerizzata (TC) è una tecnica diagnostica che sfrutta le radiazioni ionizzanti (o raggi X) per ottenere immagini
+dettagliate di un oggetto in esame.
 Questa tecnica si basa sulla raccolta, da parte di un rilevatore, di diverse viste, chiamate proiezioni.
 Tali proiezioni sono il risultato dell'attenuazione dei raggi X, che, diretti da una sorgente verso un rilevatore, attraversano
-l'oggetto di studio.\newline
+l'oggetto di studio.
 Ruotando la sorgente e il rilevatore lungo una traiettoria prestabilita, vengono raccolte molteplici proiezioni.
-Le informazioni ottenute vengono successivamente trasferite a un calcolatore, che ha il compito di convertirle in immagini 2D,
-fondamentali per la ricostruzione del volume 3D dell'oggetto scansionato.
-La TC consente di analizzare l'oggetto ricostruito, rivelando proprietà di densità della sua struttura interna precedentemente
-ignote, senza la necessità di ricorrere a tecniche distruttive.
+Le informazioni ottenute vengono successivamente trasferite a un calcolatore, che ha il compito di convertirle in immagini,
+fondamentali per la ricostruzione di aree 2D o del volume 3D dell'oggetto scansionato.
+La TC consente di analizzare l'oggetto esaminato, rivelando proprietà di densità della sua struttura interna precedentemente
+ignote, senza dover ricorrere a tecniche invasive.
 
-Nonostante sia molto sfruttata in ambito medico, la TC, in realtà, non fu ideata solamente per scopi medici ma trova applicazione
-in vari settori industriali, nella paleontologia, nell'archeologia ed in numerosi altri ambiti.
+Dal punto di vista matematico, la ricostruzione dell'oggetto a partire dalle proiezioni rappresenta un problema inverso,
+in cui si determinano le cause a partire dagli effetti osservati.
+In questa tesi viene invece affrontato il problema diretto, partendo dal corpo studiato, si devono determinare le proiezioni che
+una TC 3D potrebbe generare.
 
-La TC è stata possibile grazie agli studi del matematico austriaco Johann Radon, che dimostrò teoricamente la possibilità di
-ricostruire un oggetto tridimensionale a partire da un numero infinito di proiezioni bidimensionali dell'oggetto stesso.
-L'adattamento di queste teorie all'uso di un numero finito di proiezioni ha reso concreta l'applicazione della TC.
-Dal punto di vista matematico, la ricostruzione dell'oggetto 3D a partire dalle proiezioni 2D rappresenta un problema inverso,
-in cui si determinano le cause a partire dagli effetti osservati.\newline
-In questa tesi viene invece affrontato il problema diretto, partendo dal corpo studiato si devono determinare le proiezioni che
-una TC potrebbe generare.\newline
-Gli obiettivi di questo lavoro sono:
+Gli obiettivi di questa tesi progettuale sono:
 \begin{itemize}
-  \item Implementare una versione per GPU NVIDIA ottimizzata dell'algoritmo di proiezione proposto da Siddon \cite{Siddon1984}
-        partendo da una sua implementazione multicore per la CPU \cite{Colletta2024}.
-  \item Analizzare le prestazioni della versione per GPU realizzata e confrontarle con la versione per CPU già nota.
+  \item Sviluppare un programma per GPU NVIDIA ottimizzato dell'algoritmo di proiezione proposto da Siddon \cite{Siddon1984},
+        utilizzando il linguaggio C con CUDA, partendo da una sua implementazione multicore per CPU scritta in C con OpenMP
+        \cite{Colletta2024}.
+  \item Analizzare le prestazioni della versione per GPU realizzata e confrontarle con quelle della versione per CPU già nota.
 \end{itemize}
+
+Di seguito si riassumono i principali contenuti dei capitoli che compongono questa tesi.
+
+Nell'\hyperref[chap:intro]{introduzione} viene presentata una panoramica sull'evoluzione della tecnica e sui suoi principi
+fondamentali.
+
+Successivamente, vengono approfonditi i \hyperref[chap:math]{fondamenti matematici e geometrici} alla base del problema diretto.
+
+Nel capitolo dedicato alla \hyperref[chap:proj]{descrizione del progetto di tesi}, si analizzano le versioni OpenMP di partenza,
+il processo di parallelizzazione adottato per lo sviluppo della versione CUDA e la verifica della correttezza dei risultati.
+
+Segue la \hyperref[chap:perf]{valutazione delle prestazioni}, in cui la versione CUDA viene confrontata con l'implementazione
+OpenMP iniziale.
+
+Infine, sulla base dei risultati ottenuti, vengono tratte le opportune \hyperref[chap:conc]{conclusioni}.
+
 \end{abstract}
 
 \fancypagestyle{fancy}{\fancyfoot[C]{\thepage}}
@@ -230,50 +245,51 @@ Introdotta nel 1972, la tomografia computerizzata a raggi X (TC) è una tecnica 
 interne di un corpo in modo non invasivo, ampiamente utilizzata per individuare eventuali anomalie nei volumi corporei esaminati.
 In ambito medico è diventata uno strumento essenziale per lo studio di molteplici condizioni cliniche.
 
-Ancora presente, ma in disuso, è l'acronimo TAC, che sta per tomografia ``assiale'' computerizzata, ad indicare che l'esame
-inizialmente era condotto lungo un solo asse, con sezioni perpendicolari alla lunghezza del corpo.
-Oggi esistono macchinari più moderni e la tomografia computerizzata non è più solo assiale, le immagini sono acquisite con una
-tecnica spirale che permette di ottenere immagini tridimensionali.
-Il termine TAC è ora ritenuto improprio e obsoleto.
+L'acronimo TAC (tomografia ``assiale'' computerizzata) indica che l'esame veniva condotto lungo un solo asse, con sezioni
+perpendicolari alla lunghezza del corpo.
+Oggi esistono macchinari più moderni e la tomografia computerizzata non non è più limitata alla modalità assiale, le immagini sono
+acquisite con una tecnica a spirale che consente di ottenere immagini tridimensionali.
+Il termine TAC è ormai considerato improprio e obsoleto.
 
-La TC è frequentemente paragonata alla radiografia tradizionale.
-Entrambe, sono tecniche di imaging basate sui raggi X, ma hanno differenze fondamentali in termini di acquisizione delle immagini,
+La TC viene spesso paragonata alla radiografia tradizionale.
+Entrambe sono tecniche di imaging basate sui raggi X, ma hanno differenze fondamentali in termini di acquisizione delle immagini,
 qualità e applicazioni.
-La radiografia è una tecnica rapida ed economica che fornisce immagini bidimensionali con sovrapposizione delle strutture e di
-conseguenza minore dettaglio.
-Espone l'oggetto ad una bassa dose di radiazioni ed è ideale per lo studio di strutture ad alto contrasto.
+La radiografia è una tecnica rapida ed economica che fornisce immagini bidimensionali con sovrapposizione delle strutture e, di
+conseguenza, minore dettaglio.
+Essa espone l'oggetto a una bassa dose di radiazioni ed è ideale per lo studio di strutture ad alto contrasto.
 La TC, invece, utilizza varie scansioni da diverse angolazioni per generare immagini dettagliate in sezioni assiali (2D) o volumi
-(3D), permettendo una migliore visualizzazione dell'oggetto, ma ad un costo più elevato ed un'esposizione maggiore alle radiazioni
-rispetto alla radiografia.
+(3D), permettendo una visualizzazione migliore dell'oggetto, ma a un costo più elevato e con una maggiore esposizione alle
+radiazioni rispetto alla radiografia.
 
-Segue una breve introduzione alla TC, per approfondimenti si rimanda a \cite{Faggioni2011} e \cite{MoroLoli2021}.
+Segue una breve introduzione alla TC; per ulteriori approfondimenti, si rimanda a \cite{Faggioni2011} e \cite{MoroLoli2021}.
 
 \section{Cenni storici}
 
-Gli studi dell'imaging medico cominciano dopo la scoperta dei raggi X da parte di Wilhelm Röntge, nel 1895.
-Non appena gli scienziati si resero conto delle capacità dei raggi X di attraversare gli oggetti, le immagini 2D (radiografie)
-sono state largamente usate per investigare i volumi interni del corpo umano.
-Comunque, queste immagini rappresentano solo una vista delle informazioni del volume scannerizzato, rappresentato su un piano.
-La teoria matematica pubblicata da Johann Radon nel 1917, gli studi del fisico tedesco Grossmann, insieme al desiderio di superare
-il processo della radiografia a raggi X, hanno portato allo sviluppo della tomografia come nuovo strumento per ispezionare gli
-oggetti.
+Gli studi sull'imaging medico ebbero inizio dopo la scoperta dei raggi X da parte di Wilhelm Röntge, nel 1895.
+Non appena gli scienziati compresero la capacità dei raggi X di attraversare gli oggetti, le immagini 2D (radiografie) furono
+ampiamente utilizzate per studiare i volumi interni del corpo umano.
+Tuttavia, queste immagini forniscono solo una rappresentazione bidimensionale del volume acquisito.
+La teoria matematica di Johann Radon e gli studi del fisico tedesco Grossmann, uniti al desiderio di superare i limiti della
+radiografia a raggi X, portarono allo sviluppo della tomografia come nuovo strumento di analisi degli oggetti.
+In particolare, gli studi del matematico austriaco Johann Radon del 1917 dimostrarono teoricamente la possibilità di ricostruire
+un oggetto tridimensionale a partire da un numero infinito di proiezioni bidimensionali dello stesso.
+L'adattamento di queste teorie all'uso di un numero finito di proiezioni ha reso concreta l'applicazione della TC.
 
-Dall'avvento dei computer, attorno al 1970, la TC ha rivoluzionato l'imaging diagnostico, permettendo di ricostruire
-l'orientamento tridimensionale dell'anatomia di un oggetto.
+Con l'avvento dei computer, intorno al 1970, la TC ha rivoluzionato l'imaging diagnostico, permettendo di ricostruire
+l'anatomia tridimensionale di un oggetto.
 La transizione dell'imaging medico da semplice curiosità sperimentale a vera e propria applicazione clinica è stata resa
 possibile, in gran parte, dal lavoro dell'ingegnere inglese Godfrey Hounsfield.
 
 Nell'ottobre del 1971, con l'aiuto di un prototipo di tomografo, nel reparto radiologico dell'Atkinson Morley Hospital di Londra,
-fu prodotta la prima immagine di un encefalo, dalla quale risultava chiaramente la presenza di una lesione tumorale nel lobo
-frontale.
+venne prodotta la prima immagine di un encefalo, che mostrava chiaramente una lesione tumorale nel lobo frontale.
 Questo tomografo permetteva movimenti di traslazione e rotazione del complesso tubo radiogeno-detettore e produceva un'immagine su
 una matrice di \(80 \times 80\) con una risoluzione spaziale di 0,5 cm, richiedendo per l'acquisizione e la ricostruzione di
 ciascuna fetta, rispettivamente, 4 e 7 minuti.
 
-Nel 1972 furono sottoposti a esame tomografico ben 70 pazienti e i risultati furono presentati al congresso annuale del British
+Nel 1972, 70 pazienti furono sottoposti a esame tomografico e i risultati furono presentati al congresso annuale del British
 Institute of Radiology di Londra.
-Nello stesso anno, i risultati ottenuti furono pubblicati su un articolo del London Times e l'entusiasmo per questa nuova tecnica
-diagnostica crebbe notevolmente.
+Nello stesso anno, essi vennero pubblicati in un articolo del London Times, suscitando grande entusiasmo per questa nuova tecnica
+diagnostica.
 
 \begin{figure}[H]
   \centering
@@ -282,8 +298,8 @@ diagnostica crebbe notevolmente.
            Sulla destra si vede il computer usato per processare i dati raccolti dal tomografo.}
 \end{figure}
 
-Nella \autoref{fig:history_mark_1} è rappresentato l'EMI Mark 1, il primo tomografo computerizzato commerciale prodotto dalla EMI
-nel 1973 per lo studio del cranio.
+La \autoref{fig:history_mark_1} mostra l'EMI Mark 1, il primo tomografo computerizzato commerciale prodotto dalla EMI nel 1973
+per lo studio del cranio.
 
 Oggi, grazie ai continui avanzamenti tecnologici e all'innovazione nelle metodologie, la TC è sempre più diffusa e impiegata in
 svariati ambiti, dalla diagnostica medica alla ricerca scientifica, fino alle applicazioni industriali e archeologiche.
@@ -298,25 +314,25 @@ la qualità delle immagini diagnostiche e la velocità di acquisizione dei dati.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.8\textwidth]{tecniche-di-scansione}
+  \includegraphics[width=0.7\textwidth]{tecniche-di-scansione}
   \caption{\label{fig:history_tecnologies} Schizzi di dispositivi tomografici, dalla tecnologia primordiale
            con scansioni parallele a raggi X (in alto a sinistra) alle soluzioni più moderne che utilizzano fasci a ventaglio per
            la TC 2D (in alto a destra) e fasci conici per la TC 3D (in basso). \cite{MoroLoli2021}}
 \end{figure}
 
 Si osservi la \autoref{fig:history_tecnologies}.
-La prima generazione di scanner per la TC, sviluppata attorno al 1970, utilizzava un fascio di raggi X paralleli con movimenti
+La prima generazione di scanner per la TC, sviluppata intorno al 1970, utilizzava un fascio di raggi X paralleli con movimenti
 alternati di traslazione e rotazione.
 Questo approccio, sebbene pionieristico, richiedeva tempi di scansione prolungati, rendendo possibile l'analisi solo di organi
 statici come l'encefalo.
-Successivamente, la seconda generazione di scanner produceva fasci di raggi a ventaglio, migliorando l'efficienza della
+Successivamente, la seconda generazione di scanner introdusse fasci di raggi a ventaglio, migliorando l'efficienza della
 scansione e riducendo i tempi necessari per acquisire le immagini.
-Come ulteriore evoluzione, la terza generazione ha portato all'adozione di un fascio di raggi a forma di cono per acquisire
-immagini tridimensionali in una singola rotazione attorno al paziente, offrendo dettagli ad alta risoluzione con un'esposizione
-inferiore alle radiazioni rispetto alle generazioni precedenti.
+Come ulteriore evoluzione, la terza generazione adottò un fascio di raggi a forma di cono per acquisire immagini tridimensionali
+in una singola rotazione attorno al paziente, offrendo dettagli ad alta risoluzione con un'esposizione inferiore alle radiazioni
+rispetto alle generazioni precedenti.
 
-In questa tesi verrà simulata una tecnologia di proiezione paragonabile a quella di fasci conici, per produrre cioè scansioni 2D
-del corpo analizzato.
+In questa tesi verrà simulata una tecnologia di proiezione per la TC 3D, simile a quella a fasci conici, con l'obiettivo di
+generare scansioni 2D del corpo analizzato.
 
 \section{Il processo}
 
@@ -325,7 +341,7 @@ oggetto in esame, ottenute da varie angolazioni diverse, seguendo una specifica 
 Durante questo processo, un fascio di raggi X attraversa l'oggetto, e i dati raccolti dai rivelatori vengono elaborati da un
 software per ricostruire un'immagine dettagliata tridimensionale della sua struttura interna.
 
-Dal punto di vista matematico, si parla di:
+Dal punto di vista matematico, nella TC 3D si parla di:
 \begin{itemize}
   \item Problema diretto: partendo dall'oggetto 3D si calcolano le proiezioni 2D ottenendo il sinogramma, cioè l'insieme di tutte
         le proiezioni.
@@ -341,20 +357,20 @@ Siddon \cite{Siddon1984}, utilizzato per simulare il passaggio dei raggi X attra
 \chapter{Fondamenti matematici e geometrici} \label{chap:math}
 
 Durante una scansione tomografica sono acquisite numerose proiezioni attorno all'oggetto di studio.
-Nel caso più semplice, che noi analizzeremo, la sorgente ed il rilevatore si muovono lungo una traiettoria circolare.
+Nel caso più semplice, che verrà analizzato in questa tesi, la sorgente e il rilevatore si muovono lungo una traiettoria
+circolare.
 Intuitivamente più sono le proiezioni acquisite, più la ricostruzione dell'oggetto sarà accurata.
-D'altra parte, specialmente in ambito medico, ridurre l'esposizione del corpo alle radiazioni è di beneficio per l'individuo
-scansionato.
-Questo implica che il numero di proiezioni generate è esso stesso molto variabile in base all'applicazione.
+D'altra parte, specialmente in ambito medico, ridurre l'esposizione del corpo alle radiazioni è vantaggioso per il paziente.
+Di conseguenza, il numero di proiezioni generate varia sensibilmente a seconda dell'applicazione.
 
-Dal punto di vista fisico, i dati di proiezione riflettono l'assorbimento dei fotoni che costituiscono i raggi X.
-Una proiezione può essere considerata come una matrice i cui valori rappresentano l'attenuazione dei raggi che attraversano il
-corpo oggetto di studio.
+Fisicamente, i dati di proiezione rappresentano l'assorbimento dei fotoni che compongono i raggi X.
+Una proiezione può essere rappresentata come una matrice, in cui ogni valore indica il livello di attenuazione subito dai raggi X
+dopo aver attraversato il corpo oggetto di studio.
 Considerando la matrice proiezione, i valori rappresentano i vari livelli di attenuazione: un raggio che attraversa una regione
-più densa del corpo subisce una maggiore attenuazione rispetto ad un raggio che attraversa una regione meno densa.
+più densa del corpo subisce una maggiore attenuazione rispetto a un raggio che attraversa una regione meno densa.
 
-Nelle sezioni successive verrà illustrato il modello matematico che costituisce la base della computazione, mettendolo in
-relazione diretta con le sue applicazioni nell'algoritmo risolutivo.
+Nelle sezioni successive verrà illustrato il modello matematico alla base del calcolo, evidenziandone il legame con l'algoritmo
+risolutivo.
 Infine, saranno esaminate le considerazioni necessarie per risolvere il problema dal punto di vista geometrico.
 
 \section{Il modello matematico}
@@ -414,14 +430,14 @@ dove:
   \item \(f_j\) è il valore del coefficiente di attenuazione assunto nel volume interno al \(j\)-esimo voxel.
 \end{itemize}
 
-L'indice \(j\), considerando lo spazio cartesiano, è determinato dalle tre coordinate cartesiane, combinate tra di loro in modo da
-individuare un singolo indice.
+L'indice \(j\), nel sistema cartesiano, è determinato dalla combinazione delle tre coordinate cartesiane, in modo da identificare
+un unico indice.
 
-Matematicamente quindi, per il calcolo delle proiezioni, viene considerata un'approssimazione dell'oggetto analizzato, vedi
-\autoref{fig:CT_cube_to_voxels}.
+Quindi dal punto di vista matematico, per il calcolo delle proiezioni, viene considerata un'approssimazione dell'oggetto
+analizzato, vedi \autoref{fig:CT_cube_to_voxels}.
 
-Ritornando all'\autoref{eq:law_lambert-beer_discrete}, si può notare come il numero totale di voxel \(N\) sia, considerando lo
-spazio cartesiano, determinata da \(N_x \times N_y \times N_z\).
+Ritornando all'\autoref{eq:law_lambert-beer_discrete}, si può notare che il numero totale di voxel \(N\), nel caso di uno spazio
+cartesiano, è dato da \(N_x \times N_y \times N_z\).
 
 \begin{figure}[H]
   \centering
@@ -470,15 +486,14 @@ spazio cartesiano, determinata da \(N_x \times N_y \times N_z\).
            dimensione \(d = d_x = d_y = d_z\) fissata in base alle necessità.}
 \end{figure}
 
-Nel caso discreto della trasformata di Radon il numero di proiezioni dipende dal numero di posizioni considerate in cui si
-effettuano le scansioni, tale numero verrà di seguito indicato con \(N_\theta\).
-Ad ogni posizione la sorgente ed il rilevatore sono posti in modo da poter analizzare lo stesso oggetto da più angolazioni
-diverse.
+Nel caso discreto della trasformata di Radon, il numero di proiezioni dipende dal numero di posizioni considerate in cui si
+effettuano le scansioni, indicato di seguito con \(N_\theta\).
+In ciascuna posizione, la sorgente e il rilevatore sono posti in modo da poter analizzare l'oggetto da diverse angolazioni.
 
 \section{Algoritmo risolutivo}
 
-Come già accennato in precedenza, alla base del progetto di tesi sviluppato in questa tesi c'è l'algoritmo di proiezione proposto
-da Siddon \cite{Siddon1984}.
+Come già accennato in precedenza, alla base del progetto di tesi sviluppato si applica l'algoritmo di proiezione proposto da
+Siddon \cite{Siddon1984}.
 
 Considerando quanto già visto nel modello matematico, nel nostro caso l'algoritmo di Siddon si occupa di calcolare la matrice
 \(M\), mentre il vettore \(f\) deve essere già noto in partenza.
@@ -552,20 +567,20 @@ La matrice \(M\) ci permette di identificare, per ogni raggio, la lunghezza del 
     \end{scope}
     \end{tikzpicture}
   }
-  \caption{\label{fig:CT_Siddon_grid_to_planes} Pixel, caso 2D, considerati come rette parallele che rappresentano la
-           struttura dell'oggetto considerato.
-           Nell'algoritmo si parlerà invece di voxel e piani paralleli, caso 3D.
-           Come si può notare alcune intersezioni tra il raggio e i piani non sono valide perché fuori dalla griglia, vedi i
-           punti rossi della figura \textit{b}.}
+  \caption{\label{fig:CT_Siddon_grid_to_planes} Esempio bidimensionale di una griglia di pixel, mostrato in figura
+           \textit{(a)}, che è rappresentata da due insiemi di rette parallele, come illustrato in figura \textit{(b)}.
+           Nell'algoritmo, invece, si considerano voxel come piani paralleli in un contesto tridimensionale.
+           Di conseguenza, le intersezioni tra il raggio e i piani esterni alla griglia, indicate dai punti rossi, non devono
+           essere prese in considerazione.}
 \end{figure}
 
 I punti chiave dell'algoritmo, nella determinazione della matrice \(M\), possono essere così riassunti:
 \begin{itemize}
   \item L'algoritmo considera, invece dei singoli voxel indipendenti, tre insiemi di piani ortogonali ed equidistanti tra loro che
         vanno a costruire la griglia di discretizzazione del corpo nello spazio, vedi \autoref{fig:CT_Siddon_grid_to_planes}.
-  \item Si calcolano i punti di intersezione tra le rette, cioè i raggi, e i piani che definiscono i voxel.
-  \item Si calcola la lunghezza dei segmenti sottesi ai voxel, come la differenza tra punti di intersezione consecutivi,
-        determinando così la matrice \(M\).
+  \item Si calcolano i punti di intersezione tra i raggi e i piani della griglia che delimitano i voxel.
+  \item La lunghezza dei segmenti sottesi ai voxel viene determinata come differenza tra punti di intersezione consecutivi,
+        ottenendo così la matrice \(M\).
 \end{itemize}
 
 \subsection{Il vettore \texorpdfstring{\(f\)}{f}} \label{subsec:vector_f}
@@ -574,24 +589,23 @@ Il vettore \(f\) riassume ciò che sappiamo dell'oggetto da scansionare.
 In particolare esso rappresenta il coefficiente di attenuazione assunto nella regione interna al volume occupato da ciascun voxel.
 % Presenta dunque un numero di elementi pari al numero di voxel in cui è suddiviso l'oggetto.
 
-I coefficienti di attenuazione nel progetto di tesi sviluppato sono: 1 per una regione ``molto densa'', approssimando sempre uno
-stesso tipo di materiale, 0 per una ``poco densa'', approssimando l'aria.
+Nel progetto di tesi sviluppato, i coefficienti di attenuazione adottati sono: 1 per una regione ``molto densa'', approssimando un
+unico tipo di materiale, e 0 per una regione ``poco densa'', approssimando l'aria.
 
 I tre oggetti considerati sono:
 \begin{itemize}
   \item \textbf{Cubo}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi di \(f\) all'interno
-        della regione cubica sono posti ad 1, altrimenti a 0.
+        della regione cubica sono posti a 1, altrimenti a 0.
   \item \textbf{Cubo con cavità sferica}: stabilita la lunghezza del lato del cubo che si intende rappresentare, gli elementi
-        di \(f\) all'interno della regione cubica, ad eccezione di quelli la cui distanza da un punto stabilito all'interno
-        dell'oggetto sia inferiore ad un raggio stabilito, sono posti ad 1, altrimenti a 0.
+        di \(f\) all'interno della regione cubica, a eccezione di quelli la cui distanza da un punto stabilito all'interno
+        dell'oggetto sia inferiore a un raggio stabilito, sono posti a 1, altrimenti a 0.
   \item \textbf{Semisfera}: stabilita la lunghezza del raggio della semisfera che si intende rappresentare, gli elementi di
-        \(f\) all'interno della regione semisferica sono posti ad 1, altrimenti a 0.
+        \(f\) all'interno della regione semisferica sono posti a 1, altrimenti a 0.
 \end{itemize}
 
 \section{Considerazioni geometriche}
 
-Di seguito si approfondiscono i riferimenti geometrici necessari per poter procedere con l'implementazione dell'algoritmo di
-Siddon.
+Di seguito vengono approfonditi i riferimenti geometrici necessari per l'implementazione dell'algoritmo di Siddon.
 
 \subsection{Posizionamento di sorgente, oggetto e rilevatore nello spazio}
 
@@ -645,22 +659,22 @@ Siddon.
 
     \end{tikzpicture}
   }
-  \caption{\label{fig:CT_reference_plane} Esempio che rappresenta l'oggetto cubico già visto in \autoref{fig:CT_cube_to_voxels}
-           nel sistema di riferimento cartesiano considerato nelle discussioni seguenti.}
+  \caption{\label{fig:CT_reference_plane} Rappresentazione dell'oggetto cubico, già illustrato in \autoref{fig:CT_cube_to_voxels},
+           nel sistema di riferimento cartesiano adottato.}
 \end{figure}
 
-In \autoref{fig:CT_reference_plane} sono rappresentati un oggetto di forma cubica, la sorgente ed il rilevatore, tutti posti
+In \autoref{fig:CT_reference_plane} sono rappresentati un oggetto di forma cubica, la sorgente e il rilevatore, tutti posti
 in uno specifico sistema cartesiano in cui il centro dell'oggetto corrisponde con l'origine degli assi.
 
 La sorgente dei raggi e i pixel del rilevatore, verso cui sono diretti, ruotano lungo un'orbita circolare per scansionare il corpo
 da diverse angolazioni.
 
-Quando la sorgente ruota in un senso, orario o antiorario, fino a specifiche posizioni nell'orbita, il rilevatore ruota
-coerentemente, quindi dello stesso angolo, nel senso opposto.
+Quando la sorgente ruota in un senso, orario o antiorario, di un certo angolo nell'orbita, il rilevatore ruota coerentemente,
+quindi dello stesso angolo, nel senso opposto.
 
 \subsection{Le sorgenti} \label{subsec:sources}
 
-La sorgente è approssimata ad un punto, che indica la posizione a partire dalla quale sono diretti i raggi.
+La sorgente è approssimata a un punto, che indica la posizione a partire dalla quale sono diretti i raggi.
 Le posizioni considerate sono più di una e, nell'implementazione trattata, sono distribuite lungo una traiettoria circolare
 (o una sezione di essa) intorno all'oggetto.
 Occorre stabilire le coordinate cartesiane dei punti che rappresentano le sorgenti nello spazio.
@@ -749,26 +763,27 @@ Inoltre, \(Z_i\) è posta a \(0\) in quanto, per costruzione, la traiettoria del
 
 \subsection{L'oggetto}
 
-Un oggetto è approssimato da un certo numero di voxel, cioè parallelepipedi retti con dimensioni uniformi l'uno con l'altro.
-Le griglie che questi creano, dall'algoritmo di Siddon, sono rappresentate da un certo numero di piani paralleli tra loro.
+Un oggetto è approssimato da un certo numero di voxel, ovvero parallelepipedi retti con dimensioni uniformi l'uno con l'altro.
+Le griglie generate da questi voxel, secondo l'algoritmo di Siddon, sono rappresentate da un certo numero di piani paralleli tra
+loro.
 
 L'equazione cartesiana di un piano nello spazio è un'equazione di primo grado in tre incognite:
 \begin{equation*}
   ax + by + cz + d = 0 \quad \text{con } a, b, c, d \in \Re
 \end{equation*}
 
-Avendo in mente la \autoref{fig:CT_reference_plane}, i piani coinvolti, oltre che ad essere paralleli tra di loro, sono paralleli
-anche agli assi cartesiani.
-Dunque, le loro equazioni sono nella forma:
+Come mostrato nella \autoref{fig:CT_reference_plane}, i piani coinvolti non solo sono paralleli tra loro, ma sono anche paralleli
+agli assi cartesiani.
+Pertanto, le loro equazioni sono nella forma:
 \begin{align*}
   ax + d &= 0 \quad \text{se parallelo al piano } yz \\
   by + d &= 0 \quad \text{se parallelo al piano } xz \\
   cz + d &= 0 \quad \text{se parallelo al piano } xy
 \end{align*}
 
-Dato che le distanze tra i piani paralleli sono uniformi, avendo l'equazione di un piano è possibile determinare l'equazione degli
-altri traslando più volte.
-L'equazione degli altri piani a partire dal primo si determina nel seguente modo:
+Poiché le distanze tra i piani paralleli sono uniformi, una volta determinata l'equazione di un piano, è possibile determinare
+l'equazione degli altri traslando più volte.
+L'equazione di ciascun piano successivo si ottiene a partire da quella del primo, utilizzando le seguenti formule:
 \begin{align*}
   X_{plane}(i) &= X_{plane}(1) + (i - 1) d_x \quad \forall i \in 1, \dots, N_x \\
   Y_{plane}(j) &= Y_{plane}(1) + (j - 1) d_y \quad \forall j \in 1, \dots, N_y \\
@@ -780,23 +795,23 @@ sono a loro volta le dimensioni di un singolo voxel lungo i tre assi cartesiani.
 
 \subsection{I rilevatori} \label{subsec:pixels}
 
-Nel caso tridimensionale, il rilevatore può essere visto come una matrice di unità di misura, ossia i pixel, posizionata a una
-distanza \(d_r\) dal centro del corpo in esame.
+Nel caso tridimensionale, il rilevatore può essere rappresentato come una matrice di unità di misurazione (pixel), posizionata a
+una distanza \(d_r\) dal centro del corpo in esame.
 
 L'approccio usato per relazionare i raggi con il rilevatore è detto \textit{ray-driven}.
 Per ciascun unità del rilevatore si considera l'esistenza di un unico raggio passante, diretto dalla sorgente al centro del
 pixel stesso.
-Secondo questo approccio, il numero \(N_p\) di raggi usati per il calcolo della proiezione coincide con il numero di pixel del
-rilevatore.
+Secondo questo approccio, il numero \(N_p\) di raggi utilizzati per il calcolo della proiezione corrisponde al numero di pixel
+del rilevatore.
 
 Il rilevatore è sempre ortogonale all'asse che congiunge la sorgente con il centro del corpo.
 
 Le coordinate cartesiane del centro di un'unità del rilevatore, al variare dell'angolo considerato, sono \((X', Y', Z')\),
 derivate dalla posizione \((X, Y, Z)\), ricoperta nel caso in cui il rilevatore sia ortogonale all'asse \(y\).
 
-Considerando il semiasse negativo di \(y\) come asse polare, anche questa volta con angolo positivo in senso orario, le
-coordinate polari del punto sono:
-\begin{equation*} % \label{eq:goniometric_detector_polar}
+Considerando il semiasse negativo di \(y\) come asse polare e mantenendo il senso orario per gli angoli positivi, le coordinate
+polari del punto risultano:
+\begin{equation*}
   (d_r, \delta)
 \end{equation*}
 dove \(\delta\) è l'angolo che identifica l'unità del rilevatore.
@@ -815,10 +830,10 @@ Le coordinate di tale posizione traslata sono date da:
   \end{cases}
 \end{equation}
 dove, in modo analogo all'\autoref{eq:gonometric_source_coordinates}, sono state applicate le formule degli archi associati per
-seno e coseno per passare dal sistema con misurazione in senso orario a partire dal semi asse negativo delle \(y\) al sistema
-tradizionale con misurazione in senso antiorario a partire dal semi asse positivo delle \(x\).
+seno e coseno per passare dal sistema con misurazione in senso orario a partire dal semiasse negativo delle \(y\) al sistema
+tradizionale con misurazione in senso antiorario a partire dal semiasse positivo delle \(x\).
 In questo caso \(Z\) è costante, \(Z' = Z\), in quanto, per costruzione, la traiettoria trasla sul piano \(xy\), senza influire
-sulla coordinata nell'asse \(z\), quindi verrà omessa nella discussione seguente.
+sulla coordinata nell'asse \(z\), di conseguenza è omessa in questa discussione.
 
 A partire dall'\autoref{eq:goniometric_detector_coordinates}, applicando le formule di addizione degli archi per seno e coseno si
 ottiene:
@@ -880,7 +895,7 @@ ottiene:
            il rilevatore ha un numero di pixel per lato dispari.}
 \end{figure}
 
-Osservando la \autoref{fig:CT_polar_coordinates}, dalle formule trigonometriche per i triangoli rettangoli:
+Osservando la \autoref{fig:CT_polar_coordinates}, dalle formule trigonometriche per i triangoli rettangoli risulta:
 \begin{align*}
   d_r = -\frac{X}{\sin(\delta)} = -\frac{Y}{\cos(\delta)}
 \end{align*}
@@ -893,10 +908,11 @@ sostituendo \(d_r\) e sfruttando le formule degli archi associati per seno e cos
   \end{cases}
 \end{equation*}
 
-Analogamente a quanto avviene con la sorgente, la posizione di una unità del rilevatore varia, ad intervalli regolari, di
+Analogamente a quanto avviene con la sorgente, la posizione di una unità del rilevatore varia, a intervalli regolari, di
 un angolo \(\alpha\) su di una sezione di ampiezza regolare pari a \(\theta\).
 Quindi, ricordando l'\autoref{eq:goniometric_source_polar}, si considera \(-\lambda = -\theta/2 + \alpha i\).
-Le posizioni di un'unità del rilevatore possono dunque essere ottenute, a partire dalla posizione precedente, con:
+Le nuove posizioni di un'unità del rilevatore possono essere determinate a partire dalla posizione precedente utilizzando le
+seguenti equazioni:
 \begin{equation*}
   \begin{cases}
     X'_i = \cos(-\theta/2 + \alpha i) X + \sin(-\theta/2 + \alpha i) Y \\
@@ -906,9 +922,9 @@ Le posizioni di un'unità del rilevatore possono dunque essere ottenute, a parti
 
 \subsection{I raggi}
 
-Un raggio, approssimazione di radiazioni elettromagnetiche, è considerato come un segmento che, nell'implementazione usata,
-collega la sorgente con il centro di un pixel del rilevatore (approccio ray-driven).
-Può essere rappresentato mediante l'equazione parametrica di una retta passante per due punti \(Source = (X_1, Y_1, Z_1)\) e
+Un raggio, che rappresenta un'approssimazione delle radiazioni elettromagnetiche, è trattato come un segmento che collega la
+sorgente al centro di un pixel del rilevatore, secondo l'approccio ray-driven.
+Esso può essere descritto mediante l'equazione parametrica di una retta passante per due punti \(Source = (X_1, Y_1, Z_1)\) e
 \(Detector = (X_2, Y_2, Z_2)\):
 \begin{align*}
   X(a) &= X_1 + a (X_2 - X_1) \\
@@ -1002,22 +1018,23 @@ Può essere rappresentato mediante l'equazione parametrica di una retta passante
   \caption{\label{fig:CT_Siddon_ranges} Le quantità \(a_{min}\) e \(a_{max}\) sono quelle che definiscono gli intervalli da
            considerare per ottenere solo le intersezioni con piani effettivamente all'interno della griglia di pixel (voxel nel
            caso 3D).
-           Si può notare che \(a_{min}\) nelle figure \textit{a} e \textit{c} sarà maggiore di 0, così come \(a_{max}\) nelle
-           figure \textit{a} e \textit{b} sarà minore di 1.
+           Si può notare che \(a_{min}\) nelle figure \textit{(a)} e \textit{(c)} sarà maggiore di 0, così come \(a_{max}\) nelle
+           figure \textit{(a)} e \textit{(b)} sarà minore di 1.
            Questo permette di non considerare le intersezioni in eccesso, esterne alla griglia di partenza, risolvendo il
            problema esposto nella \autoref{fig:CT_Siddon_grid_to_planes}.}
 \end{figure}
 
 In questo modo:
 \begin{itemize}
-  \item Per definire un raggio basta conoscere il punto ``sorgente'' ed il punto sul ``rilevatore'' dove avviene la misurazione.
-  \item È possibile rappresentare un punto appartenente alla retta del raggio attraverso un unico parametro \(a\), in particolare
-        \(a = 0\) coincide con il punto \(Source\), \(a = 1\) coincide con il punto \(Detector\), per i valori di \(a\) compresi
-        tra \([0, 1]\) si hanno punti interni al segmento, vedi \autoref{fig:CT_Siddon_ranges}.
+  \item Per definire un raggio è sufficiente conoscere il punto di origine (\(Source\)) e il punto sul rilevatore (\(Detector\))
+        in cui avviene la misurazione.
+  \item È possibile rappresentare un punto appartenente alla retta del raggio tramite un unico parametro \(a\), in cui
+        \(a = 0\) coincide con il punto \(Source\), \(a = 1\) al punto \(Detector\), e per i valori di \(a\) compresi
+        nell'intervallo \([0, 1]\) si ottengono punti interni al segmento, come mostrato nella \autoref{fig:CT_Siddon_ranges}.
 \end{itemize}
 
-Il punto di intersezione di un raggio ed un piano si ottiene risolvendo in \(a\) il sistema lineare dato dall'equazione del
-piano e una componente della retta come di seguito:
+Il punto di intersezione tra un raggio e un piano si ottiene determinando il valore di \(a\) che soddisfa il sistema lineare dato
+dall'equazione del piano e da una delle equazioni parametriche della retta, come mostrato di seguito:
 \begin{equation}
   \begin{aligned}
     &\begin{cases}
@@ -1040,13 +1057,13 @@ dove sono stati indicati i sistemi utilizzati nel caso in cui il piano sia paral
 
 \chapter{Descrizione del progetto} \label{chap:proj}
 
-Il progetto di tesi include diverse implementazioni scritte in C, tra cui un programma per la generazione dei file di input, uno
-per il calcolo della proiezione basato sull'algoritmo di Siddon con OpenMP ed una versione sviluppata con CUDA.
+Il progetto di tesi \cite{CudaRepo2025} include diverse implementazioni scritte in linguaggio C, tra cui un programma per la
+generazione dei file di input, uno per il calcolo delle proiezioni basato sull'algoritmo di Siddon \cite{Siddon1984} con OpenMP e
+una versione sviluppata con CUDA.
+Mentre le prime due derivano da una rielaborazione del lavoro di \cite{Colletta2024}, l'implementazione CUDA rappresenta il fulcro
+di questo progetto.
 
-Le prime due soluzioni sono state ottenute rielaborando il lavoro di \cite{Colletta2024}, mentre l'implementazione CUDA
-costituisce il fulcro di questo progetto.
-
-Di seguito verrà riportata una breve introduzione alle tecniche di parallelizzazione utilizzate, a cui seguirà la descrizione
+Di seguito verrà riportata una breve introduzione alle tecniche di parallelizzazione adottate, seguita dalla descrizione
 delle implementazioni sviluppate.
 
 \section{Parallelizzazione}
@@ -1056,7 +1073,7 @@ applicativo, delle caratteristiche hardware e degli obiettivi di prestazione.
 In generale, l'ottimizzazione può riguardare la riduzione della complessità computazionale, una migliore gestione della memoria,
 l'uso di strutture dati efficienti o l'impiego di tecniche avanzate per minimizzare i tempi di esecuzione.
 
-Tuttavia, quando si passa ad implementazioni ottimizzate per architetture specifiche come CPU e GPU, emergono strategie di
+Tuttavia, quando si passa a implementazioni ottimizzate per architetture specifiche come CPU e GPU, emergono strategie di
 ottimizzazione mirate, che sfruttano le peculiarità di ciascun tipo di hardware.
 
 Nel seguito, ci concentreremo sulle tecniche di parallelizzazione adottate nelle implementazioni su CPU e GPU selezionate,
@@ -1066,7 +1083,7 @@ analizzando le metodologie impiegate per massimizzare le prestazioni in ciascun 
 
 La CPU (Central Processing Unit) è il componente principale di un computer responsabile dell'esecuzione delle istruzioni di un
 programma.
-Essa rappresenta l'unità di controllo ed elaborazione principale, in quanto gestisce i calcoli, l'elaborazione dei dati ed il
+Essa rappresenta l'unità di controllo ed elaborazione principale, in quanto gestisce i calcoli, l'elaborazione dei dati e il
 controllo delle operazioni.
 
 Le CPU moderne, per motivi principalmente legati al risparmio energetico, dispongono di più core e supportano il multi-threading,
@@ -1074,8 +1091,8 @@ consentendo l'esecuzione parallela di più attività.
 
 \subsubsection{OpenMP}
 
-OpenMP (Open Multi-Processing) è un'API (Application
-Programming Interface) che supporta la programmazione parallela su architetture multi core con memoria condivisa.
+OpenMP (Open Multi-Processing) è un'API (Application Programming Interface) che supporta la programmazione parallela su
+architetture multicore a memoria condivisa.
 Fornisce un insieme di direttive per il compilatore, librerie runtime e variabili d'ambiente che permettono di scrivere programmi
 paralleli.
 In questo progetto è stato utilizzato il linguaggio C.
@@ -1085,11 +1102,11 @@ OpenMP rientra nella categoria \textbf{MIMD} (Multiple Instruction, Multiple Dat
 
 Le caratteristiche principali di OpenMP sono:
 \begin{itemize}
-  \item Parallelismo a memoria condivisa: I processi condividono lo stesso spazio di indirizzamento.
-  \item Programmazione basata su direttive: Le sezioni di codice parallelo sono specificate tramite pragma.
-  \item Scalabilità: Adatta il numero di processi in base al numero di core disponibili.
-  \item Facilità di utilizzo: Non richiede riscrittura completa del codice, ma solo l'aggiunta di annotazioni.
-  \item Sincronizzazione e gestione del carico: Include meccanismi per bilanciare il carico tra i processi ed evitare race
+  \item Parallelismo a memoria condivisa: i processi condividono lo stesso spazio di indirizzamento.
+  \item Programmazione basata su direttive: le sezioni di codice parallelo sono specificate tramite direttive \lstinline|#pragma|.
+  \item Scalabilità: adatta il numero di processi in base al numero di core disponibili.
+  \item Facilità di utilizzo: non richiede riscrittura completa del codice, ma solo l'aggiunta di annotazioni.
+  \item Sincronizzazione e gestione del carico: include meccanismi per bilanciare il carico tra i processi ed evitare race
         conditions.
 \end{itemize}
 
@@ -1099,17 +1116,17 @@ La GPU (Graphics Processing Unit) è un processore specializzato progettato per 
 dati.
 Come si può intuire dal nome è stata originariamente sviluppata per il rendering grafico.
 Conseguentemente alla domanda del mercato, la GPU si è oggi ampiamente evoluta in un processore generale, che quindi può svolgere
-molti diversi tipi di carichi di lavoro al di là del solo rendering grafico.
+diverse tipologie di carichi di lavoro al di là del solo rendering grafico.
 Utilizzata in settori come intelligenza artificiale, elaborazione di immagini, deep learning e simulazioni scientifiche, grazie
-alla sua capacità di eseguire migliaia di operazioni simultaneamente.
+alla sua capacità di eseguire un elevato numero di operazioni in parallelo.
 Le GPU moderne, sebbene operino in generale a frequenze più basse delle CPU, sono molto più veloci di esse nell'eseguire i compiti
 in cui sono specializzate.
 
 \subsubsection{CUDA}
 
-CUDA (Compute Unified Device Architecture) è una
-piattaforma di calcolo parallelo e un modello di programmazione sviluppato da NVIDIA che consente di sfruttare le GPU NVIDIA per
-l'elaborazione generale, GPGPU (General-Purpose computing on Graphics Processing Units).
+CUDA (Compute Unified Device Architecture) è una piattaforma di calcolo parallelo e un modello di programmazione sviluppato da
+NVIDIA che consente di sfruttare le GPU NVIDIA per l'elaborazione generale, GPGPU (General-Purpose computing on Graphics
+Processing Units).
 In questo progetto è stato utilizzato il linguaggio `CUDA-C' (C con estensioni NVIDIA).
 
 A livello CUDA, per lavorare in modo efficiente, si astrae dal funzionamento hardware, considerando un parallelismo di tipo
@@ -1140,11 +1157,12 @@ all'interno di un singolo Warp.
 
 Le caratteristiche principali di CUDA sono:
 \begin{itemize}
-  \item Parallelismo massivo: Permette di eseguire migliaia di Thread in parallelo sulla GPU. Adatto a risolvere problemi del
+  \item Parallelismo massivo: permette di eseguire migliaia di Thread in parallelo sulla GPU. Adatto a risolvere problemi del
         tipo `Embarrassingly Parallel', quindi in cui la computazione può essere decomposta in task indipendenti, con poche
         divergenze e che richiedono poca comunicazione l'uno con l'altro.
-  \item Memoria gerarchica: Struttura di memoria ottimizzata per alte prestazioni (memoria globale, condivisa, registri).
-  \item Elevata efficienza: Permette di accelerare calcoli scientifici, AI, machine learning, rendering, simulazioni fisiche, ecc.
+  \item Memoria gerarchica: struttura di memoria ottimizzata per alte prestazioni (memoria globale, condivisa, registri).
+  \item Elevata efficienza: permette di accelerare calcoli scientifici, AI, machine learning, rendering, simulazioni fisiche, e
+        molto altro.
 \end{itemize}
 
 \section{Generazione dell'input}
@@ -1155,7 +1173,7 @@ Per generare input di dimensioni opportune alle necessità, quando si esegue il 
 pixel per lato della matrice rilevatore.
 La strategia adottata per la scrittura è descritta di seguito.
 
-\begin{lstlisting}[language=CStyle, caption={Codice C per inizializzazione di \(f\) per un cubo.}, label={lst:vector_f_config}]
+\begin{lstlisting}[language=CStyle, caption={Codice C per l'inizializzazione di \(f\) per un cubo.}, label={lst:vector_f_config}]
 unsigned Nx = N_VOXEL_X, Nz = N_VOXEL_Z, pNy = k;
 // Dove k <= N_VOXEL_Y
 for (unsigned y = 0; y < pNy; y++) {
@@ -1170,12 +1188,12 @@ for (unsigned y = 0; y < pNy; y++) {
 Il \autoref{lst:vector_f_config} mostra l'inizializzazione semplificata di \(f\) per un oggetto cubico denso.
 
 Per comprendere l'indicizzazione è utile considerare che l'elemento nell'array 1D \(f[x + z N_z + y N_x N_z]\), è equivalente a
-quello nella matrice 3D \(\rho[x][z][y]\), in cui \(x\), \(z\) ed \(y\)  sono fissati, rivedi l'\autoref{eq:law_lambert-beer_Siddon}.
+quello nella matrice 3D \(\rho[x][z][y]\), in cui \(x\), \(z\) e \(y\) sono fissati, vedi l'\autoref{eq:law_lambert-beer_Siddon}.
 
 La caratteristica fondamentale di questa soluzione è che l'inizializzazione mostrata, di fatto, ``srotola'' la matrice
 \(\rho\) in un array \(f\), in cui la coordinata \(y\) è indipendente rispetto alle altre.
 In questo senso le \(x\) e poi le \(z\) sono scritte più velocemente rispetto alla \(y\), quindi dipendono da essa.
-In altre parole, la \(y\), nel codice al \autoref{lst:vector_f_config}, è l'unico contatore non annidato, di conseguenza quello
+In altre parole, la \(y\), nel codice del \autoref{lst:vector_f_config}, è l'unico contatore non annidato, di conseguenza quello
 che non dipende dagli altri.
 
 Si osserva però che la specifica mappatura degli elementi scelta non è l'unica possibile, si sarebbero per esempio potute
@@ -1185,9 +1203,9 @@ Il \autoref{lst:vector_f_config} rappresenta in realtà un'iterazione dell'inizi
 Infatti \lstinline{pNy} non è assegnato a \mbox{\lstinline{N_VOXELS_Y},} cioè numero totale di voxel nell'asse \(y\), ma a
 \mbox{\lstinline{k}.}
 Quindi l'array \(f\), limitato nelle dimensioni da \mbox{\lstinline{pNy},} rappresenta una partizione verticale dell'oggetto
-cubico di interesse e non l'oggetto completo così come considerato nel modello matematico, rivedi la
+cubico di interesse e non l'oggetto completo così come considerato nel modello matematico, vedi la
 \autoref{fig:CT_reference_plane}.
-Tale partizione avrà numero di voxel sull'asse \(y\) pari a \mbox{\lstinline{k},} con \mbox{\lstinline{k <= N_VOXELS_Y}.}
+Tale partizione avrà un numero di voxel sull'asse \(y\) pari a \mbox{\lstinline{k},} con \mbox{\lstinline{k <= N_VOXELS_Y}.}
 Nella soluzione proposta oltretutto la singola iterazione, simile a quella presentata, viene parallelizzata sfruttando OpenMP.
 
 Seguendo questo schema, anche la lettura dell'input può essere fatta per partizioni sul numero totale di voxel nell'asse \(y\).
@@ -1217,9 +1235,9 @@ a mente l'\autoref{eq:law_lambert-beer_discrete} da cui siamo partiti. I passi d
         rilevatore con il primo e l'ultimo piano di ogni dimensione, per verificare che il raggio attraversi l'oggetto, in caso
         contrario si ritorna al punto 3;
   \item a questo punto si calcolano i valori parametrici dei piani estremi (il primo e l'ultimo) che devono essere considerati per
-        calcolare il sottoinsieme delle intersezioni con il raggio che risultano dentro la griglia dei voxel, rivedi la
+        calcolare il sottoinsieme delle intersezioni con il raggio che risultano dentro la griglia dei voxel, vedi la
         \autoref{fig:CT_Siddon_grid_to_planes};
-  \item poi si calcolano i valori parametrici delle intersezioni tra il raggio ed i piani considerati;
+  \item poi si calcolano i valori parametrici delle intersezioni tra il raggio e i piani considerati;
   \item si calcola la lunghezza del prossimo segmento sotteso ai voxel (valore di \(M\)), nel caso in cui siano finiti si ritorna
         al punto 3;
   \item ora si calcola l'indice del voxel che sottende il segmento;
@@ -1299,13 +1317,13 @@ I dettagli della funzione \lstinline{getPixel} non sono mostrati, il calcolo è 
 
 Le computazioni seguenti sono eseguite facendo riferimento all'algoritmo di Siddon \cite{Siddon1984}.
 
-Per quanto riguarda l'implementazione di questi passaggi dell'algoritmo, si analizza una scelta specifica adottata seguendo
-fedelmente l'algoritmo di Siddon.
-In particolare, l'attenzione è rivolta all'implementazione in C dei punti 6-9 del processo di calcolo delle proiezioni.
+Per l'implementazione di questi passaggi dell'algoritmo, viene analizzata una specifica scelta effettuata nel rispetto
+dell'algoritmo di Siddon.
+In particolare, l'attenzione è focalizzata sull'implementazione in C dei passaggi 6-9 del processo di calcolo delle proiezioni.
 
 \begin{lstlisting}[language=CStyle, caption={Codice C per il calcolo dell'attenuazione.}, label={lst:attenuation}]
 ... // Si procede con un raggio che interseca l'oggetto
-// Calcolo dei valori parametrici del primo ed ultimo piano validi
+// Calcolo dei valori parametrici del primo e ultimo piano validi
 Ranges indices[3];
 indices[X] = getRangeOfIndex(source.x, pixel.x, isParallel, aMin, aMax, X);
 indices[Y] = getRangeOfIndex(source.y, pixel.y, isParallel, aMin, aMax, Y);
@@ -1335,21 +1353,21 @@ g[pixelIndex] += computeAbsorption(slice, source, pixel, aMerged, lenA, f);
 ...
 \end{lstlisting}
 
-Il \autoref{lst:attenuation} illustra gli ultimi passi del calcolo dell'attenuazione nell'algoritmo descritto in
+Il \autoref{lst:attenuation} mostra gli ultimi passi del calcolo dell'attenuazione nell'algoritmo descritto in
 \cite{Colletta2024}, seguendo fedelmente l'implementazione di Siddon.
 
-I dettagli relativi alle funzioni per il calcolo delle intersezioni e dell'assorbimento non sono mostrati.
+I dettagli relativi alle funzioni per il calcolo delle intersezioni e dell'assorbimento non sono riportati.
 Tuttavia, come verrà discusso in seguito, l'allocazione dei quattro array \lstinline{aX}, \lstinline{aY}, \lstinline{aZ} e
-\lstinline{aMerged} comporta un utilizzo di memoria che può diventare significativo quando allocato simultaneamente da un elevato
-numero di processi paralleli.
+\lstinline{aMerged} comporta un utilizzo di memoria che può diventare significativo quando un elevato numero di processi paralleli
+li alloca simultaneamente.
 
-Senza considerare gli array di appoggio presenti nelle funzioni omesse, un singolo processo richiede comunque
+Anche senza considerare gli array di appoggio presenti nelle funzioni omesse, un singolo processo richiede comunque
 \lstinline{2 * gl_nPlanes[X] * gl_nPlanes[Y] * gl_nPlanes[Z] * sizeof(double)} Byte di memoria.
-Se vengono eseguiti \lstinline{p} processi, l'utilizzo totale diventa di
+Se vengono eseguiti \lstinline{p} processi, l'utilizzo complessivo diventa
 \lstinline{p * 2 * gl_nPlanes[X] * gl_nPlanes[Y] * gl_nPlanes[Z] * sizeof(double)} Byte.
 
-Ciò evidenzia come, al crescere di \lstinline{p}, l'utilizzo di memoria possa aumentare rapidamente, rappresentando un potenziale
-fattore limitante nelle esecuzioni altamente parallele.
+Ciò evidenzia come, all'aumentare di \lstinline{p}, l'utilizzo di memoria cresca rapidamente, rappresentando un potenziale fattore
+limitante nelle esecuzioni altamente parallele.
 
 \subsection{Implementazione OpenMP}
 
@@ -1358,8 +1376,8 @@ L'implementazione per CPU proposta sfrutta il parallelismo OpenMP.
 Il calcolo della soluzione, per motivi legati all'utilizzo di memoria RAM, viene fatto in partizioni, considerando di default un
 numero massimo di \(100\) voxel sull'asse \(y\).
 
-Nella rielaborazione dell'implementazione di partenza \cite{Colletta2024} è stata introdotta la possibilità di specificare il
-numero massimo di voxel quando si lancia il programma da linea di comando, ignorando quindi il valore di default.
+Nella rielaborazione dell'implementazione di partenza è stata introdotta la possibilità di specificare il numero massimo di voxel
+quando si lancia il programma da linea di comando, ignorando quindi il valore di default.
 
 \subsubsection{Parallelizzazione}
 
@@ -1376,7 +1394,8 @@ for (unsigned r = 0; r < nSidePixels; r++) {
 }
 \end{lstlisting}
 
-Il \autoref{lst:omp_D_point} mostra le direttive OpenMP usate per parallelizzare il codice presentato nel \autoref{lst:D_point}.
+Il \autoref{lst:omp_D_point} mostra le direttive OpenMP utilizzate per parallelizzare il codice presentato nel
+\autoref{lst:D_point}.
 Ogni processo OpenMP determina la posizione di un pixel del rilevatore e procede al calcolo dell'attenuazione che si verifica
 quando il raggio attraversa la partizione dell'oggetto in esame.
 La parallelizzazione viene eseguita considerando un carico di lavoro fortemente sbilanciato tra i diversi processi.
@@ -1399,8 +1418,9 @@ in cui:
 \end{itemize}
 
 Nella parallelizzazione con OpenMP, l'allocazione degli array discussa nel \autoref{lst:attenuation} non rappresenta un problema,
-poiché il numero di processi in esecuzione parallela è relativamente limitato.
-Infatti, il numero di core in una CPU è generalmente nell'ordine delle decine, evitando così un utilizzo eccessivo di memoria.
+poiché il numero di processi in esecuzione parallela è relativamente limitato, evitando così un utilizzo eccessivo di memoria.
+Infatti, il numero di core in una CPU è generalmente nell'ordine delle decine, impedendo un'eccessiva allocazione di risorse
+rispetto a scenari con un numero molto maggiore di processi.
 
 \subsection{Implementazione CUDA}
 
@@ -1478,7 +1498,7 @@ La scelta è stata fatta per mantenere la stessa struttura di calcolo all'intern
 
 Si noti che il prefisso \lstinline{async} nella funzione \mbox{\lstinline{asyncComputeProjections},} chiamata dall'host, indica
 che l'esecuzione avviene in modo asincrono.
-Così si permette alla CPU di leggere simultaneamente la prossima partizione dell'input, introducendo un ulteriore livello di
+Così si permette alla CPU di leggere simultaneamente la successiva partizione dell'input, introducendo un ulteriore livello di
 parallelismo tra le operazioni.
 
 Tale meccanismo è reso possibile dalla separazione tra la memoria RAM della CPU e quella della GPU.
@@ -1535,9 +1555,9 @@ __global__ void computeProjections(...)
 Nel \autoref{lst:cuda_kernel} viene mostrato come ogni CUDA Thread determini la posizione di un pixel del rilevatore per procedere
 al calcolo dell'attenuazione che si verifica quando il raggio attraversa la partizione dell'oggetto in esame.
 
-Nel ciclo illustrato, ogni CUDA Thread analizza ciascuna sorgente in riferimento ad uno specifico pixel, che è lo stesso per ogni
+Nel ciclo illustrato, ogni CUDA Thread analizza ciascuna sorgente in riferimento a uno specifico pixel, che è lo stesso per ogni
 iterazione sulle posizioni sorgente-rilevatore considerate.
-Tale pixel è però ricalcolato di volta in volta perché la sua posizione è ogni volta traslata di un angolo \(\alpha\).
+Tuttavia, la posizione del pixel viene ricalcolata a ogni passo, poiché subisce una traslazione di un angolo \(\alpha\).
 
 \begin{lstlisting}[language=CStyle, caption={Codice CUDA-C per effettuare la riduzione nel kernel.}, label={lst:cuda_kernel_reduction}]
 __global__ void computeProjections(...)
@@ -1586,7 +1606,7 @@ __global__ void computeProjections(...)
 Il \autoref{lst:cuda_kernel_reduction} mostra come avvengono le riduzioni, cioè il calcolo del minimo e massimo valore di
 attenuazione.
 In questa implementazione si fa uso della shared memory, cioè memoria condivisa tra tutti i thread di un blocco, per effettuare la
-riduzione in \(O(\log_2 n)\) passi paralleli.
+riduzione in \(O(\log_2 p)\) passi paralleli.
 
 Il principale vantaggio di questa soluzione è la creazione di un unico kernel per ogni partizione dell'input, garantendo così il
 minor numero possibile di esecuzioni.
@@ -1600,7 +1620,7 @@ Questo squilibrio potrebbe penalizzare le prestazioni di CUDA, causando una seri
 modello SIMT su cui si basa l'architettura delle GPU.
 
 Un'ulteriore criticità nella parallelizzazione con CUDA riguarda l'allocazione degli array discussa nel \autoref{lst:attenuation}.
-A differenza della CPU, la GPU esegue migliaia di unità parallele simultaneamente, il che può portare ad un utilizzo di memoria
+A differenza della CPU, la GPU esegue migliaia di unità parallele simultaneamente, il che può portare a un utilizzo di memoria
 significativo.
 Inoltre, per ragioni di efficienza, la dimensione degli array deve essere definita a priori.
 Per questo motivo, è stato scelto un valore massimo di 1000 piani per asse, imponendo così un limite alla dimensione totale
@@ -1678,40 +1698,41 @@ In particolare le immagini riportate, lette da sinistra a destra, corrispondono 
 considerando angoli di -45°, -30°, -15°, 0°, 15°, 30° e 45° in cui come asse polare si intende l'asse \(y\) e il senso orario di
 rotazione delle sorgenti.
 Le proiezioni sono state calcolate considerando come angoli di posizionamento della sorgente rispetto all traiettoria circolare
-\(\theta = 90^\circ\) e \(\alpha = 15^\circ\), rivedi \autoref{fig:CT_polar_coordinates_source}.
+\(\theta = 90^\circ\) e \(\alpha = 15^\circ\), vedi la \autoref{fig:CT_polar_coordinates_source}.
 
 È importante inoltre considerare che, a causa delle differenze nelle architetture hardware di CPU e GPU, unitamente al fatto che
-l'ordine dei l'ordine dei calcoli in virgola mobile eseguiti in OpenMP e CUDA può variare, i risultati ottenuti dalle due versioni
-del programma non saranno esattamente identici.
+l'ordine dei calcoli in virgola mobile eseguiti in OpenMP e CUDA può variare, i valori ottenuti dalle due versioni del
+programma non risultano equivalenti.
 Per verificare la correttezza dei risultati, si possono adottare due approcci:
 \begin{itemize}
-  \item Confrontare direttamente le versioni binarie dei risultati, scrivendo la matrice \(g\) su file.
-        Questo è il metodo più accurato.
-  \item Confrontare le versioni \lstinline{.pgm} dei risultati, dove gg viene mappata da una matrice di valori in virgola mobile a
+  \item Confrontare direttamente le versioni binarie dei risultati, salvando la matrice \(g\) su file.
+        Questo approccio garantisce la massima accuratezza.
+  \item Confrontare i risultati in formato \lstinline{.pgm}, dove \(g\) viene mappata da una matrice di valori in virgola mobile a
         un'altra di valori nell'intervallo 0-255.
-        Questo metodo è meno accurato.
-  \item Confrontare le versioni \lstinline{.png} dei risultati ad occhio.
-        Questo metodo è il meno accurato.
+        Questo metodo offre un'accuratezza inferiore rispetto al precedente.
+  \item Confrontare visivamente i risultati in formato \lstinline{.png}.
+        Questo è il metodo meno preciso.
 \end{itemize}
-Per i risultati generati, oltre alla verifica visiva, cioè il terzo metodo, come conferma è stato utilizzato il secondo metodo.
+Per i risultati generati, oltre alla verifica visiva (cioè il terzo metodo), è stato utilizzato anche il secondo metodo come
+conferma.
 Su Linux, questo confronto può essere effettuato tramite il comando:
 
 \lstinline{compare -metric RMSE PGM1 PGM2 OUTPUT}
 
 dove:
 \begin{itemize}
-  \item \lstinline{PGM1} va rimpiazzato con il percorso del primo file in formato \lstinline{.pgm} da considerare.
-  \item \lstinline{PGM2} va rimpiazzato con il percorso del secondo file in formato \lstinline{.pgm} da considerare.
-  \item \lstinline{OUTPUT} va rimpiazzato con il percorso del file in cui verranno scritte le differenze tra i due file
+  \item \lstinline{PGM1} va sostituito con il percorso del primo file in formato \lstinline{.pgm} da considerare.
+  \item \lstinline{PGM2} va sostituito con il percorso del secondo file in formato \lstinline{.pgm} da considerare.
+  \item \lstinline{OUTPUT} va sostituito con il percorso del file in cui verranno scritte le differenze tra i due file
         considerati.
 \end{itemize}
 
-Si deve inoltre considerare che se la metrica RMSE (Root Mean Square Error) ottenuta è un valore sotto a \(1000\) allora i due
-risultati possono essere considerati molto simili.
+Si deve inoltre considerare che, se la metrica RMSE (Root Mean Square Error) ottenuta è un valore sotto a \(1000\), i due
+risultati possono essere considerati altamente simili.
 
 \chapter{Valutazione delle prestazioni} \label{chap:perf}
 
-Nella valutazione delle prestazioni per l'implementazioni CUDA trattata in questo progetto di tesi, le metriche di analisi
+Nella valutazione delle prestazioni dell'implementazione CUDA trattata in questo progetto di tesi, le metriche di analisi
 considerate sono il tempo di esecuzione, il throughput e lo speedup rispetto alla versione OpenMP.
 
 Si inizierà analizzando la complessità computazionale dell'algoritmo implementato, per poi presentare le statistiche ottenute dai
@@ -1751,12 +1772,12 @@ La GPU impiegata nei test è una \mbox{\lstinline{NVIDIA GeForce GTX 1070},} dot
 Va ricordato che, su una GPU NVIDIA, l'esecuzione parallela dei processi avviene per blocchi, unità di lavoro indipendenti che
 possono essere eseguite in qualsiasi ordine.
 Nei test CUDA condotti, il numero di CUDA Thread per blocco è stato ridotto in modo significativo (da 1024 a 512) a causa
-dell'impiego dei registri nell'implementazione adottata.
-Tuttavia, quando possibile, è preferibile utilizzare il numero massimo di CUDA Thread per blocco disponibile per ottimizzare le
-prestazioni.
+dell'utilizzo dei registri dovuto all'implementazione adottata.
+Tuttavia, quando possibile, è consigliabile utilizzare il numero massimo di CUDA Thread per blocco disponibile al fine di
+ottimizzare le prestazioni.
 
 Gli input considerati sono i file \lstinline|CubeWithSphericalHole{400-1500}.dat|, cioè del tipo: cubo con cavità sferica.
-Il numero di pixel per lato della matrice rilevatore varia da \(400\) a \(1500\) con intervalli di \(100\) pixel tra un input ed
+Il numero di pixel per lato della matrice rilevatore varia da \(400\) a \(1500\) con intervalli di \(100\) pixel tra un input e
 il successivo, per un totale di 12 input diversi.
 
 \begin{table}[H]
@@ -1789,32 +1810,31 @@ il successivo, per un totale di 12 input diversi.
 La \autoref{tab:cuda_it_sizes} mostra quali sono la dimensione del problema.
 La configurazione indica le dimensioni dei parametri dell'input per ogni istanza testata.
 \(N_\theta\) è costante perché identificato dagli angoli fissati \(\theta = 90^\circ\) e \(\alpha = 15^\circ\).
-Il numero di voxel sui vari assi \(N_x\), \(N_y\) e \(N_z\) sono uguali perché viene considerato un oggetto cubico.
+Il numero di voxel sui vari assi \(N_x\), \(N_y\) e \(N_z\) è uguale perché viene considerato un oggetto cubico.
 Tale valore del numero di voxel per asse viene calcolato dal generatore di input in base al numero di pixel per lato del
 rilevatore scelti.
-Il valore di \(N_{pixel}\) viene fissato per ogni configurazione in modo empirico, cioè in base alle prestazioni del calcolatore
-a disposizione, quindi questa configurazione è adatta per lo specifico server utilizzato.
+Il valore \(N_{pixel}\) viene fissato per ogni configurazione in modo empirico, cioè in base alle prestazioni del calcolatore
+a disposizione; pertanto, questa configurazione è specifica per il server utilizzato.
 
 \subsection{Tempo di esecuzione}
 
 Il tempo di esecuzione potrebbe essere semplicemente considerato come il tempo totale impiegato dal programma per completare
 l'elaborazione.
-Tuttavia, questo includerebbe anche i tempi di lettura dell'input e di scrittura dell'output, influenzando significativamente la
+Tuttavia, ciò includerebbe anche i tempi di lettura dell'input e di scrittura dell'output, influenzando significativamente la
 misurazione.
 Per questo motivo, nel seguito verrà considerato il tempo di esecuzione dato da:
 \begin{itemize}
-  \item Allocazione dati: per la CPU semplicemente l'allocazione delle strutture dati e la loro opportuna inizializzazione, per la
-        GPU anche il trasferimento dalla RAM dell'host a quella del device.
-  \item Esecuzione dei calcoli dei valori di attenuazione per ogni chiamata alla funzione OpenMP \lstinline{computeProjections} o
-        a quella CUDA \mbox{\lstinline{asyncComputeProjections}.}
-  \item Deallocazione dati: per la CPU semplicemente la deallocazione delle strutture dati, per la GPU anche il trasferimento
-        dalla RAM del device a quella dell'host.
+  \item Allocazione dati: per la CPU, comprende l'allocazione delle strutture dati e la loro inizializzazione, mentre per la
+        GPU include anche il trasferimento dalla RAM dell'host alla RAM del device.
+  \item Calcolo dei valori di attenuazione: comprende ogni chiamata alla funzione che calcola le proiezioni.
+  \item Deallocazione dati: per la CPU, si riferisce semplicemente alla deallocazione delle strutture dati, per la GPU include
+        anche il trasferimento dalla RAM del device alla RAM dell'host.
 \end{itemize}
-Non verranno considerati:
+Non saranno presi in considerazione:
 \begin{itemize}
-  \item Tempo di lettura da file dell'input, perché le operazioni sono le stesse in entrambe le versioni.
-  \item Tempo di scrittura su file dell'output, perché anche se il risultato delle due versioni è leggermente diverso a causa dei
-        calcoli in virgola mobile, le operazioni eseguite sono le stesse.
+  \item Il tempo di lettura dell'input da file, poiché le operazioni sono identiche in entrambe le versioni.
+  \item Il tempo di scrittura dell'output su file, in quanto, sebbene i risultati delle due versioni possano differire leggermente
+        a causa dei calcoli in virgola mobile, le operazioni eseguite rimangono le stesse.
 \end{itemize}
 
 \begin{figure}[H]
@@ -1919,11 +1939,11 @@ Non verranno considerati:
     %     \addlegendentry{\small{CUDA}}
     %   \end{axis}
     % \end{tikzpicture}
-    % \caption{\label{fig:cuda_wall_clock_time} Tempi di esecuzione di CUDA ed OpenMP a confronto.}
+    % \caption{\label{fig:cuda_wall_clock_time} Tempi di esecuzione di CUDA e OpenMP a confronto.}
 \end{figure}
 
-La \autoref{fig:openmp_cuda_wall_clock_time} mostra i tempi di esecuzione a confronto per OpenMP e CUDA.
-Come si può notare i tempi di esecuzione in CUDA sono fino alle 7 volte inferiori rispetto a quelli in OpenMP.
+La \autoref{fig:openmp_cuda_wall_clock_time} mostra i tempi di esecuzione di OpenMP e CUDA a confronto.
+Come si può osservare, i tempi di esecuzione in CUDA sono fino a 7 volte inferiori rispetto a quelli ottenuti in OpenMP.
 
 \subsection{Throughput}
 
@@ -2033,19 +2053,19 @@ La dimensione dell'input è approssimata con il lavoro svolto dall'algoritmo, ve
     %     \addlegendentry{\small{CUDA}}
     %   \end{axis}
     % \end{tikzpicture}
-    % \caption{\label{fig:cuda_throughput} Throughput di CUDA ed OpenMP a confronto.}
+    % \caption{\label{fig:cuda_throughput} Throughput di CUDA e OpenMP a confronto.}
 \end{figure}
 
 Il throughput è calcolato come \(\frac{Numero\ di\ operazioni}{Tempo\ di\ esecuzione\ (s)}\).
-Per stimare il limite superiore del numero di operazioni al secondo svolte dai programmi sono stati utilizzati i dati riportati
-nella \autoref{tab:cuda_it_sizes}, i risultati sono osservabili nella \autoref{fig:openmp_cuda_throughput}.
-Tale numero di istruzioni è approssimato a miliardi di operazioni per secondo.
-In questo caso, il numero di operazioni al secondo in CUDA arriva fino a 8x rispetto a quello in OpenMP.
+Per stimare il limite superiore del numero di operazioni al secondo eseguite dai programmi sono stati utilizzati i dati riportati
+nella \autoref{tab:cuda_it_sizes}, i risultati sono visibili nella \autoref{fig:openmp_cuda_throughput}.
+Tale numero di operazioni è approssimato a miliardi di operazioni per secondo.
+In questo caso, il numero di operazioni al secondo in CUDA è fino a 8 volte superiore rispetto a quello in OpenMP.
 
 \subsection{Speedup}
 
 Lo speedup di CUDA è inteso come il confronto dei tempi di esecuzione della versione CUDA rispetto a quella OpenMP.
-Indica quanto l'implementazione per GPU è mediamente più veloce rispetto a quella per la CPU, al variare della dimensione
+Indica quanto l'implementazione per la GPU è mediamente più veloce rispetto a quella per la CPU, al variare della dimensione
 dell'input.
 
 \begin{figure}[H]
@@ -2073,50 +2093,49 @@ dell'input.
           };
         \end{axis}
     \end{tikzpicture}
-    \caption{\label{fig:cuda_speedup} Accelerazione di CUDA rispetto ad OpenMP.}
+    \caption{\label{fig:cuda_speedup} Accelerazione di CUDA rispetto a OpenMP.}
 \end{figure}
 
-La \autoref{fig:cuda_speedup} mostra le prestazioni della versione CUDA rispetto a quella OpenMP.
-Per input piccoli, l'accelerazione della versione CUDA è limitata, mentre cresce con la dimensione, stabilizzandosi intorno a 6x,
-con un picco di 7.6x in un caso favorevole.
+La \autoref{fig:cuda_speedup} mostra il confronto delle prestazioni tra la versione CUDA e quella OpenMP.
+Per input di dimensioni ridotte, l'accelerazione della versione CUDA è limitata, mentre aumenta con l'aumentare della dimensione
+dell'input, stabilizzandosi intorno alle 6 volte, con un picco di 7,6 volte in un caso favorevole.
 
-\appendix
-
-\chapter{Conclusioni e sviluppi futuri}
+\chapter{Conclusioni e sviluppi futuri} \label{chap:conc}
 
 In questa tesi è stato affrontato il problema diretto della tomografia computerizzata 3D, con l'obiettivo di sviluppare
-un'implementazione dell'algoritmo di Siddon \cite{Siddon1984} per GPU NVIDIA utilizzando CUDA, partendo da una versione parallela
-per CPU basata su OpenMP \cite{Colletta2024}.
-Il lavoro è stato articolato in diverse fasi, ciascuna delle quali ha contribuito al raggiungimento gli obiettivi prefissati.
+una versione ottimizzata dell'algoritmo di Siddon \cite{Siddon1984} per GPU NVIDIA utilizzando CUDA, partendo da una versione
+parallela per CPU basata su OpenMP \cite{Colletta2024}.
 
-Inizialmente, in una breve \hyperref[chap:intro]{introduzione} sono stati presentati l'evoluzione della tomografia computerizzata
-e i principi fondamentali della tecnica.
+Il lavoro è stato articolato in diverse fasi, ciascuna delle quali ha contribuito al raggiungimento degli obiettivi prefissati.
+
+Nell'\hyperref[chap:intro]{introduzione} sono stati presentati l'evoluzione della tomografia computerizzata e i principi
+fondamentali della tecnica.
 
 Di seguito sono stati presentati i \hyperref[chap:math]{fondamenti matematici e geometrici} alla base della risoluzione del
 problema diretto.
-In particolare, l'equazione di Lambert-Beer è stata esaminata dal punto di vista matematico, evidenziando il ruolo della matrice
-\(M\) e del vettore \(f\) nel processo di proiezione.
+In particolare, l'equazione di Lambert-Beer è stata esaminata matematicamente, evidenziando il ruolo della matrice \(M\) e del
+vettore \(f\) nel processo di proiezione.
 Inoltre, il posizionamento della sorgente, dell'oggetto e del rilevatore ha permesso di definire il sistema di riferimento
 geometrico adottato.
 
-Successivamente, nella \hyperref[chap:proj]{descrizione del progetto di tesi}, sono state illustrate le versioni del generatore di
-input e del proiettore OpenMP utilizzate come punto di partenza.
-Si è quindi discusso il processo di parallelizzazione adottato per lo sviluppo della versione CUDA, mettendo in evidenza i
-vantaggi e le criticità dell'implementazione proposta.
-Infine, è stata descritta la struttura dell'output generato ed il metodo di verifica della correttezza dei risultati ottenuti.
+Successivamente, nel capitolo dedicato alla \hyperref[chap:proj]{descrizione del progetto di tesi}, sono state illustrate le
+versioni del generatore di input e del proiettore OpenMP utilizzate come punto di partenza.
+Si è quindi discusso il processo di parallelizzazione adottato per lo sviluppo della versione CUDA, evidenziando i vantaggi e le
+criticità dell'implementazione proposta.
+Infine, è stata descritta la struttura dell'output generato e il metodo di verifica della correttezza dei risultati ottenuti.
 
 Nella fase di \hyperref[chap:perf]{valutazione delle prestazioni} la versione CUDA è stata confrontata con l'implementazione
-OpenMP iniziale, analizzando i risultati attraverso diverse metriche di performance.
-I test hanno confermato un significativo miglioramento delle prestazioni grazie all'uso della GPU.
+OpenMP iniziale, analizzando i risultati attraverso diverse metriche.
+I test hanno confermato un notevole miglioramento delle prestazioni grazie all'uso della GPU.
 
 In conclusione, questa tesi ha approfondito le tecniche di parallelizzazione di un algoritmo di proiezione tomografica su GPU.
-I risultati ottenuti dimostrano che l'implementazione CUDA sviluppata offre un'efficienza superiore rispetto alla versione OpenMP
-di partenza.
+I risultati ottenuti dimostrano che l'implementazione CUDA sviluppata offre un'efficienza superiore rispetto a quella della
+versione OpenMP di partenza.
 
 Tuttavia, rimangono alcune aree di miglioramento e possibili sviluppi futuri, tra cui:
 \begin{itemize}
-  \item Determinare dinamicamente il numero massimo di piani da trattare sull'asse \(y\), ad esempio mediante un algoritmo
-        euristico, tenendo conto della quantità di memoria RAM disponibile sulla scheda madre, sia per la versione OpenMP che per
+  \item Determinare dinamicamente il numero massimo di piani da trattare sull'asse \(y\), ad esempio tramite un algoritmo
+        euristico, considerando la quantità di memoria RAM disponibile sulla scheda madre, sia per la versione OpenMP che per
         quella CUDA.
   \item Ottimizzare l'utilizzo di memoria nei CUDA Thread nella GPU, valutando alternative all'algoritmo classico di Siddon per
         ridurre la necessità di array di appoggio.
