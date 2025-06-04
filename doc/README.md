@@ -6,8 +6,8 @@ This folder contains the documentation of the project.
 
 ### Report
 
-The `relazione.pdf`, that is also [@EnryMarch10](https://github.com/EnryMarch10) bachelor's thesis, is written in Italian.
-The source code of the report is visible in `relazione.tex`.
+The `tesi.pdf`, that is also [@EnryMarch10](https://github.com/EnryMarch10) bachelor's thesis, is written in Italian.
+The source code of the report is visible in `tesi.tex`.
 
 To compile it on a Linux machine with TeX Live installed execute:
 
